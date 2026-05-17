@@ -25,11 +25,17 @@ Trên VPS thêm SSH key của bạn vào GitHub repo (Deploy keys → Add) nếu
 
 ## 3. Clone repo
 
+aaPanel quy ước mỗi site nằm ở `/www/wwwroot/<domain>/`. Clone thẳng vào folder tên domain để Nginx alias `/uploads/` và webroot trùng nhau, đỡ 1 cấp folder.
+
 ```bash
 cd /www/wwwroot
-git clone git@github.com:cuongdesignnb/ha-thanh-home.git
-cd ha-thanh-home
+# Nếu aaPanel đã tự tạo /www/wwwroot/hathanh.cuongdesign.net (có file index mặc định) thì xoá trước:
+rm -rf hathanh.cuongdesign.net
+git clone https://github.com/cuongdesignnb/ha-thanh-home.git hathanh.cuongdesign.net
+cd hathanh.cuongdesign.net
 ```
+
+> Lưu ý: tất cả lệnh trong các mục bên dưới giả định bạn đang ở `/www/wwwroot/hathanh.cuongdesign.net`.
 
 ## 4. Tạo file env
 
@@ -88,7 +94,7 @@ curl -I http://127.0.0.1:31874/admin  # Admin
 1. aaPanel → **Website → Add Site** → domain `hathanh.cuongdesign.net`, không tạo DB, không PHP.
 2. Vào site → **Config** → mở config Nginx.
 3. Mở file [docs/nginx.aapanel.conf](docs/nginx.aapanel.conf), copy nội dung các block `location` + `client_max_body_size` vào trong `server { ... }`.
-4. Đảm bảo path trong block `/uploads/` trỏ đúng tới repo: `/www/wwwroot/ha-thanh-home/storage/uploads/`.
+4. Đảm bảo path trong block `/uploads/` trỏ đúng tới repo: `/www/wwwroot/hathanh.cuongdesign.net/storage/uploads/`.
 5. Lưu → aaPanel reload Nginx.
 
 ## 7. SSL
@@ -98,7 +104,7 @@ aaPanel → Site → **SSL → Let's Encrypt** → bật **Force HTTPS**.
 ## 8. Cập nhật code lần sau
 
 ```bash
-cd /www/wwwroot/ha-thanh-home
+cd /www/wwwroot/hathanh.cuongdesign.net
 bash scripts/deploy.sh                 # chỉ pull + build + up
 bash scripts/deploy.sh --migrate       # nếu có migration mới
 bash scripts/deploy.sh --seed          # chỉ chạy 1 lần đầu hoặc khi cần reseed
