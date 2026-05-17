@@ -71,6 +71,8 @@ services:
       args:
         NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL:-http://localhost:31873}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:31875/api}
+        ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-}
+        NEXT_PUBLIC_ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-}
     container_name: hathanh-admin
     restart: unless-stopped
     env_file:

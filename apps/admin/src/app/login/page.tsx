@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, CheckCircle2, LockKeyhole, ShieldCheck, X } from "lucide-react";
+import { adminUrl } from "@/lib/client-path";
 
 type LoginToast = {
   tone: "success" | "error";
@@ -37,7 +38,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch((process.env.NEXT_PUBLIC_ADMIN_BASE_PATH ?? "") + "/api/auth/login", {
+      const response = await fetch(adminUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -52,7 +53,7 @@ export default function LoginPage() {
       }
 
       showToast({ tone: "success", title: "Đăng nhập thành công", description: "Đang chuyển vào dashboard." });
-      window.location.href = (process.env.NEXT_PUBLIC_ADMIN_BASE_PATH ?? "") + "/";
+      window.location.href = adminUrl("/");
     } catch (submitError) {
       const detail = submitError instanceof Error ? submitError.message : "Không kết nối được API đăng nhập.";
       setError(detail);

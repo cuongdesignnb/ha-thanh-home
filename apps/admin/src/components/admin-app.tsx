@@ -52,9 +52,9 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { adminApiFetch, adminUrl } from "@/lib/client-path";
 
-const _BP = process.env.NEXT_PUBLIC_ADMIN_BASE_PATH ?? "";
-const apiFetch = (url: string, init?: RequestInit) => fetch(`${_BP}${url}`, init);
+const apiFetch = adminApiFetch;
 
 type User = { email: string; roles: string[] };
 type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "services" | "posts" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings";
@@ -321,7 +321,7 @@ export function AdminApp({ user }: { user: User }) {
 
   async function logout() {
     await apiFetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login";
+    window.location.href = adminUrl("/login");
   }
 
   return (
@@ -571,7 +571,7 @@ function MediaLibrary({ roles }: { roles: string[] }) {
       if (type) params.set("type", type);
       const response = await apiFetch(`/api/cms/media?${params}`);
       if (response.status === 401) {
-        window.location.href = "/login";
+        window.location.href = adminUrl("/login");
         return;
       }
       if (!response.ok) throw new Error(await readApiError(response, "Không tải được Media Library."));
@@ -1984,7 +1984,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       if (status) params.set("status", status);
       const response = await apiFetch(`/api/cms/${entity}?${params}`);
       if (response.status === 401) {
-        window.location.href = "/login";
+        window.location.href = adminUrl("/login");
         return;
       }
       if (!response.ok) throw new Error(await readApiError(response, `Không tải được ${entitySingular[entity]}.`));
@@ -2751,7 +2751,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
       if (type) params.set("type", type);
       const response = await apiFetch(`/api/cms/media?${params}`);
       if (response.status === 401) {
-        window.location.href = "/login";
+        window.location.href = adminUrl("/login");
         return;
       }
       if (!response.ok) throw new Error(await readApiError(response, "Không tải được thư viện ảnh."));
