@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 
@@ -10,6 +11,7 @@ type TemplateGalleryModalProps = {
 
 export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const activeImage = activeIndex === null ? null : images[activeIndex];
 
@@ -42,6 +44,10 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
   }
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (activeIndex === null) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
@@ -69,7 +75,7 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
         ))}
       </div>
 
-      {activeImage && activeIndex !== null && (
+      {activeImage && activeIndex !== null && mounted && createPortal(
         <div aria-modal="true" className="gallery-modal" role="dialog">
           <button aria-label="Đóng album" className="gallery-backdrop" onClick={close} type="button" />
           <div className="gallery-panel">
@@ -97,7 +103,8 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
