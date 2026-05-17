@@ -53,7 +53,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const _BP = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const _BP = process.env.NEXT_PUBLIC_ADMIN_BASE_PATH ?? "";
 const apiFetch = (url: string, init?: RequestInit) => fetch(`${_BP}${url}`, init);
 
 type User = { email: string; roles: string[] };

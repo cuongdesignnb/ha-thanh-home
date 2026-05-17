@@ -62,6 +62,8 @@ services:
         NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+        NEXT_PUBLIC_ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+        NEXT_PUBLIC_ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
     container_name: hathanh-admin
     restart: unless-stopped
     env_file:
