@@ -163,7 +163,7 @@ type MenuSuggestion = {
 };
 
 const contentSchema = z.object({
-  title: z.string().min(2, "Ti�u d? c?n �t nh?t 2 k� t?").optional(),
+  title: z.string().min(2, "Tiêu đề cần ít nhất 2 ký tự").optional(),
   name: z.string().optional(),
   module: z.string().optional(),
   type: z.string().optional(),
@@ -214,91 +214,91 @@ const contentSchema = z.object({
 
 const modules = [
   {
-    group: "T?ng quan",
+    group: "Tổng quan",
     items: [
-      { id: "dashboard", label: "Dashboard", description: "S? li?u v� t�c v? nhanh", icon: LayoutDashboard, roles: ["Super Admin", "Admin", "SEO Editor", "Sales", "Viewer"] },
+      { id: "dashboard", label: "Dashboard", description: "Số liệu và tác vụ nhanh", icon: LayoutDashboard, roles: ["Super Admin", "Admin", "SEO Editor", "Sales", "Viewer"] },
     ],
   },
   {
-    group: "C�ng tr�nh & N?i th?t",
+    group: "Công trình & Nội thất",
     items: [
-      { id: "projects", label: "D? �n", description: "C�ng tr�nh, n?i th?t, showroom", icon: FolderKanban, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "project-categories", label: "Danh m?c d? �n", description: "Tabs v� nh�m d? �n public", icon: List, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "project-filter-options", label: "B? l?c d? �n", description: "Option filter d?ng cho public", icon: Search, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "architecture-designs", label: "M?u ki?n tr�c", description: "Catalog bi?t th?, nh� ph?, nh� c?p 4", icon: Building2, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "interior-designs", label: "M?u n?i th?t", description: "Catalog phong c�ch, lo?i ph�ng, di?n t�ch", icon: Sofa, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "services", label: "D?ch v?", description: "D?ch v? c�ng tr�nh v� n?i th?t", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "estimator", label: "D? to�n c�ng tr�nh", description: "C?u h�nh c�ng th?c v� lu?t t�nh", icon: Calculator, roles: ["Super Admin", "Admin", "Sales", "Viewer"] },
+      { id: "projects", label: "Dự án", description: "Công trình, nội thất, showroom", icon: FolderKanban, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "project-categories", label: "Danh mục dự án", description: "Tabs và nhóm dự án public", icon: List, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "project-filter-options", label: "Bộ lọc dự án", description: "Option filter động cho public", icon: Search, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "architecture-designs", label: "Mẫu kiến trúc", description: "Catalog biệt thự, nhà phố, nhà cấp 4", icon: Building2, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "interior-designs", label: "Mẫu nội thất", description: "Catalog phong cách, loại phòng, diện tích", icon: Sofa, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "services", label: "Dịch vụ", description: "Dịch vụ công trình và nội thất", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "estimator", label: "Dự toán công trình", description: "Cấu hình công thức và lượt tính", icon: Calculator, roles: ["Super Admin", "Admin", "Sales", "Viewer"] },
     ],
   },
   {
-    group: "N?i dung",
+    group: "Nội dung",
     items: [
-      { id: "posts", label: "B�i vi?t SEO", description: "Draft, scheduled, published", icon: Newspaper, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
-      { id: "media", label: "Media Library", description: "?nh WebP v� thu vi?n d�ng l?i", icon: Image, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
-      { id: "ai", label: "AI Content Studio", description: "Outline, meta, b�i vi?t draft", icon: Sparkles, roles: ["Super Admin", "Admin", "SEO Editor"] },
+      { id: "posts", label: "Bài viết SEO", description: "Draft, scheduled, published", icon: Newspaper, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
+      { id: "media", label: "Media Library", description: "Ảnh WebP và thư viện dùng lại", icon: Image, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
+      { id: "ai", label: "AI Content Studio", description: "Outline, meta, bài viết draft", icon: Sparkles, roles: ["Super Admin", "Admin", "SEO Editor"] },
     ],
   },
   {
     group: "Kinh doanh",
     items: [
-      { id: "leads", label: "Lead tu v?n", description: "Ngu?n kh�ch h�ng v� tr?ng th�i", icon: Users, roles: ["Super Admin", "Admin", "Sales"] },
+      { id: "leads", label: "Lead tư vấn", description: "Nguồn khách hàng và trạng thái", icon: Users, roles: ["Super Admin", "Admin", "Sales"] },
     ],
   },
   {
-    group: "H? th?ng",
+    group: "Hệ thống",
     items: [
-      { id: "menus", label: "Menu", description: "Header, footer v� k�o th? 3 c?p", icon: MenuIcon, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "settings", label: "C?u h�nh", description: "Th�ng tin website", icon: Settings, roles: ["Super Admin", "Admin"] },
+      { id: "menus", label: "Menu", description: "Header, footer và kéo thả 3 cấp", icon: MenuIcon, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "settings", label: "Cấu hình", description: "Thông tin website", icon: Settings, roles: ["Super Admin", "Admin"] },
     ],
   },
 ] satisfies Array<{ group: string; items: Array<{ id: string; label: string; description: string; icon: LucideIcon; roles: string[] }> }>;
 
 const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?: string }> = {
-  dashboard: { title: "T?ng quan v?n h�nh", subtitle: "Theo d�i d? li?u th?t t? CMS, lead v� l?ch dang b�i." },
-  projects: { title: "Qu?n l� d? �n", subtitle: "T�ch r� kh?i C�ng Tr�nh v� kh?i N?i Th?t.", createLabel: "Th�m d? �n" },
-  "project-categories": { title: "Danh m?c d? �n", subtitle: "Qu?n l� tab danh m?c tr�n trang D? �n d� th?c hi?n.", createLabel: "Th�m danh m?c" },
-  "project-filter-options": { title: "B? l?c d? �n", subtitle: "Qu?n l� option dropdown l?c d? �n ngo�i website.", createLabel: "Th�m option l?c" },
-  "architecture-designs": { title: "M?u thi?t k? ki?n tr�c", subtitle: "Catalog m?u bi?t th?, nh� ph?, nh� c?p 4 v?i b? l?c chi ti?t.", createLabel: "Th�m m?u ki?n tr�c" },
-  "interior-designs": { title: "M?u thi?t k? n?i th?t", subtitle: "Catalog phong c�ch n?i th?t, lo?i ph�ng, di?n t�ch v� ng�n s�ch.", createLabel: "Th�m m?u n?i th?t" },
-  services: { title: "Qu?n l� d?ch v?", subtitle: "D?ch v? c�ng tr�nh, n?i th?t v� n?i dung SEO.", createLabel: "Th�m d?ch v?" },
-  posts: { title: "B�i vi?t SEO", subtitle: "So?n b�i, luu nh�p, d?t l?ch v� xu?t b?n.", createLabel: "Th�m b�i vi?t" },
-  leads: { title: "Lead tu v?n", subtitle: "Theo d�i ngu?n lead, tr?ng th�i x? l� v� ghi ch� n?i b?." },
-  media: { title: "Media Library", subtitle: "Upload, chuy?n WebP, t?o thumbnail v� t�i s? d?ng ?nh." },
-  ai: { title: "AI Content Studio", subtitle: "T?o outline, meta SEO v� b�i vi?t draft b?ng AI theo c?u h�nh h? th?ng." },
-  menus: { title: "Qu?n l� Menu", subtitle: "K�o th? menu header/footer t?i da 3 c?p, ch?n link g?i � ho?c t? nh?p URL." },
-  estimator: { title: "D? to�n c�ng tr�nh", subtitle: "C?u h�nh input, c�ng th?c t�nh chi ph� v� xem lu?t d? to�n t? website." },
-  settings: { title: "C?u h�nh website", subtitle: "Qu?n l� hotline, email, d?a ch?, social v� th�ng tin thuong hi?u." },
+  dashboard: { title: "Tổng quan vận hành", subtitle: "Theo dõi dữ liệu thật từ CMS, lead và lịch đăng bài." },
+  projects: { title: "Quản lý dự án", subtitle: "Tách rõ khối Công Trình và khối Nội Thất.", createLabel: "Thêm dự án" },
+  "project-categories": { title: "Danh mục dự án", subtitle: "Quản lý tab danh mục trên trang Dự án đã thực hiện.", createLabel: "Thêm danh mục" },
+  "project-filter-options": { title: "Bộ lọc dự án", subtitle: "Quản lý option dropdown lọc dự án ngoài website.", createLabel: "Thêm option lọc" },
+  "architecture-designs": { title: "Mẫu thiết kế kiến trúc", subtitle: "Catalog mẫu biệt thự, nhà phố, nhà cấp 4 với bộ lọc chi tiết.", createLabel: "Thêm mẫu kiến trúc" },
+  "interior-designs": { title: "Mẫu thiết kế nội thất", subtitle: "Catalog phong cách nội thất, loại phòng, diện tích và ngân sách.", createLabel: "Thêm mẫu nội thất" },
+  services: { title: "Quản lý dịch vụ", subtitle: "Dịch vụ công trình, nội thất và nội dung SEO.", createLabel: "Thêm dịch vụ" },
+  posts: { title: "Bài viết SEO", subtitle: "Soạn bài, lưu nháp, đặt lịch và xuất bản.", createLabel: "Thêm bài viết" },
+  leads: { title: "Lead tư vấn", subtitle: "Theo dõi nguồn lead, trạng thái xử lý và ghi chú nội bộ." },
+  media: { title: "Media Library", subtitle: "Upload, chuyển WebP, tạo thumbnail và tái sử dụng ảnh." },
+  ai: { title: "AI Content Studio", subtitle: "Tạo outline, meta SEO và bài viết draft bằng AI theo cấu hình hệ thống." },
+  menus: { title: "Quản lý Menu", subtitle: "Kéo thả menu header/footer tối đa 3 cấp, chọn link gợi ý hoặc tự nhập URL." },
+  estimator: { title: "Dự toán công trình", subtitle: "Cấu hình input, công thức tính chi phí và xem lượt dự toán từ website." },
+  settings: { title: "Cấu hình website", subtitle: "Quản lý hotline, email, địa chỉ, social và thông tin thương hiệu." },
 };
 
 const entitySingular: Record<Entity, string> = {
   dashboard: "dashboard",
-  projects: "d? �n",
-  "project-categories": "danh m?c d? �n",
-  "project-filter-options": "option l?c d? �n",
-  "architecture-designs": "m?u ki?n tr�c",
-  "interior-designs": "m?u n?i th?t",
-  services: "d?ch v?",
-  posts: "b�i vi?t",
+  projects: "dự án",
+  "project-categories": "danh mục dự án",
+  "project-filter-options": "option lọc dự án",
+  "architecture-designs": "mẫu kiến trúc",
+  "interior-designs": "mẫu nội thất",
+  services: "dịch vụ",
+  posts: "bài viết",
   leads: "lead",
   media: "media",
   ai: "AI content",
   menus: "menu",
-  estimator: "d? to�n c�ng tr�nh",
-  settings: "c?u h�nh",
+  estimator: "dự toán công trình",
+  settings: "cấu hình",
 };
 
 const statusLabels: Record<string, string> = {
-  draft: "Nh�p",
-  pending_review: "Ch? duy?t",
-  scheduled: "�?t l?ch",
-  published: "�� xu?t b?n",
-  archived: "Luu tr?",
-  new: "M?i",
-  contacted: "�� li�n h?",
-  consulting: "�ang tu v?n",
-  won: "�� ch?t",
-  lost: "Kh�ng ti?m nang",
+  draft: "Nháp",
+  pending_review: "Chờ duyệt",
+  scheduled: "Đặt lịch",
+  published: "Đã xuất bản",
+  archived: "Lưu trữ",
+  new: "Mới",
+  contacted: "Đã liên hệ",
+  consulting: "Đang tư vấn",
+  won: "Đã chốt",
+  lost: "Không tiềm năng",
   spam: "Spam",
 };
 
@@ -331,8 +331,8 @@ export function AdminApp({ user }: { user: User }) {
         <div className="admin-brand">
           <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
           <div>
-            <strong>{T("H� Th�nh Home")}</strong>
-            <span>{T("Thi?t k? - Thi c�ng - N?i th?t")}</span>
+            <strong>{T("Hà Thành Home")}</strong>
+            <span>{T("Thiết kế - Thi công - Nội thất")}</span>
           </div>
         </div>
 
@@ -356,7 +356,7 @@ export function AdminApp({ user }: { user: User }) {
             <strong>{user.email}</strong>
             <span>{user.roles.join(", ")}</span>
           </div>
-          <button onClick={logout} type="button"><LogOut size={16} /> �ang xu?t</button>
+          <button onClick={logout} type="button"><LogOut size={16} /> Đăng xuất</button>
         </div>
       </aside>
 
@@ -423,7 +423,7 @@ function FeedbackProvider({ children }: { children: ReactNode }) {
           <div className={`toast toast-${toast.tone}`} key={toast.id}>
             <span>{toast.tone === "success" ? <CheckCircle2 size={18} /> : toast.tone === "error" ? <AlertTriangle size={18} /> : <BadgeCheck size={18} />}</span>
             <div><strong>{T(toast.title)}</strong>{toast.description ? <p>{T(toast.description)}</p> : null}</div>
-            <button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} aria-label="��ng th�ng b�o"><X size={15} /></button>
+            <button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} aria-label="Đóng thông báo"><X size={15} /></button>
           </div>
         ))}
       </div>
@@ -434,8 +434,8 @@ function FeedbackProvider({ children }: { children: ReactNode }) {
             <h2 id="confirm-title">{T(confirmState.title)}</h2>
             {confirmState.description ? <p>{T(confirmState.description)}</p> : null}
             <div className="confirm-actions">
-              <button className="secondary-button" type="button" onClick={() => closeConfirm(false)}>{confirmState.cancelLabel ? T(confirmState.cancelLabel) : "H?y"}</button>
-              <button className={`primary-button ${confirmState.tone === "danger" ? "danger-button" : ""}`} type="button" onClick={() => closeConfirm(true)}>{confirmState.confirmLabel ? T(confirmState.confirmLabel) : "X�c nh?n"}</button>
+              <button className="secondary-button" type="button" onClick={() => closeConfirm(false)}>{confirmState.cancelLabel ? T(confirmState.cancelLabel) : "Hủy"}</button>
+              <button className={`primary-button ${confirmState.tone === "danger" ? "danger-button" : ""}`} type="button" onClick={() => closeConfirm(true)}>{confirmState.confirmLabel ? T(confirmState.confirmLabel) : "Xác nhận"}</button>
             </div>
           </section>
         </div>
@@ -502,21 +502,21 @@ function Dashboard({ setActive }: { setActive: (entity: Entity) => void }) {
   useEffect(() => {
     apiFetch("/api/cms/dashboard")
       .then(async (res) => {
-        if (!res.ok) throw new Error(await readApiError(res, "Kh�ng t?i du?c dashboard."));
+        if (!res.ok) throw new Error(await readApiError(res, "Không tải được dashboard."));
         return res.json();
       })
       .then(setData)
-      .catch((error) => notify({ tone: "error", title: "Kh�ng t?i du?c dashboard", description: describeClientError(error, "Ki?m tra API ho?c phi�n dang nh?p.") }));
+      .catch((error) => notify({ tone: "error", title: "Không tải được dashboard", description: describeClientError(error, "Kiểm tra API hoặc phiên đăng nhập.") }));
   }, [notify]);
 
   const metrics = data?.metrics || {};
   const cards = [
-    ["T?ng d? �n", metrics.totalProjects || 0, FolderKanban],
-    ["D? �n c�ng tr�nh", metrics.constructionProjects || 0, Building2],
-    ["D? �n n?i th?t", metrics.interiorProjects || 0, PenTool],
-    ["M?u ki?n tr�c", metrics.architectureDesigns || 0, Building2],
-    ["M?u n?i th?t", metrics.interiorDesigns || 0, Sofa],
-    ["Lead m?i", metrics.newLeads || 0, PhoneCall],
+    ["Tổng dự án", metrics.totalProjects || 0, FolderKanban],
+    ["Dự án công trình", metrics.constructionProjects || 0, Building2],
+    ["Dự án nội thất", metrics.interiorProjects || 0, PenTool],
+    ["Mẫu kiến trúc", metrics.architectureDesigns || 0, Building2],
+    ["Mẫu nội thất", metrics.interiorDesigns || 0, Sofa],
+    ["Lead mới", metrics.newLeads || 0, PhoneCall],
   ] satisfies Array<[string, number, LucideIcon]>;
 
   return (
@@ -532,23 +532,23 @@ function Dashboard({ setActive }: { setActive: (entity: Entity) => void }) {
 
       <section className="dashboard-grid">
         <article className="panel large">
-          <div className="panel-heading"><div><h2>Lead m?i g?n d�y</h2><p>Danh s�ch lead du?c ghi nh?n t? form tu v?n.</p></div><button onClick={() => setActive("leads")} type="button">Xem lead</button></div>
-          <SimpleTable rows={data?.recentLeads || []} columns={["fullName", "phone", "status"]} emptyText="Chua c� lead m?i." />
+          <div className="panel-heading"><div><h2>Lead mới gần đây</h2><p>Danh sách lead được ghi nhận từ form tư vấn.</p></div><button onClick={() => setActive("leads")} type="button">Xem lead</button></div>
+          <SimpleTable rows={data?.recentLeads || []} columns={["fullName", "phone", "status"]} emptyText="Chưa có lead mới." />
         </article>
 
         <article className="panel">
-          <div className="panel-heading"><div><h2>T�c v? nhanh</h2><p>�i nhanh d?n m�n h�nh thu?ng d�ng.</p></div></div>
+          <div className="panel-heading"><div><h2>Tác vụ nhanh</h2><p>Đi nhanh đến màn hình thường dùng.</p></div></div>
           <div className="quick-actions">
-            <button onClick={() => setActive("projects")} type="button"><FolderKanban size={18} /> Th�m d? �n</button>
-            <button onClick={() => setActive("posts")} type="button"><Newspaper size={18} /> Vi?t b�i SEO</button>
-            <button onClick={() => setActive("media")} type="button"><UploadCloud size={18} /> Upload ?nh</button>
+            <button onClick={() => setActive("projects")} type="button"><FolderKanban size={18} /> Thêm dự án</button>
+            <button onClick={() => setActive("posts")} type="button"><Newspaper size={18} /> Viết bài SEO</button>
+            <button onClick={() => setActive("media")} type="button"><UploadCloud size={18} /> Upload ảnh</button>
           </div>
         </article>
 
         <article className="panel">
-          <div className="panel-heading"><div><h2>L?ch n?i dung</h2><p>B�i vi?t dang d?t l?ch xu?t b?n.</p></div></div>
-          <div className="content-status-row"><CalendarClock size={20} /><strong>{metrics.scheduledPosts || 0}</strong><span>b�i dang d?t l?ch</span></div>
-          <div className="content-status-row"><FileText size={20} /><strong>{metrics.totalPosts || 0}</strong><span>t?ng b�i vi?t</span></div>
+          <div className="panel-heading"><div><h2>Lịch nội dung</h2><p>Bài viết đang đặt lịch xuất bản.</p></div></div>
+          <div className="content-status-row"><CalendarClock size={20} /><strong>{metrics.scheduledPosts || 0}</strong><span>bài đang đặt lịch</span></div>
+          <div className="content-status-row"><FileText size={20} /><strong>{metrics.totalPosts || 0}</strong><span>tổng bài viết</span></div>
         </article>
       </section>
     </div>
@@ -574,12 +574,12 @@ function MediaLibrary({ roles }: { roles: string[] }) {
         window.location.href = "/login";
         return;
       }
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c Media Library."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được Media Library."));
       const payload: ListResponse<CmsItem> = await response.json();
       setRows(payload.data || []);
       setSelected((current) => current || payload.data?.[0] || null);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c Media Library", description: describeClientError(error, "Ki?m tra API ho?c k?t n?i m?ng.") });
+      notify({ tone: "error", title: "Không tải được Media Library", description: describeClientError(error, "Kiểm tra API hoặc kết nối mạng.") });
     }
   }
 
@@ -600,35 +600,35 @@ function MediaLibrary({ roles }: { roles: string[] }) {
         const response = await apiFetch("/api/cms/media/upload", { method: "POST", body: formData });
         if (!response.ok) {
           failed += 1;
-          notify({ tone: "error", title: "Upload th?t b?i", description: `${file.name}: ${await readApiError(response, "File kh�ng h?p l? ho?c vu?t qu� dung lu?ng.")}` });
+          notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${await readApiError(response, "File không hợp lệ hoặc vượt quá dung lượng.")}` });
         }
       } catch (error) {
         failed += 1;
-        notify({ tone: "error", title: "Upload th?t b?i", description: `${file.name}: ${describeClientError(error, "Kh�ng k?t n?i du?c API upload.")}` });
+        notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${describeClientError(error, "Không kết nối được API upload.")}` });
       }
     }
     setUploading(false);
     await load();
-    if (failed < files.length) notify({ tone: "success", title: "Upload ho�n t?t", description: failed ? `�� upload ${files.length - failed}/${files.length} ?nh.` : "Thu vi?n ?nh d� du?c c?p nh?t." });
+    if (failed < files.length) notify({ tone: "success", title: "Upload hoàn tất", description: failed ? `Đã upload ${files.length - failed}/${files.length} ảnh.` : "Thư viện ảnh đã được cập nhật." });
   }
 
   async function copyUrl(url?: string) {
     if (!url) return;
     await navigator.clipboard.writeText(url);
-    notify({ tone: "success", title: "�� copy URL ?nh" });
+    notify({ tone: "success", title: "Đã copy URL ảnh" });
   }
 
   return (
     <section className="media-layout">
       <article className="panel media-browser">
         <div className="entity-toolbar">
-          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="T�m t�n file, alt, caption..." /></div>
+          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên file, alt, caption..." /></div>
           <select value={type} onChange={(event) => setType(event.target.value)}>
-            <option value="">T?t c? lo?i ?nh</option>
+            <option value="">Tất cả loại ảnh</option>
             {["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
-          <button className="secondary-button" onClick={load} type="button">L?c</button>
-          {canUpload ? <label className="primary-button upload-control">{uploading ? "�ang upload..." : "Upload ?nh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label> : null}
+          <button className="secondary-button" onClick={load} type="button">Lọc</button>
+          {canUpload ? <label className="primary-button upload-control">{uploading ? "Đang upload..." : "Upload ảnh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label> : null}
         </div>
         <div className="media-grid">
           {rows.map((media) => (
@@ -637,23 +637,23 @@ function MediaLibrary({ roles }: { roles: string[] }) {
               <span>{String(media.originalName || media.fileName)}</span>
             </button>
           ))}
-          {rows.length === 0 ? <div className="empty-state">Chua c� ?nh n�o. Upload ?nh d?u ti�n d? b?t d?u thu vi?n.</div> : null}
+          {rows.length === 0 ? <div className="empty-state">Chưa có ảnh nào. Upload ảnh đầu tiên để bắt đầu thư viện.</div> : null}
         </div>
       </article>
 
       <aside className="panel media-detail">
-        <h2>Chi ti?t ?nh</h2>
+        <h2>Chi tiết ảnh</h2>
         {selected ? (
           <>
             <img alt={String(selected.altText || selected.originalName || "Media")} src={String(selected.webpUrl)} />
             <dl>
-              <div><dt>T�n file</dt><dd>{String(selected.originalName || selected.fileName)}</dd></div>
-              <div><dt>Lo?i</dt><dd>{String(selected.type || "general")}</dd></div>
+              <div><dt>Tên file</dt><dd>{String(selected.originalName || selected.fileName)}</dd></div>
+              <div><dt>Loại</dt><dd>{String(selected.type || "general")}</dd></div>
               <div><dt>URL WebP</dt><dd>{String(selected.webpUrl)}</dd></div>
             </dl>
             <button className="primary-button" onClick={() => copyUrl(selected.webpUrl)} type="button">Copy URL WebP</button>
           </>
-        ) : <p className="muted">Ch?n m?t ?nh d? xem th�ng tin.</p>}
+        ) : <p className="muted">Chọn một ảnh để xem thông tin.</p>}
       </aside>
     </section>
   );
@@ -664,15 +664,15 @@ type AiOutput = Record<string, unknown> | null;
 function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void }) {
   const { notify } = useAdminFeedback();
   const [form, setForm] = useState({
-    topic: "Xu hu?ng thi?t k? n?i th?t cao c?p cho bi?t th? hi?n d?i",
-    focusKeyword: "thi?t k? n?i th?t bi?t th?",
-    secondaryKeywords: "n?i th?t cao c?p, bi?t th? hi?n d?i, H� Th�nh Home",
+    topic: "Xu hướng thiết kế nội thất cao cấp cho biệt thự hiện đại",
+    focusKeyword: "thiết kế nội thất biệt thự",
+    secondaryKeywords: "nội thất cao cấp, biệt thự hiện đại, Hà Thành Home",
     group: "interior",
-    audience: "Ch? bi?t th?, ch? d?u tu nh� ph? cao c?p",
-    tone: "Chuy�n gia, sang tr?ng, tu v?n b�n h�ng",
-    articleType: "C?m nang",
-    length: "1200 t?",
-    imagePrompt: "?nh hero th?c t? phong c�ch premium architecture & interior, bi?t th? hi?n d?i v?i ph�ng kh�ch sang tr?ng, �nh s�ng t? nhi�n, v?t li?u g? d� cao c?p, kh�ng ch?, kh�ng logo.",
+    audience: "Chủ biệt thự, chủ đầu tư nhà phố cao cấp",
+    tone: "Chuyên gia, sang trọng, tư vấn bán hàng",
+    articleType: "Cẩm nang",
+    length: "1200 từ",
+    imagePrompt: "Ảnh hero thực tế phong cách premium architecture & interior, biệt thự hiện đại với phòng khách sang trọng, ánh sáng tự nhiên, vật liệu gỗ đá cao cấp, không chữ, không logo.",
   });
   const [loading, setLoading] = useState("");
   const [output, setOutput] = useState<AiOutput>(null);
@@ -681,10 +681,10 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
   async function loadHistory() {
     try {
       const response = await apiFetch("/api/cms/ai/generations");
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c l?ch s? AI."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được lịch sử AI."));
       setHistory(await response.json());
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c l?ch s? AI", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được lịch sử AI", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
@@ -694,7 +694,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
 
   async function run(action: "generate-outline" | "generate-meta" | "generate-article", createDraft = false) {
     if (!form.topic.trim() || !form.focusKeyword.trim()) {
-      notify({ tone: "error", title: "Thi?u d? li?u AI", description: "Ch? d? v� t? kh�a ch�nh l� b?t bu?c." });
+      notify({ tone: "error", title: "Thiếu dữ liệu AI", description: "Chủ đề và từ khóa chính là bắt buộc." });
       return;
     }
     setLoading(action + (createDraft ? "-draft" : ""));
@@ -706,26 +706,26 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         body: JSON.stringify({ ...form, createDraft }),
       });
       if (!response.ok) {
-        notify({ tone: "error", title: "AI chua ch?y du?c", description: await readApiError(response, "Ki?m tra OPENAI_API_KEY v� model trong .env.") });
+        notify({ tone: "error", title: "AI chưa chạy được", description: await readApiError(response, "Kiểm tra OPENAI_API_KEY và model trong .env.") });
         setLoading("");
         return;
       }
       payload = await response.json();
     } catch (error) {
       setLoading("");
-      notify({ tone: "error", title: "AI chua ch?y du?c", description: describeClientError(error, "Kh�ng k?t n?i du?c API AI.") });
+      notify({ tone: "error", title: "AI chưa chạy được", description: describeClientError(error, "Không kết nối được API AI.") });
       return;
     }
     setLoading("");
     setOutput(payload);
     await loadHistory();
-    notify({ tone: "success", title: createDraft ? "�� t?o b�i nh�p" : "AI d� t?o n?i dung" });
+    notify({ tone: "success", title: createDraft ? "Đã tạo bài nháp" : "AI đã tạo nội dung" });
     if (createDraft) setActive("posts");
   }
 
   async function generateImage() {
     if (!form.imagePrompt.trim()) {
-      notify({ tone: "error", title: "Thi?u prompt ?nh", description: "Nh?p m� t? ?nh c?n t?o tru?c khi g?i AI." });
+      notify({ tone: "error", title: "Thiếu prompt ảnh", description: "Nhập mô tả ảnh cần tạo trước khi gọi AI." });
       return;
     }
     setLoading("generate-image");
@@ -744,54 +744,54 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         }),
       });
       if (!response.ok) {
-        notify({ tone: "error", title: "Chua t?o du?c ?nh", description: await readApiError(response, "Ki?m tra OPENAI_API_KEY v� OPENAI_IMAGE_MODEL trong .env.") });
+        notify({ tone: "error", title: "Chưa tạo được ảnh", description: await readApiError(response, "Kiểm tra OPENAI_API_KEY và OPENAI_IMAGE_MODEL trong .env.") });
         setLoading("");
         return;
       }
       payload = await response.json();
     } catch (error) {
       setLoading("");
-      notify({ tone: "error", title: "Chua t?o du?c ?nh", description: describeClientError(error, "Kh�ng k?t n?i du?c API t?o ?nh.") });
+      notify({ tone: "error", title: "Chưa tạo được ảnh", description: describeClientError(error, "Không kết nối được API tạo ảnh.") });
       return;
     }
     setLoading("");
     setOutput(payload);
     await loadHistory();
-    notify({ tone: "success", title: "�� t?o ?nh v� luu v�o Media Library" });
+    notify({ tone: "success", title: "Đã tạo ảnh và lưu vào Media Library" });
   }
 
   return (
     <section className="ai-layout">
       <article className="panel ai-studio-card">
         <div className="panel-heading">
-          <div><h2>T?o n?i dung SEO</h2><p>AI ch? t?o draft, kh�ng t? xu?t b?n. Model v� API key l?y t? c?u h�nh m�i tru?ng.</p></div>
+          <div><h2>Tạo nội dung SEO</h2><p>AI chỉ tạo draft, không tự xuất bản. Model và API key lấy từ cấu hình môi trường.</p></div>
         </div>
         <div className="cms-form two-columns">
-          <label className="wide">Ch? d?<input value={form.topic} onChange={(event) => setForm({ ...form, topic: event.target.value })} /></label>
-          <label>T? kh�a ch�nh<input value={form.focusKeyword} onChange={(event) => setForm({ ...form, focusKeyword: event.target.value })} /></label>
-          <label>T? kh�a ph?<input value={form.secondaryKeywords} onChange={(event) => setForm({ ...form, secondaryKeywords: event.target.value })} /></label>
-          <label>Nh�m n?i dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">C�ng tr�nh</option><option value="interior">N?i th?t</option></select></label>
-          <label>Lo?i b�i<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })}><option>C?m nang</option><option>D?ch v?</option><option>D? �n/case study</option><option>So s�nh</option><option>B�o gi� tham kh?o</option></select></label>
-          <label>Gi?ng van<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })}><option>Chuy�n gia</option><option>Th�n thi?n</option><option>Sang tr?ng</option><option>Tu v?n b�n h�ng</option><option>Chuy�n gia, sang tr?ng, tu v?n b�n h�ng</option></select></label>
-          <label>�? d�i<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })}><option>800 t?</option><option>1200 t?</option><option>1800 t?</option><option>2500 t?</option></select></label>
-          <label className="wide">�?i tu?ng kh�ch h�ng<input value={form.audience} onChange={(event) => setForm({ ...form, audience: event.target.value })} /></label>
-          <label className="wide">Prompt t?o ?nh b�i vi?t<textarea value={form.imagePrompt} onChange={(event) => setForm({ ...form, imagePrompt: event.target.value })} rows={4} placeholder="M� t? ?nh cover c?n t?o, kh�ng c?n th�m ch?/logo." /></label>
+          <label className="wide">Chủ đề<input value={form.topic} onChange={(event) => setForm({ ...form, topic: event.target.value })} /></label>
+          <label>Từ khóa chính<input value={form.focusKeyword} onChange={(event) => setForm({ ...form, focusKeyword: event.target.value })} /></label>
+          <label>Từ khóa phụ<input value={form.secondaryKeywords} onChange={(event) => setForm({ ...form, secondaryKeywords: event.target.value })} /></label>
+          <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+          <label>Loại bài<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })}><option>Cẩm nang</option><option>Dịch vụ</option><option>Dự án/case study</option><option>So sánh</option><option>Báo giá tham khảo</option></select></label>
+          <label>Giọng văn<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })}><option>Chuyên gia</option><option>Thân thiện</option><option>Sang trọng</option><option>Tư vấn bán hàng</option><option>Chuyên gia, sang trọng, tư vấn bán hàng</option></select></label>
+          <label>Độ dài<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })}><option>800 từ</option><option>1200 từ</option><option>1800 từ</option><option>2500 từ</option></select></label>
+          <label className="wide">Đối tượng khách hàng<input value={form.audience} onChange={(event) => setForm({ ...form, audience: event.target.value })} /></label>
+          <label className="wide">Prompt tạo ảnh bài viết<textarea value={form.imagePrompt} onChange={(event) => setForm({ ...form, imagePrompt: event.target.value })} rows={4} placeholder="Mô tả ảnh cover cần tạo, không cần thêm chữ/logo." /></label>
         </div>
         <div className="ai-actions">
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-outline")} type="button"><Sparkles size={16} /> {loading === "generate-outline" ? "�ang t?o..." : "T?o outline"}</button>
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-meta")} type="button"><FileText size={16} /> {loading === "generate-meta" ? "�ang t?o..." : "T?o meta SEO"}</button>
-          <button className="primary-button" disabled={Boolean(loading)} onClick={() => run("generate-article", true)} type="button"><Newspaper size={16} /> {loading === "generate-article-draft" ? "�ang t?o draft..." : "T?o b�i vi?t draft"}</button>
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={generateImage} type="button"><ImagePlus size={16} /> {loading === "generate-image" ? "�ang t?o ?nh..." : "T?o ?nh luu Media"}</button>
+          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-outline")} type="button"><Sparkles size={16} /> {loading === "generate-outline" ? "Đang tạo..." : "Tạo outline"}</button>
+          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-meta")} type="button"><FileText size={16} /> {loading === "generate-meta" ? "Đang tạo..." : "Tạo meta SEO"}</button>
+          <button className="primary-button" disabled={Boolean(loading)} onClick={() => run("generate-article", true)} type="button"><Newspaper size={16} /> {loading === "generate-article-draft" ? "Đang tạo draft..." : "Tạo bài viết draft"}</button>
+          <button className="secondary-button" disabled={Boolean(loading)} onClick={generateImage} type="button"><ImagePlus size={16} /> {loading === "generate-image" ? "Đang tạo ảnh..." : "Tạo ảnh lưu Media"}</button>
         </div>
       </article>
 
       <article className="panel ai-output-card">
-        <div className="panel-heading"><div><h2>K?t qu? AI</h2><p>Ki?m tra n?i dung tru?c khi d�ng cho b�i vi?t ho?c SEO.</p></div></div>
-        {output ? <AiOutputView output={output} /> : <div className="empty-state">Chua c� k?t qu? AI. Ch?n m?t t�c v? ? b�n tr�i d? b?t d?u.</div>}
+        <div className="panel-heading"><div><h2>Kết quả AI</h2><p>Kiểm tra nội dung trước khi dùng cho bài viết hoặc SEO.</p></div></div>
+        {output ? <AiOutputView output={output} /> : <div className="empty-state">Chưa có kết quả AI. Chọn một tác vụ ở bên trái để bắt đầu.</div>}
       </article>
 
       <aside className="panel ai-history-card">
-        <h2>L?ch s? g?n d�y</h2>
+        <h2>Lịch sử gần đây</h2>
         <div className="ai-history-list">
           {history.slice(0, 8).map((item) => (
             <article key={item.id}>
@@ -800,7 +800,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
               <p>{String(item.prompt || "").slice(0, 110)}...</p>
             </article>
           ))}
-          {history.length === 0 ? <div className="empty-state">Chua c� l?ch s? AI.</div> : null}
+          {history.length === 0 ? <div className="empty-state">Chưa có lịch sử AI.</div> : null}
         </div>
       </aside>
     </section>
@@ -817,13 +817,13 @@ function AiOutputView({ output }: { output: Record<string, unknown> }) {
         <div className="ai-generated-media">
           <img alt={String(media.altText || media.originalName || "AI generated image")} src={mediaUrl} />
           <div>
-            <strong>?nh d� luu v�o Media Library</strong>
+            <strong>Ảnh đã lưu vào Media Library</strong>
             <p>{String(media.originalName || media.fileName || "")}</p>
             <code>{String(media.webpUrl || "")}</code>
           </div>
         </div>
       ) : null}
-      {draft?.id ? <div className="ai-draft-banner"><CheckCircle2 size={18} /><span>�� t?o draft: <strong>{draft.title}</strong></span></div> : null}
+      {draft?.id ? <div className="ai-draft-banner"><CheckCircle2 size={18} /><span>Đã tạo draft: <strong>{draft.title}</strong></span></div> : null}
       {"title" in output ? <h3>{String(output.title)}</h3> : null}
       {"h1" in output ? <h3>{String(output.h1)}</h3> : null}
       {"metaTitle" in output ? <p><strong>Meta title:</strong> {String(output.metaTitle)}</p> : null}
@@ -831,7 +831,7 @@ function AiOutputView({ output }: { output: Record<string, unknown> }) {
       {"slug" in output ? <p><strong>Slug:</strong> {String(output.slug)}</p> : null}
       {"contentHtml" in output ? <div className="ai-html-preview" dangerouslySetInnerHTML={{ __html: String(output.contentHtml || "") }} /> : null}
       <details>
-        <summary>Xem JSON d?y d?</summary>
+        <summary>Xem JSON đầy đủ</summary>
         <pre>{JSON.stringify(output, null, 2)}</pre>
       </details>
     </div>
@@ -859,8 +859,8 @@ function MenuBuilder({ roles }: { roles: string[] }) {
         apiFetch("/api/cms/menus"),
         apiFetch("/api/cms/menu-link-suggestions"),
       ]);
-      if (!menusResponse.ok) throw new Error(await readApiError(menusResponse, "Kh�ng t?i du?c danh s�ch menu."));
-      if (!suggestionsResponse.ok) throw new Error(await readApiError(suggestionsResponse, "Kh�ng t?i du?c danh s�ch link g?i �."));
+      if (!menusResponse.ok) throw new Error(await readApiError(menusResponse, "Không tải được danh sách menu."));
+      if (!suggestionsResponse.ok) throw new Error(await readApiError(suggestionsResponse, "Không tải được danh sách link gợi ý."));
       const nextMenus: MenuRecord[] = await menusResponse.json();
       const nextSuggestions: MenuSuggestion[] = await suggestionsResponse.json();
       setMenus(nextMenus);
@@ -869,7 +869,7 @@ function MenuBuilder({ roles }: { roles: string[] }) {
       setActiveMenuId(nextActive?.id || null);
       setTree(buildMenuTree(nextActive?.items || []));
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c Menu Builder", description: describeClientError(error, "Ki?m tra API ho?c phi�n dang nh?p.") });
+      notify({ tone: "error", title: "Không tải được Menu Builder", description: describeClientError(error, "Kiểm tra API hoặc phiên đăng nhập.") });
     }
   }
 
@@ -902,13 +902,13 @@ function MenuBuilder({ roles }: { roles: string[] }) {
       const response = await apiFetch("/api/cms/menus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: location === "header" ? "Menu ch�nh" : "Menu footer", location, isActive: true }),
+        body: JSON.stringify({ name: location === "header" ? "Menu chính" : "Menu footer", location, isActive: true }),
       });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?o du?c menu."));
-      notify({ tone: "success", title: "�� t?o menu" });
+      if (!response.ok) throw new Error(await readApiError(response, "Không tạo được menu."));
+      notify({ tone: "success", title: "Đã tạo menu" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?o du?c menu", description: describeClientError(error, "Ki?m tra quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tạo được menu", description: describeClientError(error, "Kiểm tra quyền tài khoản.") });
     }
   }
 
@@ -917,13 +917,13 @@ function MenuBuilder({ roles }: { roles: string[] }) {
     try {
       const parent = parentId ? flatItems.find((item) => item.id === parentId) : null;
       if (parent && parent.depth >= 2) {
-        notify({ tone: "error", title: "Kh�ng th? th�m c?p 4", description: "Menu ch? h? tr? t?i da 3 c?p." });
+        notify({ tone: "error", title: "Không thể thêm cấp 4", description: "Menu chỉ hỗ trợ tối đa 3 cấp." });
         return;
       }
       const payload = {
         menuId: activeMenu.id,
         parentId,
-        label: newItem.label.trim() || "Menu m?i",
+        label: newItem.label.trim() || "Menu mới",
         url: newItem.url.trim() || "#",
         target: "self",
         itemType: suggestions.find((item) => item.url === newItem.suggestion)?.type || "custom",
@@ -937,12 +937,12 @@ function MenuBuilder({ roles }: { roles: string[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng th�m du?c menu item."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không thêm được menu item."));
       setNewItem({ label: "", url: "", suggestion: "" });
-      notify({ tone: "success", title: "�� th�m menu item" });
+      notify({ tone: "success", title: "Đã thêm menu item" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng th�m du?c menu item", description: describeClientError(error, "Ki?m tra d? li?u nh?p.") });
+      notify({ tone: "error", title: "Không thêm được menu item", description: describeClientError(error, "Kiểm tra dữ liệu nhập.") });
     }
   }
 
@@ -966,25 +966,25 @@ function MenuBuilder({ roles }: { roles: string[] }) {
           isActive: item.isActive !== false,
         }),
       });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng luu du?c menu item."));
-      notify({ tone: "success", title: "�� luu menu item" });
+      if (!response.ok) throw new Error(await readApiError(response, "Không lưu được menu item."));
+      notify({ tone: "success", title: "Đã lưu menu item" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c menu item", description: describeClientError(error, "Ki?m tra d? li?u ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không lưu được menu item", description: describeClientError(error, "Kiểm tra dữ liệu hoặc quyền tài khoản.") });
     }
   }
 
   async function deleteItem(item: MenuItem) {
     if (!canWrite) return;
-    const accepted = await confirm({ tone: "danger", title: "X�a menu item?", description: `Menu "${item.label}" v� c�c menu con s? b? x�a.`, confirmLabel: "X�a" });
+    const accepted = await confirm({ tone: "danger", title: "Xóa menu item?", description: `Menu "${item.label}" và các menu con sẽ bị xóa.`, confirmLabel: "Xóa" });
     if (!accepted) return;
     try {
       const response = await apiFetch(`/api/cms/menu-items/${item.id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng x�a du?c menu item."));
-      notify({ tone: "success", title: "�� x�a menu item" });
+      if (!response.ok) throw new Error(await readApiError(response, "Không xóa được menu item."));
+      notify({ tone: "success", title: "Đã xóa menu item" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng x�a du?c menu item", description: describeClientError(error, "Ki?m tra quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không xóa được menu item", description: describeClientError(error, "Kiểm tra quyền tài khoản.") });
     }
   }
 
@@ -1008,11 +1008,11 @@ function MenuBuilder({ roles }: { roles: string[] }) {
           isActive: item.isActive !== false,
         }),
       });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng nh�n b?n du?c menu item."));
-      notify({ tone: "success", title: "�� nh�n b?n menu item" });
+      if (!response.ok) throw new Error(await readApiError(response, "Không nhân bản được menu item."));
+      notify({ tone: "success", title: "Đã nhân bản menu item" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng nh�n b?n du?c menu item", description: describeClientError(error, "Ki?m tra quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không nhân bản được menu item", description: describeClientError(error, "Kiểm tra quyền tài khoản.") });
     }
   }
 
@@ -1025,11 +1025,11 @@ function MenuBuilder({ roles }: { roles: string[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tree: serializeMenuTree(tree) }),
       });
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng luu du?c th? t? menu."));
-      notify({ tone: "success", title: "�� luu th? t? menu" });
+      if (!response.ok) throw new Error(await readApiError(response, "Không lưu được thứ tự menu."));
+      notify({ tone: "success", title: "Đã lưu thứ tự menu" });
       await load();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c th? t? menu", description: describeClientError(error, "Ki?m tra c?u tr�c menu t?i da 3 c?p.") });
+      notify({ tone: "error", title: "Không lưu được thứ tự menu", description: describeClientError(error, "Kiểm tra cấu trúc menu tối đa 3 cấp.") });
     } finally {
       setSavingOrder(false);
     }
@@ -1046,14 +1046,14 @@ function MenuBuilder({ roles }: { roles: string[] }) {
       <div className="menu-builder-header">
         <div className="menu-tabs">
           {menus.map((menu) => <button className={activeMenuId === menu.id ? "active" : ""} key={menu.id} onClick={() => setActiveMenuId(menu.id)} type="button">{menu.location === "header" ? "Header" : "Footer"}<span>{menu.name}</span></button>)}
-          {menus.length === 0 && canWrite ? <><button onClick={() => createMenu("header")} type="button">T?o Header</button><button onClick={() => createMenu("footer")} type="button">T?o Footer</button></> : null}
+          {menus.length === 0 && canWrite ? <><button onClick={() => createMenu("header")} type="button">Tạo Header</button><button onClick={() => createMenu("footer")} type="button">Tạo Footer</button></> : null}
         </div>
-        <button className="primary-button" disabled={!canWrite || savingOrder || !activeMenu} onClick={saveOrder} type="button">{savingOrder ? "�ang luu..." : "Luu th? t?"}</button>
+        <button className="primary-button" disabled={!canWrite || savingOrder || !activeMenu} onClick={saveOrder} type="button">{savingOrder ? "Đang lưu..." : "Lưu thứ tự"}</button>
       </div>
 
       <div className="menu-builder-layout">
         <article className="panel menu-tree-panel">
-          <div className="panel-heading"><div><h2>{activeMenu?.name || "Chua c� menu"}</h2><p>K�o item l�n xu?ng d? d?i v? tr�. K�o l?ch sang ph?i/tr�i d? d?i c?p, t?i da 3 c?p.</p></div></div>
+          <div className="panel-heading"><div><h2>{activeMenu?.name || "Chưa có menu"}</h2><p>Kéo item lên xuống để đổi vị trí. Kéo lệch sang phải/trái để đổi cấp, tối đa 3 cấp.</p></div></div>
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
             <SortableContext items={flatItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
               <div className="menu-item-list">
@@ -1071,18 +1071,18 @@ function MenuBuilder({ roles }: { roles: string[] }) {
                     suggestions={suggestions}
                   />
                 ))}
-                {flatItems.length === 0 ? <div className="empty-state">Menu n�y chua c� item. Th�m item d?u ti�n ? panel b�n ph?i.</div> : null}
+                {flatItems.length === 0 ? <div className="empty-state">Menu này chưa có item. Thêm item đầu tiên ở panel bên phải.</div> : null}
               </div>
             </SortableContext>
           </DndContext>
         </article>
 
         <aside className="panel menu-create-panel">
-          <h2>Th�m menu item</h2>
-          <label>�u?ng d?n g?i �<select value={newItem.suggestion} onChange={(event) => applySuggestion(event.target.value)}><option value="">Ch?n route ho?c n?i dung</option>{suggestions.map((item) => <option key={`${item.type}-${item.url}`} value={item.url}>{item.label} - {item.url}</option>)}</select></label>
-          <label>Label<input value={newItem.label} onChange={(event) => setNewItem({ ...newItem, label: event.target.value })} placeholder="T�n menu" /></label>
-          <label>URL<input value={newItem.url} onChange={(event) => setNewItem({ ...newItem, url: event.target.value })} placeholder="/du-an ho?c https://..." /></label>
-          <button className="primary-button" disabled={!canWrite || !activeMenu} onClick={() => createItem(null)} type="button"><Plus size={16} /> Th�m c?p 1</button>
+          <h2>Thêm menu item</h2>
+          <label>Đường dẫn gợi ý<select value={newItem.suggestion} onChange={(event) => applySuggestion(event.target.value)}><option value="">Chọn route hoặc nội dung</option>{suggestions.map((item) => <option key={`${item.type}-${item.url}`} value={item.url}>{item.label} - {item.url}</option>)}</select></label>
+          <label>Label<input value={newItem.label} onChange={(event) => setNewItem({ ...newItem, label: event.target.value })} placeholder="Tên menu" /></label>
+          <label>URL<input value={newItem.url} onChange={(event) => setNewItem({ ...newItem, url: event.target.value })} placeholder="/du-an hoặc https://..." /></label>
+          <button className="primary-button" disabled={!canWrite || !activeMenu} onClick={() => createItem(null)} type="button"><Plus size={16} /> Thêm cấp 1</button>
         </aside>
       </div>
     </section>
@@ -1103,19 +1103,19 @@ function SortableMenuItem({ canWrite, item, onApplySuggestion, onCreateChild, on
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
   return (
     <article className={`menu-builder-item depth-${item.depth} ${item.isActive === false ? "inactive" : ""}`} ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}>
-      <button className="drag-handle" type="button" {...attributes} {...listeners} aria-label="K�o th? menu item"><GripVertical size={17} /></button>
+      <button className="drag-handle" type="button" {...attributes} {...listeners} aria-label="Kéo thả menu item"><GripVertical size={17} /></button>
       <div className="menu-builder-fields">
         <label>Label<input disabled={!canWrite} value={item.label || ""} onChange={(event) => onPatch(item.id, { label: event.target.value })} /></label>
         <label>URL<input disabled={!canWrite} value={item.url || ""} onChange={(event) => onPatch(item.id, { url: event.target.value, itemType: "custom", referenceType: null, referenceId: null })} /></label>
-        <label>G?i �<select disabled={!canWrite} defaultValue="" onChange={(event) => onApplySuggestion(event.target.value, item.id)}><option value="">Ch?n link</option>{suggestions.map((suggestion) => <option key={`${item.id}-${suggestion.type}-${suggestion.url}`} value={suggestion.url}>{suggestion.label} - {suggestion.url}</option>)}</select></label>
-        <label>Target<select disabled={!canWrite} value={item.target || "self"} onChange={(event) => onPatch(item.id, { target: event.target.value as "self" | "blank", rel: event.target.value === "blank" ? "noopener noreferrer" : "" })}><option value="self">C�ng tab</option><option value="blank">Tab m?i</option></select></label>
+        <label>Gợi ý<select disabled={!canWrite} defaultValue="" onChange={(event) => onApplySuggestion(event.target.value, item.id)}><option value="">Chọn link</option>{suggestions.map((suggestion) => <option key={`${item.id}-${suggestion.type}-${suggestion.url}`} value={suggestion.url}>{suggestion.label} - {suggestion.url}</option>)}</select></label>
+        <label>Target<select disabled={!canWrite} value={item.target || "self"} onChange={(event) => onPatch(item.id, { target: event.target.value as "self" | "blank", rel: event.target.value === "blank" ? "noopener noreferrer" : "" })}><option value="self">Cùng tab</option><option value="blank">Tab mới</option></select></label>
       </div>
       <div className="menu-builder-actions">
-        <label className="check-row"><input checked={item.isActive !== false} disabled={!canWrite} onChange={(event) => onPatch(item.id, { isActive: event.target.checked })} type="checkbox" /> Hi?n</label>
-        <button className="secondary-button" disabled={!canWrite} onClick={() => onSave(item)} type="button">Luu</button>
-        <button className="secondary-button" disabled={!canWrite || item.depth >= 2} onClick={() => onCreateChild(item.id)} type="button">Th�m con</button>
-        <button className="secondary-button" disabled={!canWrite} onClick={() => onDuplicate(item)} type="button"><Copy size={14} /> Nh�n b?n</button>
-        <button className="secondary-button danger" disabled={!canWrite} onClick={() => onDelete(item)} type="button">X�a</button>
+        <label className="check-row"><input checked={item.isActive !== false} disabled={!canWrite} onChange={(event) => onPatch(item.id, { isActive: event.target.checked })} type="checkbox" /> Hiện</label>
+        <button className="secondary-button" disabled={!canWrite} onClick={() => onSave(item)} type="button">Lưu</button>
+        <button className="secondary-button" disabled={!canWrite || item.depth >= 2} onClick={() => onCreateChild(item.id)} type="button">Thêm con</button>
+        <button className="secondary-button" disabled={!canWrite} onClick={() => onDuplicate(item)} type="button"><Copy size={14} /> Nhân bản</button>
+        <button className="secondary-button danger" disabled={!canWrite} onClick={() => onDelete(item)} type="button">Xóa</button>
       </div>
     </article>
   );
@@ -1218,7 +1218,7 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
         apiFetch("/api/cms/construction-estimator/config"),
         apiFetch("/api/cms/construction-estimator/estimates?limit=8"),
       ]);
-      if (!configResponse.ok) throw new Error(await readApiError(configResponse, "Kh�ng t?i du?c c?u h�nh d? to�n."));
+      if (!configResponse.ok) throw new Error(await readApiError(configResponse, "Không tải được cấu hình dự toán."));
       const payload = repairVietnamese(await configResponse.json()) as Record<string, unknown>;
       setConfig(payload);
       setInputSchemaText(JSON.stringify(payload.inputSchemaJson || [], null, 2));
@@ -1229,7 +1229,7 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
         setEstimates(list.data || []);
       }
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c d? to�n", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được dự toán", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     } finally {
       setLoading(false);
     }
@@ -1240,10 +1240,10 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
   }, []);
 
   function buildPayload() {
-    if (!config) throw new Error("C?u h�nh chua s?n s�ng.");
+    if (!config) throw new Error("Cấu hình chưa sẵn sàng.");
     return {
       id: Number(config.id || 1),
-      name: String(config.name || "D? to�n c�ng tr�nh"),
+      name: String(config.name || "Dự toán công trình"),
       isActive: Boolean(config.isActive ?? true),
       currency: String(config.currency || "VND"),
       minFactor: Number(config.minFactor || 0.9),
@@ -1261,7 +1261,7 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
     try {
       payload = { ...buildPayload(), input: JSON.parse(previewInputText || "{}") };
     } catch (error) {
-      notify({ tone: "error", title: "D? li?u preview chua h?p l?", description: describeClientError(error, "Ki?m tra di?n t�ch m?u ho?c ph?n n�ng cao.") });
+      notify({ tone: "error", title: "Dữ liệu preview chưa hợp lệ", description: describeClientError(error, "Kiểm tra diện tích mẫu hoặc phần nâng cao.") });
       return;
     }
     const response = await apiFetch("/api/cms/construction-estimator/preview", {
@@ -1270,11 +1270,11 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      notify({ tone: "error", title: "Preview c�ng th?c l?i", description: await readApiError(response, "Ki?m tra h? s? ho?c c�ng th?c n�ng cao.") });
+      notify({ tone: "error", title: "Preview công thức lỗi", description: await readApiError(response, "Kiểm tra hệ số hoặc công thức nâng cao.") });
       return;
     }
     setPreview(await response.json());
-    notify({ tone: "success", title: "C�ng th?c h?p l?" });
+    notify({ tone: "success", title: "Công thức hợp lệ" });
   }
 
   async function saveConfig() {
@@ -1282,7 +1282,7 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
     try {
       payload = buildPayload();
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: describeClientError(error, "C?u h�nh ho?c ph?n n�ng cao chua h?p l?.") });
+      notify({ tone: "error", title: "Không lưu được cấu hình", description: describeClientError(error, "Cấu hình hoặc phần nâng cao chưa hợp lệ.") });
       return;
     }
     const response = await apiFetch("/api/cms/construction-estimator/config", {
@@ -1291,20 +1291,20 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: await readApiError(response, "C�ng th?c c� th? dang l?i ho?c thi?u bi?n.") });
+      notify({ tone: "error", title: "Không lưu được cấu hình", description: await readApiError(response, "Công thức có thể đang lỗi hoặc thiếu biến.") });
       return;
     }
-    notify({ tone: "success", title: "�� luu c?u h�nh d? to�n" });
+    notify({ tone: "success", title: "Đã lưu cấu hình dự toán" });
     await load();
   }
 
   async function resetDefaultConfig() {
     const response = await apiFetch("/api/cms/construction-estimator/reset-default", { method: "POST" });
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng reset du?c c?u h�nh", description: await readApiError(response, "Ki?m tra quy?n admin ho?c API.") });
+      notify({ tone: "error", title: "Không reset được cấu hình", description: await readApiError(response, "Kiểm tra quyền admin hoặc API.") });
       return;
     }
-    notify({ tone: "success", title: "�� n?p c�ng th?c m2 t�nh gi�", description: "C?u h�nh d? to�n d� chuy?n sang m� h�nh m�ng, m�i, t?ng h?m quy d?i theo h? s?." });
+    notify({ tone: "success", title: "Đã nạp công thức m2 tính giá", description: "Cấu hình dự toán đã chuyển sang mô hình móng, mái, tầng hầm quy đổi theo hệ số." });
     await load();
   }
 
@@ -1335,110 +1335,110 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
     return Number(option?.variables?.[variableName] ?? fallback);
   };
 
-  if (loading) return <section className="panel"><p className="muted">�ang t?i c?u h�nh d? to�n...</p></section>;
-  if (!config) return <section className="panel"><p className="muted">Chua c� c?u h�nh d? to�n.</p></section>;
+  if (loading) return <section className="panel"><p className="muted">Đang tải cấu hình dự toán...</p></section>;
+  if (!config) return <section className="panel"><p className="muted">Chưa có cấu hình dự toán.</p></section>;
 
   return (
     <section className="estimator-admin-layout">
       <article className="panel estimator-config-panel">
         <div className="panel-heading">
-          <div><h2>C?u h�nh d? to�n theo m2</h2><p>C�i don gi� v� h? s? quy d?i. H? th?ng t? t�nh di?n t�ch t�nh gi� r?i nh�n don gi�/m2.</p></div>
+          <div><h2>Cấu hình dự toán theo m2</h2><p>Cài đơn giá và hệ số quy đổi. Hệ thống tự tính diện tích tính giá rồi nhân đơn giá/m2.</p></div>
           <div className="heading-actions">
             <button className="secondary-button" onClick={runPreview} type="button">Preview</button>
-            {canWrite ? <button className="secondary-button" onClick={resetDefaultConfig} type="button">N?p chu?n m2</button> : null}
-            {canWrite ? <button className="primary-button" onClick={saveConfig} type="button">Luu c?u h�nh</button> : null}
+            {canWrite ? <button className="secondary-button" onClick={resetDefaultConfig} type="button">Nạp chuẩn m2</button> : null}
+            {canWrite ? <button className="primary-button" onClick={saveConfig} type="button">Lưu cấu hình</button> : null}
           </div>
         </div>
 
         <div className="estimator-guide">
-          <strong>C�ch hi?u c?u h�nh n�y</strong>
-          <p>T?ng di?n t�ch t�nh gi� = s�n c�c t?ng + m�ng quy d?i + m�i quy d?i + t?ng h?m quy d?i. Chi ph� d? ki?n = t?ng di?n t�ch t�nh gi� x don gi�/m2, sau d� nh�n h? s? lo?i c�ng tr�nh v� khu v?c.</p>
+          <strong>Cách hiểu cấu hình này</strong>
+          <p>Tổng diện tích tính giá = sàn các tầng + móng quy đổi + mái quy đổi + tầng hầm quy đổi. Chi phí dự kiến = tổng diện tích tính giá x đơn giá/m2, sau đó nhân hệ số loại công trình và khu vực.</p>
         </div>
 
         <div className="form-grid">
-          <label>T�n c?u h�nh<input value={String(config.name || "")} onChange={(event) => setConfig({ ...config, name: event.target.value })} /></label>
-          <label>Ti?n t?<input value={String(config.currency || "VND")} onChange={(event) => setConfig({ ...config, currency: event.target.value })} /></label>
-          <label>Bi�n th?p nh?t<input type="number" step="0.01" value={Number(config.minFactor || 0.9)} onChange={(event) => setConfig({ ...config, minFactor: Number(event.target.value) })} /></label>
-          <label>Bi�n cao nh?t<input type="number" step="0.01" value={Number(config.maxFactor || 1.15)} onChange={(event) => setConfig({ ...config, maxFactor: Number(event.target.value) })} /></label>
+          <label>Tên cấu hình<input value={String(config.name || "")} onChange={(event) => setConfig({ ...config, name: event.target.value })} /></label>
+          <label>Tiền tệ<input value={String(config.currency || "VND")} onChange={(event) => setConfig({ ...config, currency: event.target.value })} /></label>
+          <label>Biên thấp nhất<input type="number" step="0.01" value={Number(config.minFactor || 0.9)} onChange={(event) => setConfig({ ...config, minFactor: Number(event.target.value) })} /></label>
+          <label>Biên cao nhất<input type="number" step="0.01" value={Number(config.maxFactor || 1.15)} onChange={(event) => setConfig({ ...config, maxFactor: Number(event.target.value) })} /></label>
         </div>
 
         <div className="estimator-simple-grid">
-          <EstimatorSettingCard title="�on gi� x�y d?ng / m2" description="Gi� n�y l� gi� nh�n v?i di?n t�ch t�nh gi�. Admin c� th? di?u ch?nh theo th? tru?ng.">
-            <EstimatorNumber label="Ph?n th�" value={getOptionVariable("scope", "phan-tho", "unit_price", 3500000)} suffix="d/m2" onChange={(value) => updateOptionVariable("scope", "phan-tho", "unit_price", value)} />
-            <EstimatorNumber label="Tr?n g�i co b?n" value={getOptionVariable("scope", "tron-goi-co-ban", "unit_price", 4800000)} suffix="d/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-co-ban", "unit_price", value)} />
-            <EstimatorNumber label="Tr?n g�i ti�u chu?n" value={getOptionVariable("scope", "tron-goi-tieu-chuan", "unit_price", 5800000)} suffix="d/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-tieu-chuan", "unit_price", value)} />
-            <EstimatorNumber label="Tr?n g�i cao c?p" value={getOptionVariable("scope", "tron-goi-cao-cap", "unit_price", 7000000)} suffix="d/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-cao-cap", "unit_price", value)} />
+          <EstimatorSettingCard title="Đơn giá xây dựng / m2" description="Giá này là giá nhân với diện tích tính giá. Admin có thể điều chỉnh theo thị trường.">
+            <EstimatorNumber label="Phần thô" value={getOptionVariable("scope", "phan-tho", "unit_price", 3500000)} suffix="đ/m2" onChange={(value) => updateOptionVariable("scope", "phan-tho", "unit_price", value)} />
+            <EstimatorNumber label="Trọn gói cơ bản" value={getOptionVariable("scope", "tron-goi-co-ban", "unit_price", 4800000)} suffix="đ/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-co-ban", "unit_price", value)} />
+            <EstimatorNumber label="Trọn gói tiêu chuẩn" value={getOptionVariable("scope", "tron-goi-tieu-chuan", "unit_price", 5800000)} suffix="đ/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-tieu-chuan", "unit_price", value)} />
+            <EstimatorNumber label="Trọn gói cao cấp" value={getOptionVariable("scope", "tron-goi-cao-cap", "unit_price", 7000000)} suffix="đ/m2" onChange={(value) => updateOptionVariable("scope", "tron-goi-cao-cap", "unit_price", value)} />
           </EstimatorSettingCard>
 
-          <EstimatorSettingCard title="H? s? m�ng" description="V� d? m�ng bang 1 phuong 50% nghia l� c?ng th�m 50% di?n t�ch m?t s�n v�o di?n t�ch t�nh gi�.">
-            <EstimatorNumber label="M�ng don" value={getOptionVariable("foundationType", "mong-don", "foundation_area_factor", 0)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-don", "foundation_area_factor", value)} />
-            <EstimatorNumber label="M�ng bang 1 phuong" value={getOptionVariable("foundationType", "mong-bang-1-phuong", "foundation_area_factor", 0.5)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-bang-1-phuong", "foundation_area_factor", value)} />
-            <EstimatorNumber label="M�ng bang 2 phuong" value={getOptionVariable("foundationType", "mong-bang-2-phuong", "foundation_area_factor", 0.7)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-bang-2-phuong", "foundation_area_factor", value)} />
-            <EstimatorNumber label="M�ng c?c/d�i m�ng" value={getOptionVariable("foundationType", "mong-coc", "foundation_area_factor", 0.25)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-coc", "foundation_area_factor", value)} />
+          <EstimatorSettingCard title="Hệ số móng" description="Ví dụ móng băng 1 phương 50% nghĩa là cộng thêm 50% diện tích một sàn vào diện tích tính giá.">
+            <EstimatorNumber label="Móng đơn" value={getOptionVariable("foundationType", "mong-don", "foundation_area_factor", 0)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-don", "foundation_area_factor", value)} />
+            <EstimatorNumber label="Móng băng 1 phương" value={getOptionVariable("foundationType", "mong-bang-1-phuong", "foundation_area_factor", 0.5)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-bang-1-phuong", "foundation_area_factor", value)} />
+            <EstimatorNumber label="Móng băng 2 phương" value={getOptionVariable("foundationType", "mong-bang-2-phuong", "foundation_area_factor", 0.7)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-bang-2-phuong", "foundation_area_factor", value)} />
+            <EstimatorNumber label="Móng cọc/đài móng" value={getOptionVariable("foundationType", "mong-coc", "foundation_area_factor", 0.25)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("foundationType", "mong-coc", "foundation_area_factor", value)} />
           </EstimatorSettingCard>
 
-          <EstimatorSettingCard title="H? s? m�i" description="M�i du?c quy d?i theo ph?n tram di?n t�ch m?t s�n.">
-            <EstimatorNumber label="M�i t�n" value={getOptionVariable("roofType", "mai-ton", "roof_area_factor", 0.2)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ton", "roof_area_factor", value)} />
-            <EstimatorNumber label="M�i BTCT" value={getOptionVariable("roofType", "mai-btct", "roof_area_factor", 0.5)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-btct", "roof_area_factor", value)} />
-            <EstimatorNumber label="M�i ng�i k�o s?t" value={getOptionVariable("roofType", "mai-ngoi-keo-sat", "roof_area_factor", 0.7)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ngoi-keo-sat", "roof_area_factor", value)} />
-            <EstimatorNumber label="M�i ng�i BTCT / Nh?t / Th�i" value={getOptionVariable("roofType", "mai-ngoi-btct", "roof_area_factor", 1)} suffix="x di?n t�ch" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ngoi-btct", "roof_area_factor", value)} />
+          <EstimatorSettingCard title="Hệ số mái" description="Mái được quy đổi theo phần trăm diện tích một sàn.">
+            <EstimatorNumber label="Mái tôn" value={getOptionVariable("roofType", "mai-ton", "roof_area_factor", 0.2)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ton", "roof_area_factor", value)} />
+            <EstimatorNumber label="Mái BTCT" value={getOptionVariable("roofType", "mai-btct", "roof_area_factor", 0.5)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-btct", "roof_area_factor", value)} />
+            <EstimatorNumber label="Mái ngói kèo sắt" value={getOptionVariable("roofType", "mai-ngoi-keo-sat", "roof_area_factor", 0.7)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ngoi-keo-sat", "roof_area_factor", value)} />
+            <EstimatorNumber label="Mái ngói BTCT / Nhật / Thái" value={getOptionVariable("roofType", "mai-ngoi-btct", "roof_area_factor", 1)} suffix="x diện tích" step={0.05} onChange={(value) => updateOptionVariable("roofType", "mai-ngoi-btct", "roof_area_factor", value)} />
           </EstimatorSettingCard>
 
-          <EstimatorSettingCard title="H? s? t?ng h?m" description="N?u kh�ch nh?p di?n t�ch h?m, h? s? n�y d�ng d? quy d?i v�o di?n t�ch t�nh gi�.">
-            <EstimatorNumber label="Kh�ng h?m" value={getOptionVariable("basementType", "khong-ham", "basement_area_factor", 0)} suffix="x di?n t�ch h?m" step={0.1} onChange={(value) => updateOptionVariable("basementType", "khong-ham", "basement_area_factor", value)} />
-            <EstimatorNumber label="H?m n�ng" value={getOptionVariable("basementType", "ham-150", "basement_area_factor", 1.5)} suffix="x di?n t�ch h?m" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-150", "basement_area_factor", value)} />
-            <EstimatorNumber label="H?m ti�u chu?n" value={getOptionVariable("basementType", "ham-200", "basement_area_factor", 2)} suffix="x di?n t�ch h?m" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-200", "basement_area_factor", value)} />
-            <EstimatorNumber label="H?m s�u/ph?c t?p" value={getOptionVariable("basementType", "ham-250", "basement_area_factor", 2.5)} suffix="x di?n t�ch h?m" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-250", "basement_area_factor", value)} />
+          <EstimatorSettingCard title="Hệ số tầng hầm" description="Nếu khách nhập diện tích hầm, hệ số này dùng để quy đổi vào diện tích tính giá.">
+            <EstimatorNumber label="Không hầm" value={getOptionVariable("basementType", "khong-ham", "basement_area_factor", 0)} suffix="x diện tích hầm" step={0.1} onChange={(value) => updateOptionVariable("basementType", "khong-ham", "basement_area_factor", value)} />
+            <EstimatorNumber label="Hầm nông" value={getOptionVariable("basementType", "ham-150", "basement_area_factor", 1.5)} suffix="x diện tích hầm" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-150", "basement_area_factor", value)} />
+            <EstimatorNumber label="Hầm tiêu chuẩn" value={getOptionVariable("basementType", "ham-200", "basement_area_factor", 2)} suffix="x diện tích hầm" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-200", "basement_area_factor", value)} />
+            <EstimatorNumber label="Hầm sâu/phức tạp" value={getOptionVariable("basementType", "ham-250", "basement_area_factor", 2.5)} suffix="x diện tích hầm" step={0.1} onChange={(value) => updateOptionVariable("basementType", "ham-250", "basement_area_factor", value)} />
           </EstimatorSettingCard>
 
-          <EstimatorSettingCard title="D? li?u m?u d? preview" description="D�ng d? ki?m tra ngay sau khi d?i don gi� ho?c h? s?.">
-            <EstimatorNumber label="Di?n t�ch m?t s�n" value={Number(previewInput.area || 100)} suffix="m2" onChange={(value) => updatePreviewValue("area", value)} />
-            <EstimatorNumber label="S? t?ng n?i" value={Number(previewInput.floors || 2)} suffix="t?ng" step={1} onChange={(value) => updatePreviewValue("floors", value)} />
-            <EstimatorNumber label="Di?n t�ch t?ng h?m" value={Number(previewInput.basementArea || 0)} suffix="m2" onChange={(value) => updatePreviewValue("basementArea", value)} />
+          <EstimatorSettingCard title="Dữ liệu mẫu để preview" description="Dùng để kiểm tra ngay sau khi đổi đơn giá hoặc hệ số.">
+            <EstimatorNumber label="Diện tích một sàn" value={Number(previewInput.area || 100)} suffix="m2" onChange={(value) => updatePreviewValue("area", value)} />
+            <EstimatorNumber label="Số tầng nổi" value={Number(previewInput.floors || 2)} suffix="tầng" step={1} onChange={(value) => updatePreviewValue("floors", value)} />
+            <EstimatorNumber label="Diện tích tầng hầm" value={Number(previewInput.basementArea || 0)} suffix="m2" onChange={(value) => updatePreviewValue("basementArea", value)} />
           </EstimatorSettingCard>
 
           <div className="estimator-preview-box">
-            <span>K?t qu? preview</span>
+            <span>Kết quả preview</span>
             {preview ? (
               <>
                 <strong>{formatMoneyRange(Number(preview.totalMin || 0), Number(preview.totalMax || 0))}</strong>
                 <dl>
-                  <div><dt>Di?n t�ch t�nh gi�</dt><dd>{Number((preview.variables as Record<string, unknown> | undefined)?.priced_area || 0).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} m2</dd></div>
-                  <div><dt>�on gi�</dt><dd>{formatMoney(Number((preview.variables as Record<string, unknown> | undefined)?.unit_price || 0))}/m2</dd></div>
+                  <div><dt>Diện tích tính giá</dt><dd>{Number((preview.variables as Record<string, unknown> | undefined)?.priced_area || 0).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} m2</dd></div>
+                  <div><dt>Đơn giá</dt><dd>{formatMoney(Number((preview.variables as Record<string, unknown> | undefined)?.unit_price || 0))}/m2</dd></div>
                 </dl>
                 <pre>{JSON.stringify(preview.lineItems || [], null, 2)}</pre>
               </>
-            ) : <p className="muted">Chua preview.</p>}
+            ) : <p className="muted">Chưa preview.</p>}
           </div>
         </div>
 
         <details className="estimator-advanced">
-          <summary>N�ng cao: xem JSON v� c�ng th?c</summary>
+          <summary>Nâng cao: xem JSON và công thức</summary>
           <div className="estimator-json-grid">
             <label>Input schema JSON<textarea value={inputSchemaText} onChange={(event) => setInputSchemaText(event.target.value)} spellCheck={false} /></label>
             <label>Formula items JSON<textarea value={formulaText} onChange={(event) => setFormulaText(event.target.value)} spellCheck={false} /></label>
             <label>Preview input JSON<textarea value={previewInputText} onChange={(event) => setPreviewInputText(event.target.value)} spellCheck={false} /></label>
-            <div className="estimator-preview-box"><span>C�ng th?c hi?n t?i</span><pre>{JSON.stringify(formulaItems, null, 2)}</pre></div>
+            <div className="estimator-preview-box"><span>Công thức hiện tại</span><pre>{JSON.stringify(formulaItems, null, 2)}</pre></div>
           </div>
         </details>
 
         <div className="form-grid">
-          <label className="wide">Ghi ch� b�o gi�<textarea rows={3} value={String(config.disclaimer || "")} onChange={(event) => setConfig({ ...config, disclaimer: event.target.value })} /></label>
-          <label>Ti�u d? CTA<input value={String(config.ctaTitle || "")} onChange={(event) => setConfig({ ...config, ctaTitle: event.target.value })} /></label>
-          <label>M� t? CTA<input value={String(config.ctaDescription || "")} onChange={(event) => setConfig({ ...config, ctaDescription: event.target.value })} /></label>
+          <label className="wide">Ghi chú báo giá<textarea rows={3} value={String(config.disclaimer || "")} onChange={(event) => setConfig({ ...config, disclaimer: event.target.value })} /></label>
+          <label>Tiêu đề CTA<input value={String(config.ctaTitle || "")} onChange={(event) => setConfig({ ...config, ctaTitle: event.target.value })} /></label>
+          <label>Mô tả CTA<input value={String(config.ctaDescription || "")} onChange={(event) => setConfig({ ...config, ctaDescription: event.target.value })} /></label>
         </div>
       </article>
       <aside className="panel estimator-history-panel">
-        <div className="panel-heading"><div><h2>Lu?t d? to�n m?i</h2><p>C�c lu?t t�nh t? popup ngo�i website.</p></div></div>
+        <div className="panel-heading"><div><h2>Lượt dự toán mới</h2><p>Các lượt tính từ popup ngoài website.</p></div></div>
         <div className="estimate-history-list">
           {estimates.map((item) => (
             <article key={item.id}>
               <strong>{formatMoneyRange(Number(item.totalMin || 0), Number(item.totalMax || 0))}</strong>
               <span>{formatDateTime(item.createdAt)} {item.leadId ? `- Lead #${item.leadId}` : ""}</span>
-              <p>{String(item.sourceUrl || "Kh�ng c� ngu?n")}</p>
+              <p>{String(item.sourceUrl || "Không có nguồn")}</p>
             </article>
           ))}
-          {estimates.length === 0 ? <div className="empty-state">Chua c� lu?t d? to�n n�o.</div> : null}
+          {estimates.length === 0 ? <div className="empty-state">Chưa có lượt dự toán nào.</div> : null}
         </div>
       </aside>
     </section>
@@ -1484,8 +1484,8 @@ function EstimatorNumber({ label, value, suffix, step = 100000, onChange }: { la
 }
 
 function formatMoney(value: number) {
-  if (value >= 1000000000) return `${(value / 1000000000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} t?`;
-  return `${Math.round(value / 1000000).toLocaleString("vi-VN")} tri?u`;
+  if (value >= 1000000000) return `${(value / 1000000000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} tỷ`;
+  return `${Math.round(value / 1000000).toLocaleString("vi-VN")} triệu`;
 }
 
 function repairVietnamese(value: unknown): unknown {
@@ -1525,7 +1525,7 @@ function sampleEstimatorInput(schema: unknown) {
 }
 
 function formatMoneyRange(min: number, max: number) {
-  return `${Math.round(min / 1000000).toLocaleString("vi-VN")} - ${Math.round(max / 1000000).toLocaleString("vi-VN")} tri?u`;
+  return `${Math.round(min / 1000000).toLocaleString("vi-VN")} - ${Math.round(max / 1000000).toLocaleString("vi-VN")} triệu`;
 }
 
 function ImageUrlPicker({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
@@ -1541,10 +1541,10 @@ function ImageUrlPicker({ label, value, onChange }: { label: string; value: stri
     <div className="form-field image-url-picker">
       <span>{label}</span>
       <div className="image-url-preview">
-        {value ? <img alt={label} src={value} /> : <div><ImagePlus size={20} /> Chua ch?n ?nh</div>}
+        {value ? <img alt={label} src={value} /> : <div><ImagePlus size={20} /> Chưa chọn ảnh</div>}
         <div>
-          <input value={value} onChange={(event) => onChange(event.target.value)} placeholder="URL ?nh ho?c ch?n t? Media Library" />
-          <button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Ch?n t? Media Library</button>
+          <input value={value} onChange={(event) => onChange(event.target.value)} placeholder="URL ảnh hoặc chọn từ Media Library" />
+          <button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Chọn từ Media Library</button>
         </div>
       </div>
       {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={selectMedia} /> : null}
@@ -1555,11 +1555,11 @@ function ImageUrlPicker({ label, value, onChange }: { label: string; value: stri
 function ThemeSettingsPanel({ roles }: { roles: string[] }) {
   const { notify } = useAdminFeedback();
   const [values, setValues] = useState<Record<string, string>>({
-    name: "H� Th�nh Home",
-    tagline: "Thi?t k? - Thi c�ng - N?i th?t",
+    name: "Hà Thành Home",
+    tagline: "Thiết kế - Thi công - Nội thất",
     hotline: "0966 123 456",
     email: "info@hathanhhome.vn",
-    address: "H� N?i, Vi?t Nam",
+    address: "Hà Nội, Việt Nam",
     facebook: "",
     zalo: "",
     workingHours: "",
@@ -1573,26 +1573,26 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     headingFont: "cormorant",
     bodyFont: "inter",
     containerMax: "1500",
-    heroEyebrow: "H� Th�nh Home",
-    heroTitle: "Thi?t k? & thi c�ng c�ng tr�nh, n?i th?t hi?n d?i",
-    heroDescription: "H� Th�nh Home mang d?n gi?i ph�p tr?n g�i t? � tu?ng, thi?t k? d?n thi c�ng ho�n thi?n cho nh� ?, bi?t th?, van ph�ng v� showroom.",
+    heroEyebrow: "Hà Thành Home",
+    heroTitle: "Thiết kế & thi công công trình, nội thất hiện đại",
+    heroDescription: "Hà Thành Home mang đến giải pháp trọn gói từ ý tưởng, thiết kế đến thi công hoàn thiện cho nhà ở, biệt thự, văn phòng và showroom.",
     heroImageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2000&q=85",
-    heroPrimaryLabel: "Xem d? �n n?i b?t",
+    heroPrimaryLabel: "Xem dự án nổi bật",
     heroPrimaryUrl: "#projects",
-    heroSecondaryLabel: "Tu v?n mi?n ph�",
+    heroSecondaryLabel: "Tư vấn miễn phí",
     heroSecondaryUrl: "/lien-he",
-    aboutEyebrow: "V? H� Th�nh Home",
-    aboutTitle: "Ki?n t?o kh�ng gian s?ng v� c�ng tr�nh d?ng c?p",
-    aboutDescription: "V?i hon 10 nam kinh nghi?m trong linh v?c thi?t k?, thi c�ng v� n?i th?t, H� Th�nh Home tu v?n gi?i ph�p t?i uu, b?n v?ng, th?m m? v� ph� h?p chi ph�.",
+    aboutEyebrow: "Về Hà Thành Home",
+    aboutTitle: "Kiến tạo không gian sống và công trình đẳng cấp",
+    aboutDescription: "Với hơn 10 năm kinh nghiệm trong lĩnh vực thiết kế, thi công và nội thất, Hà Thành Home tư vấn giải pháp tối ưu, bền vững, thẩm mỹ và phù hợp chi phí.",
     aboutImageUrl: "https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1400&q=85",
-    expertiseEyebrow: "Hai kh?i chuy�n m�n",
-    expertiseTitle: "C�ng tr�nh v� n?i th?t du?c v?n h�nh t�ch bi?t",
-    architectureTemplatesTitle: "M?u thi?t k? ki?n tr�c n?i b?t",
-    interiorTemplatesTitle: "M?u thi?t k? n?i th?t n?i b?t",
-    servicesTitle: "D?ch v? c?a ch�ng t�i",
-    processTitle: "Quy tr�nh l�m vi?c",
-    testimonialsTitle: "Kh�ch h�ng n�i g� v? ch�ng t�i",
-    newsTitle: "Tin t?c & c?m h?ng",
+    expertiseEyebrow: "Hai khối chuyên môn",
+    expertiseTitle: "Công trình và nội thất được vận hành tách biệt",
+    architectureTemplatesTitle: "Mẫu thiết kế kiến trúc nổi bật",
+    interiorTemplatesTitle: "Mẫu thiết kế nội thất nổi bật",
+    servicesTitle: "Dịch vụ của chúng tôi",
+    processTitle: "Quy trình làm việc",
+    testimonialsTitle: "Khách hàng nói gì về chúng tôi",
+    newsTitle: "Tin tức & cảm hứng",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1600,7 +1600,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
   useEffect(() => {
     apiFetch("/api/cms/settings")
       .then(async (res) => {
-        if (!res.ok) throw new Error(await readApiError(res, "Kh�ng t?i du?c c?u h�nh website."));
+        if (!res.ok) throw new Error(await readApiError(res, "Không tải được cấu hình website."));
         return res.json();
       })
       .then((payload) => {
@@ -1651,7 +1651,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           newsTitle: String(homepage.newsTitle || current.newsTitle),
         }));
       })
-      .catch((error) => notify({ tone: "error", title: "Kh�ng t?i du?c c?u h�nh", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") }));
+      .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
   }, [notify]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -1696,26 +1696,26 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       aboutDescription: values.aboutDescription,
       aboutImageUrl: values.aboutImageUrl,
       aboutBenefits: [
-        { title: "Thi?t k? s�ng t?o", description: "� tu?ng kh�c bi?t, b�m s�t nhu c?u s? d?ng." },
-        { title: "Thi c�ng d�ng ti?n d?", description: "Qu?n tr? r� r�ng t? k? ho?ch d?n b�n giao." },
-        { title: "V?t li?u ch?t lu?ng", description: "Ki?m so�t v?t li?u, k? thu?t v� ho�n thi?n." },
-        { title: "B?o h�nh t?n t�m", description: "�?ng h�nh sau b�n giao." },
+        { title: "Thiết kế sáng tạo", description: "Ý tưởng khác biệt, bám sát nhu cầu sử dụng." },
+        { title: "Thi công đúng tiến độ", description: "Quản trị rõ ràng từ kế hoạch đến bàn giao." },
+        { title: "Vật liệu chất lượng", description: "Kiểm soát vật liệu, kỹ thuật và hoàn thiện." },
+        { title: "Bảo hành tận tâm", description: "Đồng hành sau bàn giao." },
       ],
       expertiseEyebrow: values.expertiseEyebrow,
       expertiseTitle: values.expertiseTitle,
-      architectureTemplatesEyebrow: "M?u thi?t k?",
+      architectureTemplatesEyebrow: "Mẫu thiết kế",
       architectureTemplatesTitle: values.architectureTemplatesTitle,
-      interiorTemplatesEyebrow: "M?u thi?t k?",
+      interiorTemplatesEyebrow: "Mẫu thiết kế",
       interiorTemplatesTitle: values.interiorTemplatesTitle,
-      servicesEyebrow: "D?ch v?",
+      servicesEyebrow: "Dịch vụ",
       servicesTitle: values.servicesTitle,
       processTitle: values.processTitle,
       stats: [
-        { value: "10+", label: "Nam kinh nghi?m" },
-        { value: "500+", label: "D? �n ho�n thi?n" },
-        { value: "98%", label: "Kh�ch h�ng h�i l�ng" },
-        { value: "24/7", label: "H? tr? tu v?n" },
-        { value: "50+", label: "Nh�n s? chuy�n m�n" },
+        { value: "10+", label: "Năm kinh nghiệm" },
+        { value: "500+", label: "Dự án hoàn thiện" },
+        { value: "98%", label: "Khách hàng hài lòng" },
+        { value: "24/7", label: "Hỗ trợ tư vấn" },
+        { value: "50+", label: "Nhân sự chuyên môn" },
       ],
       testimonialsTitle: values.testimonialsTitle,
       newsTitle: values.newsTitle,
@@ -1740,12 +1740,12 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       ]);
       const failed = responses.find((response) => !response.ok);
       if (failed) {
-        notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: await readApiError(failed, "Ki?m tra quy?n t�i kho?n ho?c d? li?u nh?p.") });
+        notify({ tone: "error", title: "Không lưu được cấu hình", description: await readApiError(failed, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
         return;
       }
-      notify({ tone: "success", title: "�� luu c?u h�nh website", description: "M�u s?c, font ch? v� d? r?ng frontend s? t? d?ng b? khi m? l?i tab ho?c t?i l?i trang." });
+      notify({ tone: "success", title: "Đã lưu cấu hình website", description: "Màu sắc, font chữ và độ rộng frontend sẽ tự đồng bộ khi mở lại tab hoặc tải lại trang." });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không lưu được cấu hình", description: describeClientError(error, "Không kết nối được API.") });
     } finally {
       setSaving(false);
     }
@@ -1756,93 +1756,93 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       <article className="panel settings-card">
         <div className="panel-heading">
           <div>
-            <h2>Th�ng tin thuong hi?u</h2>
-            <p>D? li?u n�y d�ng cho header, footer, form tu v?n v� c�c trang public.</p>
+            <h2>Thông tin thương hiệu</h2>
+            <p>Dữ liệu này dùng cho header, footer, form tư vấn và các trang public.</p>
           </div>
         </div>
         <form className="cms-form two-columns" onSubmit={submit}>
-          <label>T�n thuong hi?u<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="H� Th�nh Home" /></label>
-          <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thi?t k? - Thi c�ng - N?i th?t" /></label>
+          <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
+          <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
           <label>Hotline<input value={values.hotline} onChange={(event) => setValues({ ...values, hotline: event.target.value })} placeholder="0966 123 456" /></label>
           <label>Email<input value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} placeholder="info@hathanhhome.vn" /></label>
-          <label className="wide">�?a ch?<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="S? 123 Nguy?n Tr�i, H� N?i" /></label>
+          <label className="wide">Địa chỉ<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="Số 123 Nguyễn Trãi, Hà Nội" /></label>
           <label>Facebook<input value={values.facebook} onChange={(event) => setValues({ ...values, facebook: event.target.value })} placeholder="https://facebook.com/..." /></label>
           <label>Zalo<input value={values.zalo} onChange={(event) => setValues({ ...values, zalo: event.target.value })} placeholder="https://zalo.me/..." /></label>
-          <label className="wide">Gi? l�m vi?c<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Th? 2 - Th? 7" /></label>
+          <label className="wide">Giờ làm việc<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Thứ 2 - Thứ 7" /></label>
 
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">
               <span>Homepage</span>
-              <div><h3>Hero, banner slide v� CTA</h3><p>�i?u ch?nh n?i dung ph?n d?u trang ch?. ?nh n�n ch?n t? Media Library d? tr�nh link h?ng.</p></div>
+              <div><h3>Hero, banner slide và CTA</h3><p>Điều chỉnh nội dung phần đầu trang chủ. Ảnh nên chọn từ Media Library để tránh link hỏng.</p></div>
             </div>
             <div className="form-grid">
               <label>Eyebrow hero<input value={values.heroEyebrow} onChange={(event) => setValues({ ...values, heroEyebrow: event.target.value })} /></label>
-              <label className="wide">Ti�u d? hero<textarea value={values.heroTitle} onChange={(event) => setValues({ ...values, heroTitle: event.target.value })} rows={3} /></label>
-              <label className="wide">M� t? hero<textarea value={values.heroDescription} onChange={(event) => setValues({ ...values, heroDescription: event.target.value })} rows={3} /></label>
-              <ImageUrlPicker label="?nh banner hero" value={values.heroImageUrl} onChange={(value) => setValues({ ...values, heroImageUrl: value })} />
-              <label>N�t ch�nh<input value={values.heroPrimaryLabel} onChange={(event) => setValues({ ...values, heroPrimaryLabel: event.target.value })} /></label>
-              <label>Link n�t ch�nh<input value={values.heroPrimaryUrl} onChange={(event) => setValues({ ...values, heroPrimaryUrl: event.target.value })} /></label>
-              <label>N�t ph?<input value={values.heroSecondaryLabel} onChange={(event) => setValues({ ...values, heroSecondaryLabel: event.target.value })} /></label>
-              <label>Link n�t ph?<input value={values.heroSecondaryUrl} onChange={(event) => setValues({ ...values, heroSecondaryUrl: event.target.value })} /></label>
+              <label className="wide">Tiêu đề hero<textarea value={values.heroTitle} onChange={(event) => setValues({ ...values, heroTitle: event.target.value })} rows={3} /></label>
+              <label className="wide">Mô tả hero<textarea value={values.heroDescription} onChange={(event) => setValues({ ...values, heroDescription: event.target.value })} rows={3} /></label>
+              <ImageUrlPicker label="Ảnh banner hero" value={values.heroImageUrl} onChange={(value) => setValues({ ...values, heroImageUrl: value })} />
+              <label>Nút chính<input value={values.heroPrimaryLabel} onChange={(event) => setValues({ ...values, heroPrimaryLabel: event.target.value })} /></label>
+              <label>Link nút chính<input value={values.heroPrimaryUrl} onChange={(event) => setValues({ ...values, heroPrimaryUrl: event.target.value })} /></label>
+              <label>Nút phụ<input value={values.heroSecondaryLabel} onChange={(event) => setValues({ ...values, heroSecondaryLabel: event.target.value })} /></label>
+              <label>Link nút phụ<input value={values.heroSecondaryUrl} onChange={(event) => setValues({ ...values, heroSecondaryUrl: event.target.value })} /></label>
             </div>
           </div>
 
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">
               <span>Sections</span>
-              <div><h3>N?i dung c�c section trang ch?</h3><p>C�c ti�u d? n�y s? render tr?c ti?p ngo�i client v� du?c can gi?a theo layout m?i.</p></div>
+              <div><h3>Nội dung các section trang chủ</h3><p>Các tiêu đề này sẽ render trực tiếp ngoài client và được căn giữa theo layout mới.</p></div>
             </div>
             <div className="form-grid">
-              <label>Eyebrow gi?i thi?u<input value={values.aboutEyebrow} onChange={(event) => setValues({ ...values, aboutEyebrow: event.target.value })} /></label>
-              <label className="wide">Ti�u d? gi?i thi?u<textarea value={values.aboutTitle} onChange={(event) => setValues({ ...values, aboutTitle: event.target.value })} rows={2} /></label>
-              <label className="wide">M� t? gi?i thi?u<textarea value={values.aboutDescription} onChange={(event) => setValues({ ...values, aboutDescription: event.target.value })} rows={3} /></label>
-              <ImageUrlPicker label="?nh section gi?i thi?u" value={values.aboutImageUrl} onChange={(value) => setValues({ ...values, aboutImageUrl: value })} />
-              <label>Eyebrow kh?i chuy�n m�n<input value={values.expertiseEyebrow} onChange={(event) => setValues({ ...values, expertiseEyebrow: event.target.value })} /></label>
-              <label>Ti�u d? kh?i chuy�n m�n<input value={values.expertiseTitle} onChange={(event) => setValues({ ...values, expertiseTitle: event.target.value })} /></label>
-              <label>Ti�u d? m?u ki?n tr�c<input value={values.architectureTemplatesTitle} onChange={(event) => setValues({ ...values, architectureTemplatesTitle: event.target.value })} /></label>
-              <label>Ti�u d? m?u n?i th?t<input value={values.interiorTemplatesTitle} onChange={(event) => setValues({ ...values, interiorTemplatesTitle: event.target.value })} /></label>
-              <label>Ti�u d? d?ch v?<input value={values.servicesTitle} onChange={(event) => setValues({ ...values, servicesTitle: event.target.value })} /></label>
-              <label>Ti�u d? quy tr�nh<input value={values.processTitle} onChange={(event) => setValues({ ...values, processTitle: event.target.value })} /></label>
-              <label>Ti�u d? d�nh gi�<input value={values.testimonialsTitle} onChange={(event) => setValues({ ...values, testimonialsTitle: event.target.value })} /></label>
-              <label>Ti�u d? tin t?c<input value={values.newsTitle} onChange={(event) => setValues({ ...values, newsTitle: event.target.value })} /></label>
+              <label>Eyebrow giới thiệu<input value={values.aboutEyebrow} onChange={(event) => setValues({ ...values, aboutEyebrow: event.target.value })} /></label>
+              <label className="wide">Tiêu đề giới thiệu<textarea value={values.aboutTitle} onChange={(event) => setValues({ ...values, aboutTitle: event.target.value })} rows={2} /></label>
+              <label className="wide">Mô tả giới thiệu<textarea value={values.aboutDescription} onChange={(event) => setValues({ ...values, aboutDescription: event.target.value })} rows={3} /></label>
+              <ImageUrlPicker label="Ảnh section giới thiệu" value={values.aboutImageUrl} onChange={(value) => setValues({ ...values, aboutImageUrl: value })} />
+              <label>Eyebrow khối chuyên môn<input value={values.expertiseEyebrow} onChange={(event) => setValues({ ...values, expertiseEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề khối chuyên môn<input value={values.expertiseTitle} onChange={(event) => setValues({ ...values, expertiseTitle: event.target.value })} /></label>
+              <label>Tiêu đề mẫu kiến trúc<input value={values.architectureTemplatesTitle} onChange={(event) => setValues({ ...values, architectureTemplatesTitle: event.target.value })} /></label>
+              <label>Tiêu đề mẫu nội thất<input value={values.interiorTemplatesTitle} onChange={(event) => setValues({ ...values, interiorTemplatesTitle: event.target.value })} /></label>
+              <label>Tiêu đề dịch vụ<input value={values.servicesTitle} onChange={(event) => setValues({ ...values, servicesTitle: event.target.value })} /></label>
+              <label>Tiêu đề quy trình<input value={values.processTitle} onChange={(event) => setValues({ ...values, processTitle: event.target.value })} /></label>
+              <label>Tiêu đề đánh giá<input value={values.testimonialsTitle} onChange={(event) => setValues({ ...values, testimonialsTitle: event.target.value })} /></label>
+              <label>Tiêu đề tin tức<input value={values.newsTitle} onChange={(event) => setValues({ ...values, newsTitle: event.target.value })} /></label>
             </div>
           </div>
 
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">
               <span>UI</span>
-              <div><h3>Giao di?n frontend client</h3><p>Thay d?i m�u s?c, font ch? v� d? r?ng container c?a to�n b? website public.</p></div>
+              <div><h3>Giao diện frontend client</h3><p>Thay đổi màu sắc, font chữ và độ rộng container của toàn bộ website public.</p></div>
             </div>
             <div className="form-grid">
               <label>Forest green<input type="color" value={values.forestGreen} onChange={(event) => setValues({ ...values, forestGreen: event.target.value })} /></label>
               <label>Gold / bronze<input type="color" value={values.gold} onChange={(event) => setValues({ ...values, gold: event.target.value })} /></label>
               <label>Cream<input type="color" value={values.cream} onChange={(event) => setValues({ ...values, cream: event.target.value })} /></label>
               <label>Charcoal<input type="color" value={values.charcoal} onChange={(event) => setValues({ ...values, charcoal: event.target.value })} /></label>
-              <label>M�u heading<input type="color" value={values.headingColor} onChange={(event) => setValues({ ...values, headingColor: event.target.value })} /></label>
-              <label>M�u text ph?<input type="color" value={values.mutedColor} onChange={(event) => setValues({ ...values, mutedColor: event.target.value })} /></label>
-              <label>M�u border<input type="color" value={values.lineColor} onChange={(event) => setValues({ ...values, lineColor: event.target.value })} /></label>
-              <label>�? r?ng layout<input type="number" min={1180} max={1680} step={20} value={values.containerMax} onChange={(event) => setValues({ ...values, containerMax: event.target.value })} /></label>
+              <label>Màu heading<input type="color" value={values.headingColor} onChange={(event) => setValues({ ...values, headingColor: event.target.value })} /></label>
+              <label>Màu text phụ<input type="color" value={values.mutedColor} onChange={(event) => setValues({ ...values, mutedColor: event.target.value })} /></label>
+              <label>Màu border<input type="color" value={values.lineColor} onChange={(event) => setValues({ ...values, lineColor: event.target.value })} /></label>
+              <label>Độ rộng layout<input type="number" min={1180} max={1680} step={20} value={values.containerMax} onChange={(event) => setValues({ ...values, containerMax: event.target.value })} /></label>
               <label>Font heading<select value={values.headingFont} onChange={(event) => setValues({ ...values, headingFont: event.target.value })}><option value="cormorant">Cormorant Garamond</option><option value="playfair">Playfair Display</option><option value="roboto">Roboto</option><option value="serif">System Serif</option></select></label>
               <label>Font body<select value={values.bodyFont} onChange={(event) => setValues({ ...values, bodyFont: event.target.value })}><option value="inter">Inter</option><option value="beVietnam">Be Vietnam Pro</option><option value="roboto">Roboto</option><option value="system">System Sans</option></select></label>
             </div>
           </div>
 
           <div className="form-actions wide">
-            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "�ang luu..." : "Luu c?u h�nh"}</button>
+            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
           </div>
         </form>
       </article>
       <aside className="panel settings-preview">
         <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
-        <h2>{values.name || "H� Th�nh Home"}</h2>
-        <p>{values.tagline || "Thi?t k? - Thi c�ng - N?i th?t"}</p>
+        <h2>{values.name || "Hà Thành Home"}</h2>
+        <p>{values.tagline || "Thiết kế - Thi công - Nội thất"}</p>
         <div className="theme-preview-strip">
           {[values.forestGreen, values.gold, values.cream, values.charcoal, values.headingColor].map((color) => <span key={color} style={{ background: color }} />)}
         </div>
         <dl>
-          <div><dt>Hotline</dt><dd>{values.hotline || "Chua c?u h�nh"}</dd></div>
-          <div><dt>Email</dt><dd>{values.email || "Chua c?u h�nh"}</dd></div>
-          <div><dt>�?a ch?</dt><dd>{values.address || "Chua c?u h�nh"}</dd></div>
+          <div><dt>Hotline</dt><dd>{values.hotline || "Chưa cấu hình"}</dd></div>
+          <div><dt>Email</dt><dd>{values.email || "Chưa cấu hình"}</dd></div>
+          <div><dt>Địa chỉ</dt><dd>{values.address || "Chưa cấu hình"}</dd></div>
           <div><dt>Layout</dt><dd>{values.containerMax}px, heading {values.headingFont}, body {values.bodyFont}</dd></div>
         </dl>
       </aside>
@@ -1853,8 +1853,8 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
 function SettingsPanel({ roles }: { roles: string[] }) {
   const { notify } = useAdminFeedback();
   const [values, setValues] = useState<Record<string, string>>({
-    name: "H� Th�nh Home",
-    tagline: "Thi?t k? - Thi c�ng - N?i th?t",
+    name: "Hà Thành Home",
+    tagline: "Thiết kế - Thi công - Nội thất",
     hotline: "",
     email: "",
     address: "",
@@ -1868,7 +1868,7 @@ function SettingsPanel({ roles }: { roles: string[] }) {
   useEffect(() => {
     apiFetch("/api/cms/settings")
       .then(async (res) => {
-        if (!res.ok) throw new Error(await readApiError(res, "Kh�ng t?i du?c c?u h�nh website."));
+        if (!res.ok) throw new Error(await readApiError(res, "Không tải được cấu hình website."));
         return res.json();
       })
       .then((payload) => {
@@ -1885,7 +1885,7 @@ function SettingsPanel({ roles }: { roles: string[] }) {
           workingHours: String(identity.workingHours || ""),
         }));
       })
-      .catch((error) => notify({ tone: "error", title: "Kh�ng t?i du?c c?u h�nh", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") }));
+      .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
   }, [notify]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -1900,17 +1900,17 @@ function SettingsPanel({ roles }: { roles: string[] }) {
         body: JSON.stringify({ key: "site.identity", value: values }),
       });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không lưu được cấu hình", description: describeClientError(error, "Không kết nối được API.") });
       setSaving(false);
       return;
     }
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng luu du?c c?u h�nh", description: await readApiError(response, "Ki?m tra quy?n t�i kho?n ho?c k?t n?i API.") });
+      notify({ tone: "error", title: "Không lưu được cấu hình", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc kết nối API.") });
       setSaving(false);
       return;
     }
     setSaving(false);
-    notify({ tone: "success", title: "�� luu c?u h�nh website" });
+    notify({ tone: "success", title: "Đã lưu cấu hình website" });
   }
 
   return (
@@ -1918,32 +1918,32 @@ function SettingsPanel({ roles }: { roles: string[] }) {
       <article className="panel settings-card">
         <div className="panel-heading">
           <div>
-            <h2>Th�ng tin li�n h?</h2>
-            <p>D? li?u n�y d�ng cho footer, form tu v?n v� c�c trang public.</p>
+            <h2>Thông tin liên hệ</h2>
+            <p>Dữ liệu này dùng cho footer, form tư vấn và các trang public.</p>
           </div>
         </div>
         <form className="cms-form two-columns" onSubmit={submit}>
-          <label>T�n thuong hi?u<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="H� Th�nh Home" /></label>
-          <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thi?t k? - Thi c�ng - N?i th?t" /></label>
+          <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
+          <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
           <label>Hotline<input value={values.hotline} onChange={(event) => setValues({ ...values, hotline: event.target.value })} placeholder="0966 123 456" /></label>
           <label>Email<input value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} placeholder="info@hathanhhome.vn" /></label>
-          <label className="wide">�?a ch?<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="S? 123 Nguy?n Tr�i, H� N?i" /></label>
+          <label className="wide">Địa chỉ<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="Số 123 Nguyễn Trãi, Hà Nội" /></label>
           <label>Facebook<input value={values.facebook} onChange={(event) => setValues({ ...values, facebook: event.target.value })} placeholder="https://facebook.com/..." /></label>
           <label>Zalo<input value={values.zalo} onChange={(event) => setValues({ ...values, zalo: event.target.value })} placeholder="https://zalo.me/..." /></label>
-          <label className="wide">Gi? l�m vi?c<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Th? 2 - Th? 7" /></label>
+          <label className="wide">Giờ làm việc<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Thứ 2 - Thứ 7" /></label>
           <div className="form-actions wide">
-            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "�ang luu..." : "Luu c?u h�nh"}</button>
+            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
           </div>
         </form>
       </article>
       <aside className="panel settings-preview">
         <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
-        <h2>{values.name || "H� Th�nh Home"}</h2>
-        <p>{values.tagline || "Thi?t k? - Thi c�ng - N?i th?t"}</p>
+        <h2>{values.name || "Hà Thành Home"}</h2>
+        <p>{values.tagline || "Thiết kế - Thi công - Nội thất"}</p>
         <dl>
-          <div><dt>Hotline</dt><dd>{values.hotline || "Chua c?u h�nh"}</dd></div>
-          <div><dt>Email</dt><dd>{values.email || "Chua c?u h�nh"}</dd></div>
-          <div><dt>�?a ch?</dt><dd>{values.address || "Chua c?u h�nh"}</dd></div>
+          <div><dt>Hotline</dt><dd>{values.hotline || "Chưa cấu hình"}</dd></div>
+          <div><dt>Email</dt><dd>{values.email || "Chưa cấu hình"}</dd></div>
+          <div><dt>Địa chỉ</dt><dd>{values.address || "Chưa cấu hình"}</dd></div>
         </dl>
       </aside>
     </section>
@@ -1987,12 +1987,12 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
         window.location.href = "/login";
         return;
       }
-      if (!response.ok) throw new Error(await readApiError(response, `Kh�ng t?i du?c ${entitySingular[entity]}.`));
+      if (!response.ok) throw new Error(await readApiError(response, `Không tải được ${entitySingular[entity]}.`));
       const payload: ListResponse<CmsItem> = await response.json();
       setRows(payload.data || []);
       setMeta(payload.meta || meta);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c danh s�ch", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được danh sách", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
@@ -2002,32 +2002,32 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() });
     try {
       const response = await apiFetch(`/api/cms/scheduled-posts?${params}`);
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c l?ch dang b�i."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được lịch đăng bài."));
       setScheduledRows(await response.json());
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c l?ch dang", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được lịch đăng", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
   async function loadProjectCategories() {
     try {
       const response = await apiFetch("/api/cms/project-categories?limit=200");
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c danh m?c d? �n."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được danh mục dự án."));
       const payload: ListResponse<CmsItem> = await response.json();
       setProjectCategories(payload.data || []);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c danh m?c d? �n", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được danh mục dự án", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
   async function loadFilterOptions() {
     try {
       const response = await apiFetch("/api/cms/project-filter-options?limit=500");
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c b? l?c catalog."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được bộ lọc catalog."));
       const payload: ListResponse<CmsItem> = await response.json();
       setFilterOptions(payload.data || []);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c b? l?c catalog", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được bộ lọc catalog", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
@@ -2068,7 +2068,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   async function submit(values: Record<string, unknown>) {
     const parsed = contentSchema.safeParse(values);
     if (!parsed.success) {
-      notify({ tone: "error", title: "D? li?u kh�ng h?p l?", description: parsed.error.issues[0]?.message || "Ki?m tra l?i c�c tru?ng b?t bu?c." });
+      notify({ tone: "error", title: "Dữ liệu không hợp lệ", description: parsed.error.issues[0]?.message || "Kiểm tra lại các trường bắt buộc." });
       return;
     }
     let response: Response;
@@ -2079,11 +2079,11 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
         body: JSON.stringify(normalizePayload(entity, values)),
       });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng luu du?c d? li?u", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không lưu được dữ liệu", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng luu du?c d? li?u", description: await readApiError(response, "Ki?m tra quy?n t�i kho?n ho?c d? li?u nh?p.") });
+      notify({ tone: "error", title: "Không lưu được dữ liệu", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
       return;
     }
     const saved = await response.json();
@@ -2096,88 +2096,88 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
           body: JSON.stringify({ scheduledAt: values.scheduledAt }),
         });
       } catch (error) {
-        notify({ tone: "error", title: "Kh�ng d?t du?c l?ch dang", description: describeClientError(error, "B�i d� luu nhung API l?ch dang kh�ng ph?n h?i.") });
+        notify({ tone: "error", title: "Không đặt được lịch đăng", description: describeClientError(error, "Bài đã lưu nhưng API lịch đăng không phản hồi.") });
         return;
       }
       if (!scheduleResponse.ok) {
-        notify({ tone: "error", title: "Kh�ng d?t du?c l?ch dang", description: await readApiError(scheduleResponse, "B�i d� luu nhung l?ch dang chua du?c c?p nh?t.") });
+        notify({ tone: "error", title: "Không đặt được lịch đăng", description: await readApiError(scheduleResponse, "Bài đã lưu nhưng lịch đăng chưa được cập nhật.") });
         return;
       }
     }
     await load(meta.page);
     await loadScheduled();
     backToList();
-    notify({ tone: "success", title: editing ? "�� c?p nh?t d? li?u" : "�� t?o d? li?u m?i" });
+    notify({ tone: "success", title: editing ? "Đã cập nhật dữ liệu" : "Đã tạo dữ liệu mới" });
   }
 
   async function remove(row: CmsItem) {
     const accepted = await confirm({
       tone: "danger",
-      title: `X�a ${entitySingular[entity]}?`,
-      description: `B?n ghi "${row.title || row.fullName || `#${row.id}`}" s? b? x�a kh?i h? th?ng.`,
-      confirmLabel: "X�a",
+      title: `Xóa ${entitySingular[entity]}?`,
+      description: `Bản ghi "${row.title || row.fullName || `#${row.id}`}" sẽ bị xóa khỏi hệ thống.`,
+      confirmLabel: "Xóa",
     });
     if (!accepted) return;
     let response: Response;
     try {
       response = await apiFetch(`/api/cms/${entity}/${row.id}`, { method: "DELETE" });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng x�a du?c d? li?u", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không xóa được dữ liệu", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng x�a du?c d? li?u", description: await readApiError(response, "B?n ghi c� th? dang du?c s? d?ng ho?c t�i kho?n kh�ng d? quy?n.") });
+      notify({ tone: "error", title: "Không xóa được dữ liệu", description: await readApiError(response, "Bản ghi có thể đang được sử dụng hoặc tài khoản không đủ quyền.") });
       return;
     }
     await load(meta.page);
-    notify({ tone: "success", title: "�� x�a d? li?u" });
+    notify({ tone: "success", title: "Đã xóa dữ liệu" });
   }
 
   async function publishPost(row: CmsItem) {
     const accepted = await confirm({
-      title: "Xu?t b?n b�i vi?t?",
-      description: `B�i "${row.title || `#${row.id}`}" s? chuy?n sang tr?ng th�i d� xu?t b?n ngay.`,
-      confirmLabel: "Xu?t b?n",
+      title: "Xuất bản bài viết?",
+      description: `Bài "${row.title || `#${row.id}`}" sẽ chuyển sang trạng thái đã xuất bản ngay.`,
+      confirmLabel: "Xuất bản",
     });
     if (!accepted) return;
     let response: Response;
     try {
       response = await apiFetch(`/api/cms/posts/${row.id}/publish`, { method: "POST" });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng xu?t b?n du?c b�i vi?t", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không xuất bản được bài viết", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng xu?t b?n du?c b�i vi?t", description: await readApiError(response, "Ki?m tra tr?ng th�i b�i vi?t ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không xuất bản được bài viết", description: await readApiError(response, "Kiểm tra trạng thái bài viết hoặc quyền tài khoản.") });
       return;
     }
     await load(meta.page);
     await loadScheduled();
-    notify({ tone: "success", title: "�� xu?t b?n b�i vi?t" });
+    notify({ tone: "success", title: "Đã xuất bản bài viết" });
   }
 
   async function cancelSchedule(row: CmsItem) {
     const accepted = await confirm({
       tone: "danger",
-      title: "H?y l?ch dang?",
-      description: `B�i "${row.title || `#${row.id}`}" s? tr? v? tr?ng th�i nh�p.`,
-      confirmLabel: "H?y l?ch",
+      title: "Hủy lịch đăng?",
+      description: `Bài "${row.title || `#${row.id}`}" sẽ trở về trạng thái nháp.`,
+      confirmLabel: "Hủy lịch",
     });
     if (!accepted) return;
     let response: Response;
     try {
       response = await apiFetch(`/api/cms/posts/${row.id}/cancel-schedule`, { method: "POST" });
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng h?y du?c l?ch dang", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không hủy được lịch đăng", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng h?y du?c l?ch dang", description: await readApiError(response, "Ki?m tra tr?ng th�i b�i vi?t ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không hủy được lịch đăng", description: await readApiError(response, "Kiểm tra trạng thái bài viết hoặc quyền tài khoản.") });
       return;
     }
     await load(meta.page);
     await loadScheduled();
-    notify({ tone: "success", title: "�� h?y l?ch dang" });
+    notify({ tone: "success", title: "Đã hủy lịch đăng" });
   }
 
   if (mode === "form") {
@@ -2189,22 +2189,22 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       <section className="entity-form-screen">
         <article className="panel entity-form-page">
           <div className="form-page-header">
-            <button className="secondary-button back-button" onClick={backToList} type="button"><ArrowLeft size={16} /> Quay l?i danh s�ch</button>
+            <button className="secondary-button back-button" onClick={backToList} type="button"><ArrowLeft size={16} /> Quay lại danh sách</button>
             <div>
-              <span>{editing ? "Ch?nh s?a" : "T?o m?i"}</span>
-              <h2>{editing ? `C?p nh?t ${entitySingular[entity]}` : metaInfo.createLabel || `Th�m ${entitySingular[entity]}`}</h2>
-              <p>{editing ? `�ang s?a: ${editing.title || editing.fullName || `#${editing.id}`}` : "Nh?p n?i dung tr�n m?t m�n h�nh r?ng d? thao t�c d? hon."}</p>
+              <span>{editing ? "Chỉnh sửa" : "Tạo mới"}</span>
+              <h2>{editing ? `Cập nhật ${entitySingular[entity]}` : metaInfo.createLabel || `Thêm ${entitySingular[entity]}`}</h2>
+              <p>{editing ? `Đang sửa: ${editing.title || editing.fullName || `#${editing.id}`}` : "Nhập nội dung trên một màn hình rộng để thao tác dễ hơn."}</p>
             </div>
           </div>
           {canWrite ? (
             <form className="cms-form editor-form" onSubmit={form.handleSubmit(submit)}>
               <EntityFields entity={entity} filterOptions={filterOptions} form={form} projectCategories={projectCategories} />
               <div className="form-actions sticky-actions">
-                <button className="secondary-button" type="button" onClick={editing ? () => startEdit(editing) : startCreate}>L�m m?i</button>
-                <button className="primary-button" type="submit">Luu thay d?i</button>
+                <button className="secondary-button" type="button" onClick={editing ? () => startEdit(editing) : startCreate}>Làm mới</button>
+                <button className="primary-button" type="submit">Lưu thay đổi</button>
               </div>
             </form>
-          ) : <p className="muted">T�i kho?n hi?n t?i ch? c� quy?n xem d? li?u n�y.</p>}
+          ) : <p className="muted">Tài khoản hiện tại chỉ có quyền xem dữ liệu này.</p>}
         </article>
       </section>
     );
@@ -2214,76 +2214,76 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     <section className="entity-layout list-only">
       <article className="panel entity-list">
         <div className="panel-heading">
-          <div><h2>Danh s�ch</h2><p>{meta.total} b?n ghi trong h? th?ng.</p></div>
+          <div><h2>Danh sách</h2><p>{meta.total} bản ghi trong hệ thống.</p></div>
           <div className="heading-actions">
             {entity === "posts" ? (
-              <div className="view-switch" aria-label="Ch? d? xem b�i vi?t">
-                <button className={view === "table" ? "active" : ""} onClick={() => setView("table")} type="button">Danh s�ch</button>
-                <button className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")} type="button"><CalendarClock size={15} /> L?ch dang</button>
+              <div className="view-switch" aria-label="Chế độ xem bài viết">
+                <button className={view === "table" ? "active" : ""} onClick={() => setView("table")} type="button">Danh sách</button>
+                <button className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")} type="button"><CalendarClock size={15} /> Lịch đăng</button>
               </div>
             ) : null}
             {canWrite && entity !== "leads" ? <button className="primary-button" onClick={startCreate} type="button"><Plus size={16} /> {metaInfo.createLabel}</button> : null}
           </div>
         </div>
         <div className="entity-toolbar">
-          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="T�m ki?m..." /></div>
+          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm..." /></div>
           {["projects", "services", "project-categories", "project-filter-options"].includes(entity) ? (
             <select value={group} onChange={(event) => setGroup(event.target.value)}>
-              <option value="">T?t c? nh�m</option>
-              <option value="construction">C�ng tr�nh</option>
-              <option value="interior">N?i th?t</option>
+              <option value="">Tất cả nhóm</option>
+              <option value="construction">Công trình</option>
+              <option value="interior">Nội thất</option>
             </select>
           ) : null}
           {entity === "project-filter-options" ? (
             <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}>
-              <option value="">T?t c? lo?i filter</option>
-              <option value="project_type">Lo?i d? �n</option>
-              <option value="house_type">Lo?i nh�</option>
-              <option value="interior_style">Phong c�ch n?i th?t</option>
-              <option value="style">Phong c�ch</option>
-              <option value="scale">Quy m�</option>
-              <option value="location">�?a di?m</option>
-              <option value="space">Kh�ng gian</option>
-              <option value="room_type">Lo?i ph�ng</option>
-              <option value="roof_type">Ki?u m�i</option>
-              <option value="floors">S? t?ng</option>
+              <option value="">Tất cả loại filter</option>
+              <option value="project_type">Loại dự án</option>
+              <option value="house_type">Loại nhà</option>
+              <option value="interior_style">Phong cách nội thất</option>
+              <option value="style">Phong cách</option>
+              <option value="scale">Quy mô</option>
+              <option value="location">Địa điểm</option>
+              <option value="space">Không gian</option>
+              <option value="room_type">Loại phòng</option>
+              <option value="roof_type">Kiểu mái</option>
+              <option value="floors">Số tầng</option>
               <option value="layout_type">Layout</option>
-              <option value="material_tone">Tone v?t li?u</option>
-              <option value="budget_range">Ng�n s�ch</option>
+              <option value="material_tone">Tone vật liệu</option>
+              <option value="budget_range">Ngân sách</option>
             </select>
           ) : null}
           {entity === "project-filter-options" ? (
             <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}>
-              <option value="">T?t c? module</option>
-              <option value="project">D? �n</option>
-              <option value="architecture_design">M?u ki?n tr�c</option>
-              <option value="interior_design">M?u n?i th?t</option>
+              <option value="">Tất cả module</option>
+              <option value="project">Dự án</option>
+              <option value="architecture_design">Mẫu kiến trúc</option>
+              <option value="interior_design">Mẫu nội thất</option>
             </select>
           ) : null}
           {entity === "architecture-designs" ? (
             <>
-              <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}><option value="">T?t c? lo?i nh�</option><option>Bi?t th?</option><option>Nh� ph?</option><option>Nh� c?p 4</option><option>Showroom</option></select>
-              <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}><option value="">T?t c? phong c�ch</option><option>Hi?n d?i</option><option>T�n c? di?n</option><option>T?i gi?n</option><option>Indochine</option></select>
+              <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}><option value="">Tất cả loại nhà</option><option>Biệt thự</option><option>Nhà phố</option><option>Nhà cấp 4</option><option>Showroom</option></select>
+              <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}><option value="">Tất cả phong cách</option><option>Hiện đại</option><option>Tân cổ điển</option><option>Tối giản</option><option>Indochine</option></select>
             </>
           ) : null}
           {entity === "interior-designs" ? (
             <>
-              <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}><option value="">T?t c? phong c�ch</option><option>Hi?n d?i</option><option>T�n c? di?n</option><option>T?i gi?n</option><option>Indochine</option></select>
-              <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}><option value="">T?t c? lo?i ph�ng</option><option>Ph�ng kh�ch</option><option>Ph�ng ng?</option><option>B?p</option><option>Tr?n g�i</option></select>
+              <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}><option value="">Tất cả phong cách</option><option>Hiện đại</option><option>Tân cổ điển</option><option>Tối giản</option><option>Indochine</option></select>
+              <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}><option value="">Tất cả loại phòng</option><option>Phòng khách</option><option>Phòng ngủ</option><option>Bếp</option><option>Trọn gói</option></select>
             </>
           ) : null}
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="">T?t c? tr?ng th�i</option>
+            <option value="">Tất cả trạng thái</option>
             {(entity === "leads" ? ["new", "contacted", "consulting", "won", "lost", "spam"] : ["draft", "pending_review", "scheduled", "published", "archived"]).map((item) => (
               <option value={item} key={item}>{statusLabels[item] || item}</option>
             ))}
           </select>
-          <button className="secondary-button" onClick={() => load(1)} type="button">L?c</button>
+          <button className="secondary-button" onClick={() => load(1)} type="button">Lọc</button>
         </div>
         {entity === "posts" && view === "calendar" ? <PostCalendarView canWrite={canWrite} monthDate={calendarDate} onCancelSchedule={cancelSchedule} onEdit={startEdit} onMonthChange={setCalendarDate} onPublish={publishPost} posts={scheduledRows} /> : <DataTable rows={rows} entity={entity} onEdit={startEdit} onDelete={remove} canWrite={canWrite} />}
         <div className="pagination" hidden={entity === "posts" && view === "calendar"}>
           <span>Trang {meta.page}/{meta.totalPages}</span>
-          <div><button disabled={meta.page <= 1} onClick={() => load(meta.page - 1)} type="button">Tru?c</button><button disabled={meta.page >= meta.totalPages} onClick={() => load(meta.page + 1)} type="button">Sau</button></div>
+          <div><button disabled={meta.page <= 1} onClick={() => load(meta.page - 1)} type="button">Trước</button><button disabled={meta.page >= meta.totalPages} onClick={() => load(meta.page + 1)} type="button">Sau</button></div>
         </div>
       </article>
     </section>
@@ -2294,8 +2294,8 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
   if (entity === "leads") {
     return (
       <>
-        <label>Tr?ng th�i<select {...form.register("status")}><option value="new">M?i</option><option value="contacted">�� li�n h?</option><option value="consulting">�ang tu v?n</option><option value="won">�� ch?t</option><option value="lost">Kh�ng ti?m nang</option><option value="spam">Spam</option></select></label>
-        <label>Ghi ch� n?i b?<textarea {...form.register("note")} rows={6} /></label>
+        <label>Trạng thái<select {...form.register("status")}><option value="new">Mới</option><option value="contacted">Đã liên hệ</option><option value="consulting">Đang tư vấn</option><option value="won">Đã chốt</option><option value="lost">Không tiềm năng</option><option value="spam">Spam</option></select></label>
+        <label>Ghi chú nội bộ<textarea {...form.register("note")} rows={6} /></label>
       </>
     );
   }
@@ -2303,13 +2303,13 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
     return (
       <>
         <section className="form-section">
-          <div className="form-section-title"><span>01</span><div><h3>Danh m?c d? �n</h3><p>D�ng l�m tab nhanh tr�n trang D? �n d� th?c hi?n.</p></div></div>
+          <div className="form-section-title"><span>01</span><div><h3>Danh mục dự án</h3><p>Dùng làm tab nhanh trên trang Dự án đã thực hiện.</p></div></div>
           <div className="form-grid">
-            <label>T�n danh m?c<input {...form.register("name")} placeholder="Bi?t th?, nh� ph?, can h?..." /></label>
-            <label>Slug<input {...form.register("slug")} placeholder="T? t?o n?u b? tr?ng" /></label>
-            <label>Nh�m<select {...form.register("group")}><option value="construction">C�ng tr�nh</option><option value="interior">N?i th?t</option></select></label>
-            <label>Th? t?<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
-            <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> �ang hi?n th? ngo�i website</label>
+            <label>Tên danh mục<input {...form.register("name")} placeholder="Biệt thự, nhà phố, căn hộ..." /></label>
+            <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
+            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+            <label>Thứ tự<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
+            <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> Đang hiển thị ngoài website</label>
           </div>
         </section>
       </>
@@ -2319,15 +2319,15 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
     return (
       <>
         <section className="form-section">
-          <div className="form-section-title"><span>01</span><div><h3>Option b? l?c</h3><p>D�ng cho dropdown l?c d? �n ngo�i website.</p></div></div>
+          <div className="form-section-title"><span>01</span><div><h3>Option bộ lọc</h3><p>Dùng cho dropdown lọc dự án ngoài website.</p></div></div>
           <div className="form-grid">
-            <label>T�n option<input {...form.register("name")} placeholder="Hi?n d?i, quy m� v?a, H� N?i..." /></label>
-            <label>Module<select {...form.register("module")}><option value="project">D? �n d� th?c hi?n</option><option value="architecture_design">M?u thi?t k? ki?n tr�c</option><option value="interior_design">M?u thi?t k? n?i th?t</option></select></label>
-            <label>Slug<input {...form.register("slug")} placeholder="T? t?o n?u b? tr?ng" /></label>
-            <label>Nh�m<select {...form.register("group")}><option value="construction">C�ng tr�nh</option><option value="interior">N?i th?t</option></select></label>
-            <label>Lo?i filter<select {...form.register("type")}><option value="project_type">Lo?i d? �n</option><option value="house_type">Lo?i nh�</option><option value="interior_style">Phong c�ch n?i th?t</option><option value="style">Phong c�ch</option><option value="scale">Quy m�</option><option value="location">�?a di?m</option><option value="space">Kh�ng gian</option><option value="room_type">Lo?i ph�ng</option><option value="roof_type">Ki?u m�i</option><option value="floors">S? t?ng</option><option value="layout_type">Layout</option><option value="material_tone">Tone v?t li?u</option><option value="budget_range">Ng�n s�ch</option></select></label>
-            <label>Th? t?<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
-            <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> �ang hi?n th? ngo�i website</label>
+            <label>Tên option<input {...form.register("name")} placeholder="Hiện đại, quy mô vừa, Hà Nội..." /></label>
+            <label>Module<select {...form.register("module")}><option value="project">Dự án đã thực hiện</option><option value="architecture_design">Mẫu thiết kế kiến trúc</option><option value="interior_design">Mẫu thiết kế nội thất</option></select></label>
+            <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
+            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+            <label>Loại filter<select {...form.register("type")}><option value="project_type">Loại dự án</option><option value="house_type">Loại nhà</option><option value="interior_style">Phong cách nội thất</option><option value="style">Phong cách</option><option value="scale">Quy mô</option><option value="location">Địa điểm</option><option value="space">Không gian</option><option value="room_type">Loại phòng</option><option value="roof_type">Kiểu mái</option><option value="floors">Số tầng</option><option value="layout_type">Layout</option><option value="material_tone">Tone vật liệu</option><option value="budget_range">Ngân sách</option></select></label>
+            <label>Thứ tự<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
+            <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> Đang hiển thị ngoài website</label>
           </div>
         </section>
       </>
@@ -2336,46 +2336,46 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
   return (
     <>
       <section className="form-section">
-        <div className="form-section-title"><span>01</span><div><h3>Th�ng tin chung</h3><p>Ti�u d?, slug, ph�n nh�m v� m� t? hi?n th? tr�n website.</p></div></div>
+        <div className="form-section-title"><span>01</span><div><h3>Thông tin chung</h3><p>Tiêu đề, slug, phân nhóm và mô tả hiển thị trên website.</p></div></div>
         <div className="form-grid">
-          <label>Ti�u d?<input {...form.register("title")} placeholder="Nh?p ti�u d? hi?n th?" /></label>
-          <label>Slug<input {...form.register("slug")} placeholder="T? t?o n?u b? tr?ng" /></label>
-          {["architecture-designs", "interior-designs"].includes(entity) ? <label>M� m?u<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
+          <label>Tiêu đề<input {...form.register("title")} placeholder="Nhập tiêu đề hiển thị" /></label>
+          <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
+          {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
           {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} /> : null}
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} /> : null}
-          {["projects", "services"].includes(entity) ? <label>Nh�m n?i dung<select {...form.register("group")}><option value="construction">C�ng tr�nh</option><option value="interior">N?i th?t</option></select></label> : null}
+          {["projects", "services"].includes(entity) ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label> : null}
           {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} /> : null}
-          {entity === "posts" ? <label className="wide">T�m t?t b�i vi?t<textarea {...form.register("excerpt")} rows={3} /></label> : null}
-          {entity !== "posts" ? <label className="wide">M� t? ng?n<textarea {...form.register("description")} rows={4} /></label> : null}
+          {entity === "posts" ? <label className="wide">Tóm tắt bài viết<textarea {...form.register("excerpt")} rows={3} /></label> : null}
+          {entity !== "posts" ? <label className="wide">Mô tả ngắn<textarea {...form.register("description")} rows={4} /></label> : null}
         </div>
       </section>
 
       <section className="form-section">
-        <div className="form-section-title"><span>02</span><div><h3>?nh & SEO</h3><p>?nh d?i di?n, metadata v� d? li?u Open Graph cho Google/social.</p></div></div>
+        <div className="form-section-title"><span>02</span><div><h3>Ảnh & SEO</h3><p>Ảnh đại diện, metadata và dữ liệu Open Graph cho Google/social.</p></div></div>
         <div className="form-grid">
           <ThumbnailPickerField form={form} />
           {["projects", "architecture-designs", "interior-designs"].includes(entity) ? <GalleryPickerField form={form} /> : null}
-          <label>Meta title<input {...form.register("metaTitle")} placeholder="T?i da kho?ng 60 k� t?" /></label>
+          <label>Meta title<input {...form.register("metaTitle")} placeholder="Tối đa khoảng 60 ký tự" /></label>
           <label>Canonical URL<input {...form.register("canonicalUrl")} placeholder="https://domain.com/duong-dan-chuan" /></label>
-          <label className="wide">Meta description<textarea {...form.register("metaDescription")} rows={3} placeholder="T?i da kho?ng 155 k� t?" /></label>
-          <label>OG title<input {...form.register("ogTitle")} placeholder="Ti�u d? khi chia s? m?ng x� h?i" /></label>
-          {entity === "posts" ? <label>T? kh�a ch�nh<input {...form.register("focusKeyword")} placeholder="T? kh�a SEO ch�nh" /></label> : null}
+          <label className="wide">Meta description<textarea {...form.register("metaDescription")} rows={3} placeholder="Tối đa khoảng 155 ký tự" /></label>
+          <label>OG title<input {...form.register("ogTitle")} placeholder="Tiêu đề khi chia sẻ mạng xã hội" /></label>
+          {entity === "posts" ? <label>Từ khóa chính<input {...form.register("focusKeyword")} placeholder="Từ khóa SEO chính" /></label> : null}
           <label className="wide">OG description<textarea {...form.register("ogDescription")} rows={3} /></label>
         </div>
       </section>
 
       <section className="form-section">
-        <div className="form-section-title"><span>03</span><div><h3>N?i dung chi ti?t</h3><p>So?n n?i dung b?ng editor, ch�n ?nh tr?c ti?p t? Media Library.</p></div></div>
+        <div className="form-section-title"><span>03</span><div><h3>Nội dung chi tiết</h3><p>Soạn nội dung bằng editor, chèn ảnh trực tiếp từ Media Library.</p></div></div>
         <div className="form-field"><RichTextField value={String(form.watch("contentHtml") || "")} onChange={(value) => form.setValue("contentHtml", value)} /></div>
       </section>
 
       <section className="form-section publish-section">
-        <div className="form-section-title"><span>04</span><div><h3>Xu?t b?n</h3><p>Tr?ng th�i, l?ch dang, th? t? hi?n th? v� l?a ch?n n?i b?t.</p></div></div>
+        <div className="form-section-title"><span>04</span><div><h3>Xuất bản</h3><p>Trạng thái, lịch đăng, thứ tự hiển thị và lựa chọn nổi bật.</p></div></div>
         <div className="form-grid">
-          <label>Tr?ng th�i<select {...form.register("status")}><option value="draft">Nh�p</option><option value="pending_review">Ch? duy?t</option><option value="scheduled">�?t l?ch</option><option value="published">�� xu?t b?n</option><option value="archived">Luu tr?</option></select></label>
-          {entity === "posts" ? <label>L?ch dang<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
-          {["projects", "services"].includes(entity) ? <label>Th? t? hi?n th?<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
-          <label className="check-row wide"><input type="checkbox" {...form.register("isFeatured")} /> Hi?n th? n?i b?t tr�n website</label>
+          <label>Trạng thái<select {...form.register("status")}><option value="draft">Nháp</option><option value="pending_review">Chờ duyệt</option><option value="scheduled">Đặt lịch</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
+          {entity === "posts" ? <label>Lịch đăng<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
+          {["projects", "services"].includes(entity) ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
+          <label className="check-row wide"><input type="checkbox" {...form.register("isFeatured")} /> Hiển thị nổi bật trên website</label>
         </div>
       </section>
     </>
@@ -2387,16 +2387,16 @@ function ProjectFields({ filterOptions, form, projectCategories }: { filterOptio
   const categories = projectCategories.filter((category) => String(category.group) === group);
   return (
     <>
-      <label>Danh m?c d? �n<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Ch?n danh m?c</option>{categories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label>
-      <label>Danh m?c fallback<input {...form.register("category")} placeholder="Bi?t th?, can h?, showroom..." /></label>
-      <TaxonomySelect form={form} name="projectType" label="Lo?i d? �n" module="project" group={group} type="project_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="style" label="Phong c�ch" module="project" group={group} type="style" options={filterOptions} />
-      <TaxonomySelect form={form} name="location" label="�?a di?m" module="project" group={group} type="location" options={filterOptions} />
-      <label>Di?n t�ch hi?n th?<input {...form.register("area")} placeholder="225m2, 1.200m2..." /></label>
-      <label>Di?n t�ch s? m2<input type="number" min={0} {...form.register("areaValue", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="scale" label="Quy m�" module="project" group={group} type="scale" options={filterOptions} />
-      <label>Ch? d?u tu / kh�ch h�ng<input {...form.register("clientName")} placeholder="Gia d�nh tu nh�n, doanh nghi?p..." /></label>
-      <TaxonomySelect form={form} name="budgetRange" label="Kho?ng ng�n s�ch" module="project" group={group} type="budget_range" options={filterOptions} />
+      <label>Danh mục dự án<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{categories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label>
+      <label>Danh mục fallback<input {...form.register("category")} placeholder="Biệt thự, căn hộ, showroom..." /></label>
+      <TaxonomySelect form={form} name="projectType" label="Loại dự án" module="project" group={group} type="project_type" options={filterOptions} />
+      <TaxonomySelect form={form} name="style" label="Phong cách" module="project" group={group} type="style" options={filterOptions} />
+      <TaxonomySelect form={form} name="location" label="Địa điểm" module="project" group={group} type="location" options={filterOptions} />
+      <label>Diện tích hiển thị<input {...form.register("area")} placeholder="225m2, 1.200m2..." /></label>
+      <label>Diện tích số m2<input type="number" min={0} {...form.register("areaValue", { valueAsNumber: true })} /></label>
+      <TaxonomySelect form={form} name="scale" label="Quy mô" module="project" group={group} type="scale" options={filterOptions} />
+      <label>Chủ đầu tư / khách hàng<input {...form.register("clientName")} placeholder="Gia đình tư nhân, doanh nghiệp..." /></label>
+      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="project" group={group} type="budget_range" options={filterOptions} />
     </>
   );
 }
@@ -2404,18 +2404,18 @@ function ProjectFields({ filterOptions, form, projectCategories }: { filterOptio
 function ArchitectureDesignFields({ filterOptions, form }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
   return (
     <>
-      <TaxonomySelect form={form} name="houseType" label="Lo?i nh�" module="architecture_design" group="construction" type="house_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="style" label="Phong c�ch" module="architecture_design" group="construction" type="style" options={filterOptions} />
-      <label>Di?n t�ch m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="floors" label="S? t?ng" module="architecture_design" group="construction" type="floors" options={filterOptions} numeric />
-      <label>M?t ti?n m<input type="number" min={0} step="0.1" {...form.register("facadeWidth", { valueAsNumber: true })} /></label>
-      <label>Chi?u s�u m<input type="number" min={0} step="0.1" {...form.register("depth", { valueAsNumber: true })} /></label>
-      <label>Ph�ng ng?<input type="number" min={0} {...form.register("bedrooms", { valueAsNumber: true })} /></label>
+      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="architecture_design" group="construction" type="house_type" options={filterOptions} />
+      <TaxonomySelect form={form} name="style" label="Phong cách" module="architecture_design" group="construction" type="style" options={filterOptions} />
+      <label>Diện tích m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
+      <TaxonomySelect form={form} name="floors" label="Số tầng" module="architecture_design" group="construction" type="floors" options={filterOptions} numeric />
+      <label>Mặt tiền m<input type="number" min={0} step="0.1" {...form.register("facadeWidth", { valueAsNumber: true })} /></label>
+      <label>Chiều sâu m<input type="number" min={0} step="0.1" {...form.register("depth", { valueAsNumber: true })} /></label>
+      <label>Phòng ngủ<input type="number" min={0} {...form.register("bedrooms", { valueAsNumber: true })} /></label>
       <label>WC<input type="number" min={0} {...form.register("bathrooms", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="roofType" label="Ki?u m�i" module="architecture_design" group="construction" type="roof_type" options={filterOptions} />
-      <label>Ng�n s�ch d? ki?n tri?u VND<input type="number" min={0} {...form.register("estimatedBudget", { valueAsNumber: true })} /></label>
-      <label>Th?i gian<input {...form.register("constructionTime")} placeholder="4 - 6 th�ng" /></label>
-      <TaxonomySelect form={form} name="location" label="V? tr�" module="architecture_design" group="construction" type="location" options={filterOptions} />
+      <TaxonomySelect form={form} name="roofType" label="Kiểu mái" module="architecture_design" group="construction" type="roof_type" options={filterOptions} />
+      <label>Ngân sách dự kiến triệu VND<input type="number" min={0} {...form.register("estimatedBudget", { valueAsNumber: true })} /></label>
+      <label>Thời gian<input {...form.register("constructionTime")} placeholder="4 - 6 tháng" /></label>
+      <TaxonomySelect form={form} name="location" label="Vị trí" module="architecture_design" group="construction" type="location" options={filterOptions} />
     </>
   );
 }
@@ -2423,16 +2423,16 @@ function ArchitectureDesignFields({ filterOptions, form }: { filterOptions: CmsI
 function InteriorDesignFields({ filterOptions, form }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
   return (
     <>
-      <TaxonomySelect form={form} name="interiorStyle" label="Phong c�ch n?i th?t" module="interior_design" group="interior" type="interior_style" options={filterOptions} />
-      <TaxonomySelect form={form} name="houseType" label="Lo?i nh�" module="interior_design" group="interior" type="house_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="roomType" label="Lo?i ph�ng" module="interior_design" group="interior" type="room_type" options={filterOptions} />
-      <label>Di?n t�ch m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
+      <TaxonomySelect form={form} name="interiorStyle" label="Phong cách nội thất" module="interior_design" group="interior" type="interior_style" options={filterOptions} />
+      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="interior_design" group="interior" type="house_type" options={filterOptions} />
+      <TaxonomySelect form={form} name="roomType" label="Loại phòng" module="interior_design" group="interior" type="room_type" options={filterOptions} />
+      <label>Diện tích m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
       <TaxonomySelect form={form} name="layoutType" label="Layout" module="interior_design" group="interior" type="layout_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="materialTone" label="Tone v?t li?u" module="interior_design" group="interior" type="material_tone" options={filterOptions} />
-      <TaxonomySelect form={form} name="budgetRange" label="Kho?ng ng�n s�ch" module="interior_design" group="interior" type="budget_range" options={filterOptions} />
-      <label>Ng�n s�ch t? tri?u VND<input type="number" min={0} {...form.register("budgetMin", { valueAsNumber: true })} /></label>
-      <label>Ng�n s�ch d?n tri?u VND<input type="number" min={0} {...form.register("budgetMax", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="location" label="V? tr�" module="interior_design" group="interior" type="location" options={filterOptions} />
+      <TaxonomySelect form={form} name="materialTone" label="Tone vật liệu" module="interior_design" group="interior" type="material_tone" options={filterOptions} />
+      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="interior_design" group="interior" type="budget_range" options={filterOptions} />
+      <label>Ngân sách từ triệu VND<input type="number" min={0} {...form.register("budgetMin", { valueAsNumber: true })} /></label>
+      <label>Ngân sách đến triệu VND<input type="number" min={0} {...form.register("budgetMax", { valueAsNumber: true })} /></label>
+      <TaxonomySelect form={form} name="location" label="Vị trí" module="interior_design" group="interior" type="location" options={filterOptions} />
     </>
   );
 }
@@ -2458,7 +2458,7 @@ function TaxonomySelect({
 }) {
   const items = options.filter((item) => String(item.module || "project") === module && String(item.group) === group && String(item.type) === type && item.isActive !== false);
   return (
-    <label>{label}<select {...form.register(name, numeric ? { valueAsNumber: true } : undefined)}><option value="">Ch?n {label.toLowerCase()}</option>{items.map((item) => <option key={item.id} value={String(item.name)}>{String(item.name)}</option>)}</select></label>
+    <label>{label}<select {...form.register(name, numeric ? { valueAsNumber: true } : undefined)}><option value="">Chọn {label.toLowerCase()}</option>{items.map((item) => <option key={item.id} value={String(item.name)}>{String(item.name)}</option>)}</select></label>
   );
 }
 
@@ -2474,11 +2474,11 @@ function LeadDetailPanel({ lead, onBack, onUpdated }: { lead: CmsItem; onBack: (
   async function loadNotes() {
     try {
       const response = await apiFetch(`/api/cms/leads/${lead.id}/notes`);
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c ghi ch� lead."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được ghi chú lead."));
       const payload: LeadNote[] = await response.json();
       setNotes(payload);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c ghi ch� lead", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được ghi chú lead", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     }
   }
 
@@ -2499,23 +2499,23 @@ function LeadDetailPanel({ lead, onBack, onUpdated }: { lead: CmsItem; onBack: (
       });
     } catch (error) {
       setSaving(false);
-      notify({ tone: "error", title: "Kh�ng c?p nh?t du?c lead", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không cập nhật được lead", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     setSaving(false);
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng c?p nh?t du?c lead", description: await readApiError(response, "Ki?m tra quy?n t�i kho?n ho?c d? li?u nh?p.") });
+      notify({ tone: "error", title: "Không cập nhật được lead", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
       return;
     }
     await onUpdated();
-    notify({ tone: "success", title: "�� c?p nh?t lead" });
+    notify({ tone: "success", title: "Đã cập nhật lead" });
   }
 
   async function addNote(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = newNote.trim();
     if (!content) {
-      notify({ tone: "error", title: "Ghi ch� dang tr?ng", description: "Nh?p n?i dung tu v?n tru?c khi luu." });
+      notify({ tone: "error", title: "Ghi chú đang trống", description: "Nhập nội dung tư vấn trước khi lưu." });
       return;
     }
     setAddingNote(true);
@@ -2528,31 +2528,31 @@ function LeadDetailPanel({ lead, onBack, onUpdated }: { lead: CmsItem; onBack: (
       });
     } catch (error) {
       setAddingNote(false);
-      notify({ tone: "error", title: "Kh�ng luu du?c ghi ch�", description: describeClientError(error, "Kh�ng k?t n?i du?c API.") });
+      notify({ tone: "error", title: "Không lưu được ghi chú", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     setAddingNote(false);
     if (!response.ok) {
-      notify({ tone: "error", title: "Kh�ng luu du?c ghi ch�", description: await readApiError(response, "Ki?m tra quy?n t�i kho?n ho?c n?i dung ghi ch�.") });
+      notify({ tone: "error", title: "Không lưu được ghi chú", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc nội dung ghi chú.") });
       return;
     }
     setNewNote("");
     await loadNotes();
-    notify({ tone: "success", title: "�� th�m ghi ch� tu v?n" });
+    notify({ tone: "success", title: "Đã thêm ghi chú tư vấn" });
   }
 
   return (
     <section className="entity-form-screen">
       <article className="panel entity-form-page">
         <div className="form-page-header lead-header">
-          <button className="secondary-button back-button" onClick={onBack} type="button"><ArrowLeft size={16} /> Quay l?i danh s�ch</button>
+          <button className="secondary-button back-button" onClick={onBack} type="button"><ArrowLeft size={16} /> Quay lại danh sách</button>
           <div>
-            <span>Lead tu v?n</span>
+            <span>Lead tư vấn</span>
             <h2>{lead.fullName || `Lead #${lead.id}`}</h2>
-            <p>{lead.phone || "Chua c� s? di?n tho?i"}{lead.email ? ` - ${lead.email}` : ""}</p>
+            <p>{lead.phone || "Chưa có số điện thoại"}{lead.email ? ` - ${lead.email}` : ""}</p>
           </div>
           <div className="lead-header-actions">
-            <a className="secondary-button" href={lead.phone ? `tel:${lead.phone}` : undefined}><PhoneCall size={16} /> G?i ngay</a>
+            <a className="secondary-button" href={lead.phone ? `tel:${lead.phone}` : undefined}><PhoneCall size={16} /> Gọi ngay</a>
             {lead.email ? <a className="secondary-button" href={`mailto:${lead.email}`}><ExternalLink size={16} /> Email</a> : null}
           </div>
         </div>
@@ -2560,53 +2560,53 @@ function LeadDetailPanel({ lead, onBack, onUpdated }: { lead: CmsItem; onBack: (
         <div className="lead-detail-layout">
           <section className="lead-main">
             <div className="form-section">
-              <div className="form-section-title"><span>01</span><div><h3>Th�ng tin kh�ch h�ng</h3><p>Nhu c?u v� ngu?n lead d? sales n?m b?i c?nh tru?c khi tu v?n.</p></div></div>
+              <div className="form-section-title"><span>01</span><div><h3>Thông tin khách hàng</h3><p>Nhu cầu và nguồn lead để sales nắm bối cảnh trước khi tư vấn.</p></div></div>
               <div className="lead-info-grid">
-                <InfoItem label="H? t�n" value={lead.fullName} />
-                <InfoItem label="�i?n tho?i" value={lead.phone} />
+                <InfoItem label="Họ tên" value={lead.fullName} />
+                <InfoItem label="Điện thoại" value={lead.phone} />
                 <InfoItem label="Email" value={lead.email} />
-                <InfoItem label="Nhu c?u" value={lead.demandType} />
-                <InfoItem label="Lo?i d? �n" value={lead.projectType} />
-                <InfoItem label="Di?n t�ch" value={lead.area} />
-                <InfoItem label="Ng�n s�ch" value={lead.budget} />
-                <InfoItem label="Khu v?c" value={lead.location} />
-                <InfoItem label="Ngu?n" value={lead.sourceUrl || lead.sourceType} wide />
-                <InfoItem label="Ng�y t?o" value={formatDateTime(lead.createdAt)} />
+                <InfoItem label="Nhu cầu" value={lead.demandType} />
+                <InfoItem label="Loại dự án" value={lead.projectType} />
+                <InfoItem label="Diện tích" value={lead.area} />
+                <InfoItem label="Ngân sách" value={lead.budget} />
+                <InfoItem label="Khu vực" value={lead.location} />
+                <InfoItem label="Nguồn" value={lead.sourceUrl || lead.sourceType} wide />
+                <InfoItem label="Ngày tạo" value={formatDateTime(lead.createdAt)} />
               </div>
               <div className="lead-message">
-                <span>N?i dung kh�ch d? l?i</span>
-                <p>{lead.message || "Kh�ch chua d? l?i n?i dung chi ti?t."}</p>
+                <span>Nội dung khách để lại</span>
+                <p>{lead.message || "Khách chưa để lại nội dung chi tiết."}</p>
               </div>
             </div>
 
             <div className="form-section">
-              <div className="form-section-title"><span>02</span><div><h3>Timeline tu v?n</h3><p>Ghi l?i l?ch s? trao d?i d? c�c sale theo d�i li�n t?c.</p></div></div>
+              <div className="form-section-title"><span>02</span><div><h3>Timeline tư vấn</h3><p>Ghi lại lịch sử trao đổi để các sale theo dõi liên tục.</p></div></div>
               <form className="lead-note-form" onSubmit={addNote}>
-                <textarea value={newNote} onChange={(event) => setNewNote(event.target.value)} rows={4} placeholder="Nh?p ghi ch� cu?c g?i, nhu c?u, b�o gi�, l?ch h?n..." />
-                <div className="form-actions"><button className="primary-button" disabled={addingNote} type="submit">{addingNote ? "�ang luu..." : "Th�m ghi ch�"}</button></div>
+                <textarea value={newNote} onChange={(event) => setNewNote(event.target.value)} rows={4} placeholder="Nhập ghi chú cuộc gọi, nhu cầu, báo giá, lịch hẹn..." />
+                <div className="form-actions"><button className="primary-button" disabled={addingNote} type="submit">{addingNote ? "Đang lưu..." : "Thêm ghi chú"}</button></div>
               </form>
               <div className="lead-timeline">
                 {notes.map((item) => (
                   <article className="lead-note" key={item.id}>
                     <span />
                     <div>
-                      <strong>{item.user?.fullName || item.user?.email || "Nh�n s?"}</strong>
+                      <strong>{item.user?.fullName || item.user?.email || "Nhân sự"}</strong>
                       <time>{formatDateTime(item.createdAt)}</time>
                       <p>{item.note}</p>
                     </div>
                   </article>
                 ))}
-                {notes.length === 0 ? <div className="empty-state">Chua c� ghi ch� tu v?n n�o cho lead n�y.</div> : null}
+                {notes.length === 0 ? <div className="empty-state">Chưa có ghi chú tư vấn nào cho lead này.</div> : null}
               </div>
             </div>
           </section>
 
           <aside className="lead-side">
             <div className="panel lead-status-card">
-              <h3>C?p nh?t x? l�</h3>
-              <label>Tr?ng th�i<select value={status} onChange={(event) => setStatus(event.target.value)}>{["new", "contacted", "consulting", "won", "lost", "spam"].map((item) => <option value={item} key={item}>{statusLabels[item]}</option>)}</select></label>
-              <label>Ghi ch� t?ng<textarea value={note} onChange={(event) => setNote(event.target.value)} rows={7} placeholder="Ghi ch� ng?n hi?n th? ? danh s�ch lead" /></label>
-              <button className="primary-button" disabled={saving} onClick={saveLead} type="button">{saving ? "�ang luu..." : "Luu tr?ng th�i"}</button>
+              <h3>Cập nhật xử lý</h3>
+              <label>Trạng thái<select value={status} onChange={(event) => setStatus(event.target.value)}>{["new", "contacted", "consulting", "won", "lost", "spam"].map((item) => <option value={item} key={item}>{statusLabels[item]}</option>)}</select></label>
+              <label>Ghi chú tổng<textarea value={note} onChange={(event) => setNote(event.target.value)} rows={7} placeholder="Ghi chú ngắn hiển thị ở danh sách lead" /></label>
+              <button className="primary-button" disabled={saving} onClick={saveLead} type="button">{saving ? "Đang lưu..." : "Lưu trạng thái"}</button>
             </div>
           </aside>
         </div>
@@ -2616,11 +2616,11 @@ function LeadDetailPanel({ lead, onBack, onUpdated }: { lead: CmsItem; onBack: (
 }
 
 function InfoItem({ label, value, wide }: { label: string; value: unknown; wide?: boolean }) {
-  return <div className={`lead-info-item ${wide ? "wide" : ""}`}><span>{label}</span><strong>{String(value || "Chua c?p nh?t")}</strong></div>;
+  return <div className={`lead-info-item ${wide ? "wide" : ""}`}><span>{label}</span><strong>{String(value || "Chưa cập nhật")}</strong></div>;
 }
 
 function formatDateTime(value: unknown) {
-  if (!value) return "Chua c?p nh?t";
+  if (!value) return "Chưa cập nhật";
   const date = new Date(String(value));
   if (Number.isNaN(date.getTime())) return String(value);
   return new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" }).format(date);
@@ -2644,16 +2644,16 @@ function ThumbnailPickerField({ form }: { form: ReturnType<typeof useForm<Record
 
   return (
     <div className="form-field thumbnail-field">
-      <span>?nh d?i di?n</span>
+      <span>Ảnh đại diện</span>
       <div className="thumbnail-picker">
         {selectedUrl ? (
-          <img alt={String(selected?.altText || selected?.originalName || "?nh d?i di?n")} src={selectedUrl} />
+          <img alt={String(selected?.altText || selected?.originalName || "Ảnh đại diện")} src={selectedUrl} />
         ) : (
-          <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chua ch?n ?nh</strong><small>Ch?n ?nh t? Media Library d? d�ng l�m thumbnail ngo�i website.</small></div>
+          <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chưa chọn ảnh</strong><small>Chọn ảnh từ Media Library để dùng làm thumbnail ngoài website.</small></div>
         )}
         <div>
-          <button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Ch?n ?nh t? thu vi?n</button>
-          {selectedUrl ? <button className="secondary-button danger" onClick={clearMedia} type="button">B? ch?n</button> : null}
+          <button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Chọn ảnh từ thư viện</button>
+          {selectedUrl ? <button className="secondary-button danger" onClick={clearMedia} type="button">Bỏ chọn</button> : null}
           {selected ? <p>{String(selected.originalName || selected.fileName || "")}</p> : null}
         </div>
       </div>
@@ -2678,12 +2678,12 @@ function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<s
 
   return (
     <div className="form-field thumbnail-field">
-      <span>Gallery ?nh</span>
+      <span>Gallery ảnh</span>
       <div className="thumbnail-picker">
         <div className="gallery-id-list">
-          {gallery.length ? gallery.map((id) => <button className="secondary-button" key={id} onClick={() => removeMedia(id)} type="button">?nh #{id} �</button>) : <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chua ch?n gallery</strong><small>Ch?n nhi?u ?nh t? Media Library d? hi?n th? trong trang chi ti?t.</small></div>}
+          {gallery.length ? gallery.map((id) => <button className="secondary-button" key={id} onClick={() => removeMedia(id)} type="button">Ảnh #{id} ×</button>) : <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chưa chọn gallery</strong><small>Chọn nhiều ảnh từ Media Library để hiển thị trong trang chi tiết.</small></div>}
         </div>
-        <div><button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Th�m ?nh gallery</button></div>
+        <div><button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Thêm ảnh gallery</button></div>
       </div>
       {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={addMedia} /> : null}
     </div>
@@ -2693,7 +2693,7 @@ function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<s
 function RichTextField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const editor = useEditor({
-    extensions: [StarterKit, Underline, Link.configure({ openOnClick: false }), ImageExtension.configure({ inline: false, allowBase64: false }), Placeholder.configure({ placeholder: "So?n n?i dung chi ti?t..." })],
+    extensions: [StarterKit, Underline, Link.configure({ openOnClick: false }), ImageExtension.configure({ inline: false, allowBase64: false }), Placeholder.configure({ placeholder: "Soạn nội dung chi tiết..." })],
     content: value || "",
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -2706,7 +2706,7 @@ function RichTextField({ value, onChange }: { value: string; onChange: (value: s
   if (!editor) return <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={9} />;
 
   function addLink() {
-    const url = window.prompt("Nh?p URL li�n k?t");
+    const url = window.prompt("Nhập URL liên kết");
     if (url) editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }
 
@@ -2725,10 +2725,10 @@ function RichTextField({ value, onChange }: { value: string; onChange: (value: s
         <button className={editor.isActive("heading", { level: 2 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} type="button"><Heading2 size={15} /> H2</button>
         <button onClick={() => editor.chain().focus().toggleBulletList().run()} type="button"><List size={15} /> List</button>
         <button onClick={addLink} type="button"><LinkIcon size={15} /> Link</button>
-        <button onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={15} /> ?nh</button>
+        <button onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={15} /> Ảnh</button>
       </div>
       <EditorContent editor={editor} />
-      <p className="editor-hint">Ch�n ?nh tr?c ti?p t? Media Library, c� th? upload nhanh ngay trong popup ch?n ?nh.</p>
+      <p className="editor-hint">Chèn ảnh trực tiếp từ Media Library, có thể upload nhanh ngay trong popup chọn ảnh.</p>
       {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={insertImage} /> : null}
     </div>
   );
@@ -2754,12 +2754,12 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
         window.location.href = "/login";
         return;
       }
-      if (!response.ok) throw new Error(await readApiError(response, "Kh�ng t?i du?c thu vi?n ?nh."));
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được thư viện ảnh."));
       const payload: ListResponse<CmsItem> = await response.json();
       setRows(payload.data || []);
       setSelected((current) => current && payload.data?.some((item) => item.id === current.id) ? current : payload.data?.[0] || null);
     } catch (error) {
-      notify({ tone: "error", title: "Kh�ng t?i du?c thu vi?n ?nh", description: describeClientError(error, "Ki?m tra API ho?c quy?n t�i kho?n.") });
+      notify({ tone: "error", title: "Không tải được thư viện ảnh", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     } finally {
       setLoading(false);
     }
@@ -2790,16 +2790,16 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
         const response = await apiFetch("/api/cms/media/upload", { method: "POST", body: formData });
         if (!response.ok) {
           failed += 1;
-          notify({ tone: "error", title: "Upload th?t b?i", description: `${file.name}: ${await readApiError(response, "File kh�ng h?p l? ho?c vu?t qu� dung lu?ng.")}` });
+          notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${await readApiError(response, "File không hợp lệ hoặc vượt quá dung lượng.")}` });
         }
       } catch (error) {
         failed += 1;
-        notify({ tone: "error", title: "Upload th?t b?i", description: `${file.name}: ${describeClientError(error, "Kh�ng k?t n?i du?c API upload.")}` });
+        notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${describeClientError(error, "Không kết nối được API upload.")}` });
       }
     }
     setUploading(false);
     await load();
-    if (failed < files.length) notify({ tone: "success", title: "Upload ho�n t?t", description: failed ? `�� upload ${files.length - failed}/${files.length} ?nh.` : "B?n c� th? ch?n ?nh v?a upload trong thu vi?n." });
+    if (failed < files.length) notify({ tone: "success", title: "Upload hoàn tất", description: failed ? `Đã upload ${files.length - failed}/${files.length} ảnh.` : "Bạn có thể chọn ảnh vừa upload trong thư viện." });
   }
 
   const selectedUrl = selected ? String(selected.webpUrl || selected.largeUrl || selected.mediumUrl || selected.thumbUrl || "") : "";
@@ -2810,51 +2810,51 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
         <header className="media-picker-header">
           <div>
             <span>Media Library</span>
-            <h2 id="media-picker-title">Ch?n ?nh d? ch�n v�o n?i dung</h2>
+            <h2 id="media-picker-title">Chọn ảnh để chèn vào nội dung</h2>
           </div>
-          <button className="icon-button" onClick={onClose} type="button" aria-label="��ng thu vi?n ?nh"><X size={18} /></button>
+          <button className="icon-button" onClick={onClose} type="button" aria-label="Đóng thư viện ảnh"><X size={18} /></button>
         </header>
 
         <div className="media-picker-toolbar">
-          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") load(); }} placeholder="T�m t�n file, alt, caption..." /></div>
+          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") load(); }} placeholder="Tìm tên file, alt, caption..." /></div>
           <select value={type} onChange={(event) => setType(event.target.value)}>
-            <option value="">T?t c? lo?i ?nh</option>
+            <option value="">Tất cả loại ảnh</option>
             {["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
-          <button className="secondary-button" onClick={load} type="button">L?c</button>
-          <label className="primary-button upload-control">{uploading ? "�ang upload..." : "Upload ?nh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label>
+          <button className="secondary-button" onClick={load} type="button">Lọc</button>
+          <label className="primary-button upload-control">{uploading ? "Đang upload..." : "Upload ảnh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label>
         </div>
 
         <div className="media-picker-body">
           <div className="media-picker-grid">
-            {loading ? <div className="empty-state">�ang t?i thu vi?n ?nh...</div> : null}
+            {loading ? <div className="empty-state">Đang tải thư viện ảnh...</div> : null}
             {!loading && rows.map((media) => (
               <button className={`media-tile ${selected?.id === media.id ? "active" : ""}`} key={media.id} onClick={() => setSelected(media)} onDoubleClick={() => onSelect(media)} type="button">
                 <img alt={String(media.altText || media.originalName || "Media")} src={String(media.thumbUrl || media.webpUrl)} />
                 <span>{String(media.originalName || media.fileName)}</span>
               </button>
             ))}
-            {!loading && rows.length === 0 ? <div className="empty-state">Chua c� ?nh ph� h?p. Upload ?nh m?i ho?c d?i b? l?c.</div> : null}
+            {!loading && rows.length === 0 ? <div className="empty-state">Chưa có ảnh phù hợp. Upload ảnh mới hoặc đổi bộ lọc.</div> : null}
           </div>
 
           <aside className="media-picker-preview">
-            <h3>?nh dang ch?n</h3>
+            <h3>Ảnh đang chọn</h3>
             {selected ? (
               <>
                 <img alt={String(selected.altText || selected.originalName || "Media")} src={selectedUrl} />
                 <dl>
-                  <div><dt>T�n file</dt><dd>{String(selected.originalName || selected.fileName)}</dd></div>
-                  <div><dt>Lo?i</dt><dd>{String(selected.type || "general")}</dd></div>
+                  <div><dt>Tên file</dt><dd>{String(selected.originalName || selected.fileName)}</dd></div>
+                  <div><dt>Loại</dt><dd>{String(selected.type || "general")}</dd></div>
                   <div><dt>URL</dt><dd>{selectedUrl}</dd></div>
                 </dl>
               </>
-            ) : <p className="muted">Ch?n m?t ?nh trong thu vi?n d? xem tru?c.</p>}
+            ) : <p className="muted">Chọn một ảnh trong thư viện để xem trước.</p>}
           </aside>
         </div>
 
         <footer className="media-picker-footer">
-          <button className="secondary-button" onClick={onClose} type="button">H?y</button>
-          <button className="primary-button" disabled={!selected || !selectedUrl} onClick={() => selected ? onSelect(selected) : undefined} type="button"><Check size={16} /> S? d?ng ?nh n�y</button>
+          <button className="secondary-button" onClick={onClose} type="button">Hủy</button>
+          <button className="primary-button" disabled={!selected || !selectedUrl} onClick={() => selected ? onSelect(selected) : undefined} type="button"><Check size={16} /> Sử dụng ảnh này</button>
         </footer>
       </section>
     </div>
@@ -2865,9 +2865,9 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
   const helper = createColumnHelper<CmsItem>();
   const columns = useMemo(
     () => [
-      helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Kh�ch h�ng" : entity === "project-categories" || entity === "project-filter-options" ? "T�n" : "Ti�u d?" }),
-      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "C�ng tr�nh" : row.group === "interior" ? "N?i th?t" : "-", { id: "group", header: entity === "leads" ? "�i?n tho?i" : entity === "project-filter-options" ? "Module / Lo?i filter" : "Nh�m" }),
-      helper.accessor((row) => row.status || "-", { id: "status", header: "Tr?ng th�i", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
+      helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Khách hàng" : entity === "project-categories" || entity === "project-filter-options" ? "Tên" : "Tiêu đề" }),
+      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
+      helper.accessor((row) => row.status || "-", { id: "status", header: "Trạng thái", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
       helper.display({
         id: "actions",
         header: "",
@@ -2875,9 +2875,9 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
           const publicUrl = getPublicEntityUrl(entity, row.original);
           return (
             <div className="row-actions">
-              {publicUrl ? <a className="row-view-link" href={publicUrl} target="_blank" rel="noreferrer" title={row.original.status === "published" ? "Xem ngo�i website" : "M? frontend theo slug. N?i dung chua xu?t b?n c� th? chua hi?n th? public."}><ExternalLink size={13} /> Xem</a> : null}
-              <button onClick={() => onEdit(row.original)} type="button">{canWrite ? "S?a" : "Chi ti?t"}</button>
-              {canWrite && entity !== "leads" ? <button className="danger-action" onClick={() => onDelete(row.original)} type="button">X�a</button> : null}
+              {publicUrl ? <a className="row-view-link" href={publicUrl} target="_blank" rel="noreferrer" title={row.original.status === "published" ? "Xem ngoài website" : "Mở frontend theo slug. Nội dung chưa xuất bản có thể chưa hiển thị public."}><ExternalLink size={13} /> Xem</a> : null}
+              <button onClick={() => onEdit(row.original)} type="button">{canWrite ? "Sửa" : "Chi tiết"}</button>
+              {canWrite && entity !== "leads" ? <button className="danger-action" onClick={() => onDelete(row.original)} type="button">Xóa</button> : null}
             </div>
           );
         },
@@ -2886,7 +2886,7 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
     [entity, canWrite],
   );
   const table = useReactTable({ data: rows, columns, getCoreRowModel: getCoreRowModel() });
-  return <table className="data-table"><thead>{table.getHeaderGroups().map((group) => <tr key={group.id}>{group.headers.map((header) => <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>)}</tr>)}</thead><tbody>{table.getRowModel().rows.map((row) => <tr key={row.id}>{row.getVisibleCells().map((cell) => <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}</tr>)}{rows.length === 0 ? <tr><td colSpan={4}><div className="empty-state">Kh�ng c� d? li?u ph� h?p.</div></td></tr> : null}</tbody></table>;
+  return <table className="data-table"><thead>{table.getHeaderGroups().map((group) => <tr key={group.id}>{group.headers.map((header) => <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>)}</tr>)}</thead><tbody>{table.getRowModel().rows.map((row) => <tr key={row.id}>{row.getVisibleCells().map((cell) => <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}</tr>)}{rows.length === 0 ? <tr><td colSpan={4}><div className="empty-state">Không có dữ liệu phù hợp.</div></td></tr> : null}</tbody></table>;
 }
 
 function PostCalendarView({
@@ -2920,14 +2920,14 @@ function PostCalendarView({
     <section className="post-calendar">
       <header className="calendar-header">
         <div>
-          <span>L?ch dang b�i SEO</span>
+          <span>Lịch đăng bài SEO</span>
           <h3>{monthLabel}</h3>
-          <p>{posts.length} b�i dang d?t l?ch trong th�ng n�y.</p>
+          <p>{posts.length} bài đang đặt lịch trong tháng này.</p>
         </div>
         <div className="calendar-nav">
-          <button className="secondary-button" onClick={() => onMonthChange(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))} type="button">Th�ng tru?c</button>
-          <button className="secondary-button" onClick={() => onMonthChange(new Date())} type="button">H�m nay</button>
-          <button className="secondary-button" onClick={() => onMonthChange(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))} type="button">Th�ng sau</button>
+          <button className="secondary-button" onClick={() => onMonthChange(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))} type="button">Tháng trước</button>
+          <button className="secondary-button" onClick={() => onMonthChange(new Date())} type="button">Hôm nay</button>
+          <button className="secondary-button" onClick={() => onMonthChange(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))} type="button">Tháng sau</button>
         </div>
       </header>
       <div className="calendar-weekdays">
@@ -2948,8 +2948,8 @@ function PostCalendarView({
                       {getPublicEntityUrl("posts", post) ? <a href={getPublicEntityUrl("posts", post) || "#"} target="_blank" rel="noreferrer"><ExternalLink size={12} /> Xem</a> : null}
                       {canWrite ? (
                         <>
-                        <button onClick={() => onPublish(post)} type="button">�ang</button>
-                        <button onClick={() => onCancelSchedule(post)} type="button">H?y</button>
+                        <button onClick={() => onPublish(post)} type="button">Đăng</button>
+                        <button onClick={() => onCancelSchedule(post)} type="button">Hủy</button>
                         </>
                       ) : null}
                     </div>
