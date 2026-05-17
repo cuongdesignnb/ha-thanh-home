@@ -2571,36 +2571,55 @@ h3 {
   }
 
   .template-album-grid {
-    grid-template-columns: 1fr;
-    grid-auto-rows: 220px;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 180px;
   }
 
   .template-album-item:first-child {
+    grid-column: span 2;
     grid-row: span 1;
+    height: 220px;
+  }
+
+  /* Always show "Xem ảnh" badge on touch devices */
+  .template-album-item span {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .gallery-modal {
-    padding: 12px;
+    padding: 0;
+    align-items: flex-end;
   }
 
   .gallery-panel {
-    max-height: calc(100vh - 24px);
-    padding: 12px;
-    border-radius: 18px;
+    width: 100%;
+    max-height: 96dvh;
+    padding: 12px 10px;
+    border-radius: 22px 22px 0 0;
+    gap: 10px;
   }
 
   .gallery-stage img {
-    max-height: 62vh;
+    max-height: 52vh;
   }
 
   .gallery-arrow {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
+    background: rgba(15,61,46,.72);
+  }
+
+  .gallery-arrow.left  { left: 8px; }
+  .gallery-arrow.right { right: 8px; }
+
+  .gallery-thumbs {
+    gap: 7px;
   }
 
   .gallery-thumbs button {
-    flex-basis: 72px;
-    height: 54px;
+    flex-basis: 60px;
+    height: 46px;
   }
 
   .template-article,

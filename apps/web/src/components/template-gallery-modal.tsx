@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 
 type TemplateGalleryModalProps = {
@@ -10,6 +10,7 @@ type TemplateGalleryModalProps = {
 
 export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
   const activeImage = activeIndex === null ? null : images[activeIndex];
 
   function open(index: number) {
@@ -26,6 +27,18 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
 
   function next() {
     setActiveIndex((current) => current === null ? 0 : (current + 1) % images.length);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 40) return;
+    if (delta < 0) next(); else previous();
   }
 
   useEffect(() => {
@@ -68,7 +81,7 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
               <button aria-label="Đóng" onClick={close} type="button"><X size={22} /></button>
             </div>
 
-            <div className="gallery-stage">
+            <div className="gallery-stage" onTouchEnd={handleTouchEnd} onTouchStart={handleTouchStart}>
               {images.length > 1 && <button aria-label="Ảnh trước" className="gallery-arrow left" onClick={previous} type="button"><ChevronLeft size={28} /></button>}
               <img src={activeImage} alt={`${title} - ảnh lớn ${activeIndex + 1}`} />
               {images.length > 1 && <button aria-label="Ảnh sau" className="gallery-arrow right" onClick={next} type="button"><ChevronRight size={28} /></button>}
