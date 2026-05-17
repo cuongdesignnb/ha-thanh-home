@@ -52,7 +52,7 @@ export default function LoginPage() {
       }
 
       showToast({ tone: "success", title: "Đăng nhập thành công", description: "Đang chuyển vào dashboard." });
-      window.location.href = "/";
+      window.location.href = (process.env.NEXT_PUBLIC_ADMIN_BASE_PATH ?? "") + "/";
     } catch (submitError) {
       const detail = submitError instanceof Error ? submitError.message : "Không kết nối được API đăng nhập.";
       setError(detail);
