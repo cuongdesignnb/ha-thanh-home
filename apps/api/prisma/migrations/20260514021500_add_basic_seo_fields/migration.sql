@@ -1,0 +1,20 @@
+ALTER TABLE `Project`
+  ADD COLUMN `metaTitle` VARCHAR(191) NULL,
+  ADD COLUMN `metaDescription` TEXT NULL,
+  ADD COLUMN `canonicalUrl` VARCHAR(191) NULL,
+  ADD COLUMN `ogTitle` VARCHAR(191) NULL,
+  ADD COLUMN `ogDescription` TEXT NULL;
+
+ALTER TABLE `Service`
+  ADD COLUMN `metaTitle` VARCHAR(191) NULL,
+  ADD COLUMN `metaDescription` TEXT NULL,
+  ADD COLUMN `canonicalUrl` VARCHAR(191) NULL,
+  ADD COLUMN `ogTitle` VARCHAR(191) NULL,
+  ADD COLUMN `ogDescription` TEXT NULL;
+
+ALTER TABLE `Post`
+  ADD COLUMN `metaTitle` VARCHAR(191) NULL,
+  ADD COLUMN `metaDescription` TEXT NULL,
+  ADD COLUMN `canonicalUrl` VARCHAR(191) NULL,
+  ADD COLUMN `ogTitle` VARCHAR(191) NULL,
+  ADD COLUMN `ogDescription` TEXT NULL;

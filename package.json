@@ -1,0 +1,35 @@
+{
+  "name": "ha-thanh-home",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:web": "npm run dev -w @hathanh/web",
+    "dev:admin": "npm run dev -w @hathanh/admin",
+    "dev:api": "npm run start:dev -w @hathanh/api",
+    "docker:check-ports": "node scripts/check-ports.mjs",
+    "docker:build": "npm run docker:check-ports && docker compose --env-file .env.docker build",
+    "docker:up": "npm run docker:check-ports && docker compose --env-file .env.docker up -d --build",
+    "docker:dev:build": "npm run docker:check-ports && docker compose --env-file .env.docker -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+    "docker:dev:up": "npm run docker:check-ports && docker compose --env-file .env.docker -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "docker:dev:logs": "docker compose --env-file .env.docker -f docker-compose.yml -f docker-compose.dev.yml logs -f --tail=150",
+    "docker:dev:down": "docker compose --env-file .env.docker -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:dev:rebuild:api": "docker compose --env-file .env.docker -f docker-compose.yml -f docker-compose.dev.yml up -d --build api",
+    "docker:down": "docker compose --env-file .env.docker down",
+    "docker:logs": "docker compose --env-file .env.docker logs -f --tail=150",
+    "docker:prod:build": "docker compose --env-file .env.docker -f docker-compose.prod.yml build",
+    "docker:prod:up": "docker compose --env-file .env.docker -f docker-compose.prod.yml up -d --build",
+    "docker:prod:down": "docker compose --env-file .env.docker -f docker-compose.prod.yml down",
+    "docker:prod:logs": "docker compose --env-file .env.docker -f docker-compose.prod.yml logs -f --tail=150",
+    "docker:prod:migrate": "docker compose --env-file .env.docker -f docker-compose.prod.yml exec api npx prisma migrate deploy",
+    "docker:prod:seed": "docker compose --env-file .env.docker -f docker-compose.prod.yml exec api npm run seed -w @hathanh/api",
+    "check:encoding": "node scripts/check-vietnamese-encoding.mjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

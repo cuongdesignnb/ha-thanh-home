@@ -1,0 +1,79 @@
+version: "3.9"
+
+# Production override cho VPS aaPanel.
+# Cách chạy:
+#   docker compose -f docker-compose.prod.yml --env-file .env.docker up -d --build
+#
+# Đặc điểm:
+#   - KHÔNG chạy MySQL container (dùng MySQL của aaPanel ở host).
+#   - api/web/admin bind 127.0.0.1 → Nginx aaPanel reverse proxy ra ngoài.
+#   - extra_hosts: host.docker.internal → host-gateway để API gọi MySQL host.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: hathanh-api
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: ${DATABASE_URL}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:${API_PORT:-31875}:4000"
+    volumes:
+      - ./storage/uploads:/app/storage/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: hathanh-web
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api:4000/api}
+    ports:
+      - "127.0.0.1:${WEB_PORT:-31873}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        ADMIN_BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+    container_name: hathanh-admin
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api:4000/api}
+    ports:
+      - "127.0.0.1:${ADMIN_PORT:-31874}:3001"
+    depends_on:
+      api:
+        condition: service_healthy

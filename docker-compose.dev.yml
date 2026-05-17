@@ -1,0 +1,37 @@
+services:
+  # NOTE: API stays in production-built mode (node dist/main.js) because tsx watch
+  # does not emit decorator metadata, which breaks NestJS dependency injection.
+  # To pick up API source changes, run: npm run docker:dev:rebuild:api
+  api:
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./storage/uploads:/app/storage/uploads
+
+  web:
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "1"
+      CHOKIDAR_INTERVAL: "300"
+    command: npm run dev -w @hathanh/web
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - web_next_cache:/app/apps/web/.next
+
+  admin:
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "1"
+      CHOKIDAR_INTERVAL: "300"
+    command: npm run dev -w @hathanh/admin
+    volumes:
+      - ./apps/admin:/app/apps/admin
+      - ./packages:/app/packages
+      - admin_next_cache:/app/apps/admin/.next
+
+volumes:
+  web_next_cache:
+  admin_next_cache:

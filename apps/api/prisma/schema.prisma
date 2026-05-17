@@ -1,0 +1,541 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectGroup {
+  construction
+  interior
+}
+
+enum ContentStatus {
+  draft
+  pending_review
+  scheduled
+  published
+  archived
+}
+
+enum LeadStatus {
+  new
+  contacted
+  consulting
+  won
+  lost
+  spam
+}
+
+enum MediaType {
+  project
+  interior
+  construction
+  blog
+  banner
+  service
+  general
+}
+
+enum ProjectFilterType {
+  project_type
+  house_type
+  interior_style
+  style
+  scale
+  location
+  space
+  room_type
+  roof_type
+  floors
+  layout_type
+  material_tone
+  budget_range
+}
+
+enum ProjectFilterModule {
+  project
+  architecture_design
+  interior_design
+}
+
+enum MenuLocation {
+  header
+  footer
+}
+
+enum MenuTarget {
+  self
+  blank
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  roles        UserRole[]
+  leadNotes    LeadNote[]
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  users       UserRole[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Menu {
+  id        Int          @id @default(autoincrement())
+  name      String
+  location  MenuLocation
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  items     MenuItem[]
+
+  @@index([location])
+  @@index([isActive])
+}
+
+model MenuItem {
+  id            Int          @id @default(autoincrement())
+  menuId        Int
+  parentId      Int?
+  label         String
+  url           String
+  target        MenuTarget   @default(self)
+  rel           String?
+  itemType      String       @default("custom")
+  referenceType String?
+  referenceId   Int?
+  sortOrder     Int          @default(0)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  menu          Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parent        MenuItem?    @relation("MenuItemChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children      MenuItem[]   @relation("MenuItemChildren")
+
+  @@index([menuId])
+  @@index([parentId])
+  @@index([sortOrder])
+  @@index([isActive])
+  @@index([referenceType, referenceId])
+}
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  title       String
+  slug        String        @unique
+  group       ProjectGroup
+  categoryId  Int?
+  categoryRef ProjectCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category    String?
+  projectType String?
+  location    String?
+  area        String?
+  areaValue   Int?
+  style       String?
+  scale       String?
+  clientName  String?
+  budgetRange String?
+  year        Int?
+  description String?       @db.Text
+  contentJson Json?
+  contentHtml String?       @db.LongText
+  thumbnailMediaId Int?
+  thumbnailMedia   MediaFile? @relation("ProjectThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  galleryMediaIds Json?
+  metaTitle   String?
+  metaDescription String? @db.Text
+  canonicalUrl String?
+  ogTitle     String?
+  ogDescription String? @db.Text
+  status      ContentStatus @default(draft)
+  isFeatured  Boolean       @default(false)
+  sortOrder   Int           @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([group])
+  @@index([categoryId])
+  @@index([projectType])
+  @@index([style])
+  @@index([scale])
+  @@index([location])
+  @@index([areaValue])
+  @@index([status])
+  @@index([thumbnailMediaId])
+  @@index([createdAt])
+  @@index([publishedAt])
+}
+
+model ProjectCategory {
+  id        Int          @id @default(autoincrement())
+  group     ProjectGroup
+  name      String
+  slug      String       @unique
+  sortOrder Int          @default(0)
+  isActive  Boolean      @default(true)
+  projects  Project[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([group])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model ProjectFilterOption {
+  id        Int               @id @default(autoincrement())
+  module    ProjectFilterModule @default(project)
+  group     ProjectGroup
+  type      ProjectFilterType
+  name      String
+  slug      String            @unique
+  sortOrder Int               @default(0)
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([module])
+  @@index([group])
+  @@index([type])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model Service {
+  id          Int           @id @default(autoincrement())
+  title       String
+  slug        String        @unique
+  group       ProjectGroup
+  icon        String?
+  description String?       @db.Text
+  contentJson Json?
+  contentHtml String?       @db.LongText
+  thumbnailMediaId Int?
+  thumbnailMedia   MediaFile? @relation("ServiceThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  metaTitle   String?
+  metaDescription String? @db.Text
+  canonicalUrl String?
+  ogTitle     String?
+  ogDescription String? @db.Text
+  status      ContentStatus @default(draft)
+  isFeatured  Boolean       @default(false)
+  sortOrder   Int           @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([group])
+  @@index([status])
+  @@index([thumbnailMediaId])
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  title       String
+  slug        String        @unique
+  excerpt     String?       @db.Text
+  contentJson Json?
+  contentHtml String?       @db.LongText
+  thumbnailMediaId Int?
+  thumbnailMedia   MediaFile? @relation("PostThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  metaTitle   String?
+  metaDescription String? @db.Text
+  canonicalUrl String?
+  ogTitle     String?
+  ogDescription String? @db.Text
+  status      ContentStatus @default(draft)
+  focusKeyword String?
+  readingTime Int?
+  wordCount   Int?
+  isFeatured  Boolean      @default(false)
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([status])
+  @@index([thumbnailMediaId])
+  @@index([createdAt])
+  @@index([publishedAt])
+}
+
+model ArchitectureDesignTemplate {
+  id                Int           @id @default(autoincrement())
+  title             String
+  slug              String        @unique
+  code              String?
+  houseType         String?
+  style             String?
+  area              Int?
+  floors            Int?
+  facadeWidth       Float?
+  depth             Float?
+  bedrooms          Int?
+  bathrooms         Int?
+  roofType          String?
+  estimatedBudget   Int?
+  constructionTime  String?
+  location          String?
+  description       String?       @db.Text
+  contentJson       Json?
+  contentHtml       String?       @db.LongText
+  thumbnailMediaId  Int?
+  thumbnailMedia    MediaFile?    @relation("ArchitectureDesignThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  galleryMediaIds   Json?
+  metaTitle         String?
+  metaDescription   String?       @db.Text
+  canonicalUrl      String?
+  ogTitle           String?
+  ogDescription     String?       @db.Text
+  status            ContentStatus @default(draft)
+  isFeatured        Boolean       @default(false)
+  sortOrder         Int           @default(0)
+  publishedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([status])
+  @@index([houseType])
+  @@index([style])
+  @@index([roofType])
+  @@index([area])
+  @@index([floors])
+  @@index([estimatedBudget])
+  @@index([isFeatured])
+  @@index([thumbnailMediaId])
+  @@index([publishedAt])
+}
+
+model InteriorDesignTemplate {
+  id                Int           @id @default(autoincrement())
+  title             String
+  slug              String        @unique
+  code              String?
+  interiorStyle     String?
+  houseType         String?
+  roomType          String?
+  area              Int?
+  layoutType        String?
+  materialTone      String?
+  budgetRange       String?
+  budgetMin         Int?
+  budgetMax         Int?
+  location          String?
+  description       String?       @db.Text
+  contentJson       Json?
+  contentHtml       String?       @db.LongText
+  thumbnailMediaId  Int?
+  thumbnailMedia    MediaFile?    @relation("InteriorDesignThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  galleryMediaIds   Json?
+  metaTitle         String?
+  metaDescription   String?       @db.Text
+  canonicalUrl      String?
+  ogTitle           String?
+  ogDescription     String?       @db.Text
+  status            ContentStatus @default(draft)
+  isFeatured        Boolean       @default(false)
+  sortOrder         Int           @default(0)
+  publishedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([status])
+  @@index([interiorStyle])
+  @@index([houseType])
+  @@index([roomType])
+  @@index([area])
+  @@index([budgetMin])
+  @@index([budgetMax])
+  @@index([isFeatured])
+  @@index([thumbnailMediaId])
+  @@index([publishedAt])
+}
+
+model MediaFile {
+  id          Int       @id @default(autoincrement())
+  originalName String
+  fileName     String
+  mimeType     String
+  extension    String
+  size         Int
+  width        Int?
+  height       Int?
+  hash         String    @unique
+  disk         String    @default("local")
+  originalUrl  String?
+  webpUrl      String
+  thumbUrl     String?
+  mediumUrl    String?
+  largeUrl     String?
+  altText      String?
+  caption      String?
+  description  String?   @db.Text
+  type         MediaType @default(general)
+  usageCount   Int       @default(0)
+  projectThumbnails Project[] @relation("ProjectThumbnail")
+  serviceThumbnails Service[] @relation("ServiceThumbnail")
+  postThumbnails    Post[]    @relation("PostThumbnail")
+  architectureDesignThumbnails ArchitectureDesignTemplate[] @relation("ArchitectureDesignThumbnail")
+  interiorDesignThumbnails InteriorDesignTemplate[] @relation("InteriorDesignThumbnail")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Lead {
+  id                 Int        @id @default(autoincrement())
+  fullName           String
+  phone              String
+  email              String?
+  demandType         String?
+  projectType        String?
+  area               String?
+  budget             String?
+  location           String?
+  message            String?    @db.Text
+  sourceUrl          String?
+  sourceType         String?
+  attachmentMediaIds Json?
+  status             LeadStatus @default(new)
+  note               String?    @db.Text
+  assignedTo         Int?
+  notes              LeadNote[]
+  constructionEstimates ConstructionEstimate[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ConstructionEstimatorConfig {
+  id              Int      @id @default(autoincrement())
+  name            String
+  isActive        Boolean  @default(true)
+  currency        String   @default("VND")
+  minFactor       Float    @default(0.92)
+  maxFactor       Float    @default(1.12)
+  inputSchemaJson Json
+  formulaItemsJson Json
+  disclaimer      String?  @db.Text
+  ctaTitle        String?
+  ctaDescription  String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([updatedAt])
+}
+
+model ConstructionEstimate {
+  id             Int      @id @default(autoincrement())
+  configId       Int?
+  configName     String?
+  inputJson      Json
+  variablesJson  Json
+  lineItemsJson  Json
+  total          BigInt
+  totalMin       BigInt
+  totalMax       BigInt
+  currency       String   @default("VND")
+  sourceUrl      String?
+  leadId         Int?
+  lead           Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([createdAt])
+}
+
+model LeadNote {
+  id        Int      @id @default(autoincrement())
+  leadId    Int
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  note      String   @db.Text
+  createdBy Int?
+  user      User?    @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+  @@index([createdAt])
+}
+
+model AiGeneration {
+  id        Int      @id @default(autoincrement())
+  prompt    String   @db.LongText
+  provider  String
+  model     String?
+  input     Json?
+  output    Json?
+  status    String   @default("success")
+  createdBy Int?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model SeoMeta {
+  id              Int      @id @default(autoincrement())
+  entityType      String
+  entityId        Int
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  slug            String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?  @db.Text
+  robotsIndex     Boolean  @default(true)
+  robotsFollow    Boolean  @default(true)
+  schemaJson      Json?
+  focusKeyword    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([slug])
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  actorId   Int?
+  action    String
+  entityType String?
+  entityId   Int?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
