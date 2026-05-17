@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   assetPrefix: basePath || undefined,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_ADMIN_BASE_PATH: basePath,
   },
 };
 
