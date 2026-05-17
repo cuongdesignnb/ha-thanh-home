@@ -2,7 +2,7 @@ version: "3.9"
 
 # Production override cho VPS aaPanel.
 # Cách chạy:
-#   docker compose -f docker-compose.prod.yml --env-file .env.docker up -d --build
+#   docker compose -f docker-compose.prod.yml --env-file .env.docker.prod up -d --build
 #
 # Đặc điểm:
 #   - KHÔNG chạy MySQL container (dùng MySQL của aaPanel ở host).
@@ -17,7 +17,7 @@ services:
     container_name: hathanh-api
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.prod
     environment:
       NODE_ENV: production
       PORT: 4000
@@ -42,7 +42,7 @@ services:
     container_name: hathanh-web
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.prod
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -65,7 +65,7 @@ services:
     container_name: hathanh-admin
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.prod
     environment:
       NODE_ENV: production
       PORT: 3001

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy / cập nhật ha-thanh-home trên VPS aaPanel.
-# Chạy ở thư mục repo (vd: /www/wwwroot/ha-thanh-home).
+# Chạy ở thư mục repo (vd: /www/wwwroot/hathanh.cuongdesign.net).
 #
 # Usage:
 #   bash scripts/deploy.sh           # pull + build + up
@@ -11,11 +11,14 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+ENV_FILE=".env.docker.prod"
+COMPOSE="docker compose --env-file ${ENV_FILE} -f docker-compose.prod.yml"
+
 echo "==> git pull"
 git pull --ff-only
 
 echo "==> docker compose build + up"
-docker compose --env-file .env.docker -f docker-compose.prod.yml up -d --build
+${COMPOSE} up -d --build
 
 if [[ " $* " == *" --migrate "* || " $* " == *" --seed "* ]]; then
   echo "==> chờ API healthy"
@@ -28,15 +31,15 @@ if [[ " $* " == *" --migrate "* || " $* " == *" --seed "* ]]; then
   done
 
   echo "==> prisma migrate deploy"
-  docker compose --env-file .env.docker -f docker-compose.prod.yml exec -T api npx prisma migrate deploy
+  ${COMPOSE} exec -T api npx prisma migrate deploy
 fi
 
 if [[ " $* " == *" --seed "* ]]; then
   echo "==> npm run seed"
-  docker compose --env-file .env.docker -f docker-compose.prod.yml exec -T api npm run seed -w @hathanh/api
+  ${COMPOSE} exec -T api npm run seed -w @hathanh/api
 fi
 
 echo "==> Trạng thái container:"
-docker compose --env-file .env.docker -f docker-compose.prod.yml ps
+${COMPOSE} ps
 
 echo "==> Hoàn tất."
