@@ -144,10 +144,95 @@ export type SiteHomepage = {
   newsTitle?: string;
 };
 
+export type LandingListItem = {
+  title?: string;
+  description?: string;
+};
+
+export type LandingProcessStep = LandingListItem & {
+  number?: string;
+};
+
+export type LandingTestimonial = {
+  name?: string;
+  project?: string;
+  quote?: string;
+};
+
+export type LandingFaq = {
+  question?: string;
+  answer?: string;
+};
+
+export type XayNhaLanding = {
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroDescription?: string;
+  heroImageUrl?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
+  introEyebrow?: string;
+  introTitle?: string;
+  introDescription?: string;
+  introImageUrl?: string;
+  introChecklist?: string[];
+  scopeEyebrow?: string;
+  scopeTitle?: string;
+  processEyebrow?: string;
+  processTitle?: string;
+  projectsEyebrow?: string;
+  projectsTitle?: string;
+  estimateEyebrow?: string;
+  estimateTitle?: string;
+  quoteTitle?: string;
+  quoteDescription?: string;
+  whyEyebrow?: string;
+  whyTitle?: string;
+  testimonialsEyebrow?: string;
+  testimonialsTitle?: string;
+  faqEyebrow?: string;
+  faqTitle?: string;
+  finalEyebrow?: string;
+  finalTitle?: string;
+  finalDescription?: string;
+  benefits?: LandingListItem[];
+  scopeItems?: LandingListItem[];
+  processSteps?: LandingProcessStep[];
+  whyChooseItems?: LandingListItem[];
+  stats?: LandingListItem[];
+  testimonials?: LandingTestimonial[];
+  faqs?: LandingFaq[];
+};
+
 export type SiteSettings = {
   "site.identity"?: SiteIdentity;
   "site.theme"?: SiteTheme;
   "site.homepage"?: SiteHomepage;
+  "site.landing.xayNhaTronGoi"?: XayNhaLanding;
+};
+
+export type EstimatorFieldOption = {
+  label: string;
+  value: string;
+  variables?: Record<string, number>;
+};
+
+export type EstimatorField = {
+  name: string;
+  label: string;
+  type: "select" | "number";
+  defaultValue?: string | number;
+  options?: EstimatorFieldOption[];
+};
+
+export type EstimatorPublicConfig = {
+  id?: number;
+  name?: string;
+  currency?: string;
+  inputSchema?: EstimatorField[];
+  disclaimer?: string;
+  ctaTitle?: string;
+  ctaDescription?: string;
 };
 
 export const fallbackHeaderMenu: MenuPayload = {
@@ -307,6 +392,93 @@ export const defaultHomepage: Required<Pick<SiteHomepage, "heroSlides" | "aboutB
   newsTitle: "Tin tức & cảm hứng",
 };
 
+export const defaultXayNhaLanding: Required<XayNhaLanding> = {
+  heroEyebrow: "Xây nhà trọn gói",
+  heroTitle: "Giải pháp xây nhà trọn gói từ thiết kế đến bàn giao",
+  heroDescription: "Hà Thành Home cung cấp giải pháp xây nhà trọn gói toàn diện, đảm bảo chất lượng - tiến độ - minh bạch chi phí - bảo hành dài hạn.",
+  heroImageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2000&q=85",
+  primaryCtaLabel: "Nhận báo giá",
+  secondaryCtaLabel: "Tư vấn miễn phí",
+  introEyebrow: "Dịch vụ xây nhà trọn gói",
+  introTitle: "Xây tổ ấm bền vững An tâm từ đầu đến cuối",
+  introDescription: "Dịch vụ xây nhà trọn gói của Hà Thành Home bao gồm toàn bộ quy trình từ khảo sát, thiết kế, xin phép, thi công phần thô, hoàn thiện, bàn giao và bảo hành.",
+  introImageUrl: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?auto=format&fit=crop&w=1400&q=85",
+  introChecklist: ["Một đầu mối - chịu trách nhiệm trọn gói", "Minh bạch chi phí - hạn chế phát sinh", "Cam kết tiến độ - đúng chất lượng", "Vật tư chính hãng - nguồn gốc rõ ràng"],
+  scopeEyebrow: "Phạm vi công việc",
+  scopeTitle: "Trọn gói từ pháp lý, kỹ thuật đến hoàn thiện",
+  processEyebrow: "Quy trình xây nhà trọn gói",
+  processTitle: "Rõ việc, rõ người, rõ tiến độ",
+  projectsEyebrow: "Dự án xây nhà tiêu biểu",
+  projectsTitle: "Công trình đã triển khai",
+  estimateEyebrow: "Dự toán chi phí xây nhà",
+  estimateTitle: "Tham khảo chi phí xây nhà trọn gói",
+  quoteTitle: "Nhận báo giá & tư vấn miễn phí",
+  quoteDescription: "Điền thông tin để nhận tư vấn chi tiết từ chuyên gia Hà Thành Home.",
+  whyEyebrow: "Vì sao chọn Hà Thành Home?",
+  whyTitle: "Năng lực triển khai thực tế, không chỉ là bản vẽ đẹp",
+  testimonialsEyebrow: "Khách hàng nói gì về chúng tôi",
+  testimonialsTitle: "Niềm tin đến từ trải nghiệm thật",
+  faqEyebrow: "Câu hỏi thường gặp",
+  faqTitle: "Những điều khách hàng thường hỏi trước khi xây nhà",
+  finalEyebrow: "Bắt đầu cùng Hà Thành Home",
+  finalTitle: "Sẵn sàng xây tổ ấm mơ ước của bạn?",
+  finalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
+  benefits: [
+    { title: "Thiết kế đồng bộ", description: "Đẹp - công năng - bền vững" },
+    { title: "Tối ưu chi phí", description: "Minh bạch, hạn chế phát sinh" },
+    { title: "Tiến độ rõ ràng", description: "Cam kết từng giai đoạn" },
+    { title: "Vật tư minh bạch", description: "Nguồn gốc rõ ràng" },
+    { title: "Bảo hành dài hạn", description: "Đồng hành sau bàn giao" },
+    { title: "Đội ngũ chuyên môn", description: "Kinh nghiệm, tận tâm" },
+  ],
+  scopeItems: [
+    { title: "Khảo sát & tư vấn", description: "Nắm nhu cầu và hiện trạng." },
+    { title: "Thiết kế kiến trúc - kết cấu", description: "Đồng bộ công năng và kỹ thuật." },
+    { title: "Xin phép xây dựng", description: "Hỗ trợ hồ sơ pháp lý cần thiết." },
+    { title: "Thi công phần thô", description: "Kết cấu chuẩn, kiểm soát an toàn." },
+    { title: "Thi công hoàn thiện", description: "Hoàn thiện vật tư theo cam kết." },
+    { title: "Giám sát công trình", description: "Theo sát tiến độ từng hạng mục." },
+    { title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng trước bàn giao." },
+    { title: "Bảo hành & bảo trì", description: "Đồng hành sau khi sử dụng." },
+  ],
+  processSteps: [
+    { number: "01", title: "Tư vấn & khảo sát", description: "Tìm hiểu nhu cầu, khảo sát hiện trạng" },
+    { number: "02", title: "Lên phương án", description: "Thiết kế sơ bộ, phương án công năng" },
+    { number: "03", title: "Báo giá chi tiết", description: "Dự toán minh bạch, cam kết rõ ràng" },
+    { number: "04", title: "Ký hợp đồng", description: "Thống nhất điều khoản và tiến độ" },
+    { number: "05", title: "Thi công", description: "Thi công phần thô và hoàn thiện" },
+    { number: "06", title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng, bàn giao công trình" },
+    { number: "07", title: "Bảo hành", description: "Bảo hành và hỗ trợ sau bàn giao" },
+  ],
+  whyChooseItems: [
+    { title: "Kinh nghiệm thực chiến", description: "10+ năm trong lĩnh vực thiết kế & thi công" },
+    { title: "Quy trình chuyên nghiệp", description: "Kiểm soát chặt chẽ từng giai đoạn" },
+    { title: "Chi phí minh bạch", description: "Báo giá chi tiết, hạn chế phát sinh" },
+    { title: "Vật tư chất lượng", description: "Vật tư chính hãng, nguồn gốc rõ ràng" },
+    { title: "Tận tâm đồng hành", description: "Hỗ trợ trước, trong và sau thi công" },
+    { title: "Bảo hành uy tín", description: "Chính sách rõ ràng, hỗ trợ dài hạn" },
+  ],
+  stats: [
+    { title: "10+", description: "Năm kinh nghiệm" },
+    { title: "500+", description: "Dự án hoàn thiện" },
+    { title: "98%", description: "Khách hàng hài lòng" },
+    { title: "24/7", description: "Hỗ trợ tư vấn" },
+  ],
+  testimonials: [
+    { name: "Anh Minh Tuấn", project: "Biệt thự Hà Nội", quote: "Hà Thành Home làm việc rất chuyên nghiệp, tiến độ đúng cam kết. Ngôi nhà hoàn thiện đẹp hơn mong đợi!" },
+    { name: "Chị Thu Hằng", project: "Nhà phố Hải Phòng", quote: "Từ thiết kế đến thi công đều rất chỉn chu, đội ngũ tận tâm, hỗ trợ nhiệt tình." },
+    { name: "Anh Quốc Huy", project: "Nhà phố Vĩnh Phúc", quote: "Chi phí hợp lý, chất lượng vượt mong đợi. Tôi rất hài lòng với dịch vụ trọn gói." },
+  ],
+  faqs: [
+    { question: "Xây nhà trọn gói bao gồm những gì?", answer: "Bao gồm khảo sát, tư vấn, thiết kế, dự toán, thi công phần thô, hoàn thiện, nghiệm thu, bàn giao và bảo hành theo hợp đồng." },
+    { question: "Thời gian thi công mất bao lâu?", answer: "Tùy quy mô và mức hoàn thiện, nhà phố thường từ 4-7 tháng, biệt thự có thể từ 7-12 tháng hoặc hơn." },
+    { question: "Có phát sinh chi phí trong quá trình thi công không?", answer: "Hà Thành Home bóc tách báo giá rõ ràng ngay từ đầu. Phát sinh chỉ xảy ra khi khách hàng thay đổi phạm vi, vật tư hoặc yêu cầu mới." },
+    { question: "Hà Thành Home sử dụng vật tư loại gì?", answer: "Vật tư được thống nhất theo hồ sơ báo giá, có thương hiệu, nguồn gốc rõ ràng và được nghiệm thu theo từng giai đoạn." },
+    { question: "Chính sách bảo hành như thế nào?", answer: "Công trình được bảo hành theo từng hạng mục, có biên bản bàn giao và quy trình tiếp nhận hỗ trợ sau thi công." },
+    { question: "Tôi có thể theo dõi tiến độ công trình không?", answer: "Có. Khách hàng được cập nhật tiến độ, hình ảnh thi công và các mốc nghiệm thu quan trọng trong quá trình triển khai." },
+  ],
+};
+
 const fallbackHome: HomeData = {
   constructionProjects: [
     { id: 1, title: "Biệt thự cao cấp Hà Nội", slug: "biet-thu-cao-cap-ha-noi", group: "construction", location: "Hà Nội", category: "Biệt thự", description: "Dự án công trình tiêu biểu." },
@@ -364,6 +536,10 @@ export async function getSiteSettings() {
   }
 }
 
+export function getConstructionEstimatorConfig() {
+  return fetchJson<EstimatorPublicConfig>("/construction-estimator/config", {});
+}
+
 export async function getMenu(location: "header" | "footer") {
   const fallback = location === "header" ? fallbackHeaderMenu : fallbackFooterMenu;
   const payload = await fetchJson<MenuPayload>(`/menus/${location}`, fallback);
@@ -409,6 +585,25 @@ export function homepageWithDefaults(homepage?: SiteHomepage): SiteHomepage {
     heroSlides: homepage?.heroSlides?.length ? homepage.heroSlides : defaultHomepage.heroSlides,
     aboutBenefits: homepage?.aboutBenefits?.length ? homepage.aboutBenefits : defaultHomepage.aboutBenefits,
     stats: homepage?.stats?.length ? homepage.stats : defaultHomepage.stats,
+  };
+}
+
+function mergeList<T>(value: T[] | undefined, fallback: T[]) {
+  return Array.isArray(value) && value.length ? value : fallback;
+}
+
+export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Required<XayNhaLanding> {
+  return {
+    ...defaultXayNhaLanding,
+    ...(landing || {}),
+    introChecklist: mergeList(landing?.introChecklist, defaultXayNhaLanding.introChecklist),
+    benefits: mergeList(landing?.benefits, defaultXayNhaLanding.benefits),
+    scopeItems: mergeList(landing?.scopeItems, defaultXayNhaLanding.scopeItems),
+    processSteps: mergeList(landing?.processSteps, defaultXayNhaLanding.processSteps),
+    whyChooseItems: mergeList(landing?.whyChooseItems, defaultXayNhaLanding.whyChooseItems),
+    stats: mergeList(landing?.stats, defaultXayNhaLanding.stats),
+    testimonials: mergeList(landing?.testimonials, defaultXayNhaLanding.testimonials),
+    faqs: mergeList(landing?.faqs, defaultXayNhaLanding.faqs),
   };
 }
 

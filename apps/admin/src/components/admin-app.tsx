@@ -1552,6 +1552,82 @@ function ImageUrlPicker({ label, value, onChange }: { label: string; value: stri
   );
 }
 
+const xayNhaAdvancedDefaults = {
+  introChecklist: [
+    "Một đầu mối - chịu trách nhiệm trọn gói",
+    "Minh bạch chi phí - hạn chế phát sinh",
+    "Cam kết tiến độ - đúng chất lượng",
+    "Vật tư chính hãng - nguồn gốc rõ ràng",
+  ],
+  benefits: [
+    { title: "Thiết kế đồng bộ", description: "Đẹp - công năng - bền vững" },
+    { title: "Tối ưu chi phí", description: "Minh bạch, hạn chế phát sinh" },
+    { title: "Tiến độ rõ ràng", description: "Cam kết từng giai đoạn" },
+    { title: "Vật tư minh bạch", description: "Nguồn gốc rõ ràng" },
+    { title: "Bảo hành dài hạn", description: "Đồng hành sau bàn giao" },
+    { title: "Đội ngũ chuyên môn", description: "Kinh nghiệm, tận tâm" },
+  ],
+  scopeItems: [
+    { title: "Khảo sát & tư vấn", description: "Nắm nhu cầu và hiện trạng." },
+    { title: "Thiết kế kiến trúc - kết cấu", description: "Đồng bộ công năng và kỹ thuật." },
+    { title: "Xin phép xây dựng", description: "Hỗ trợ hồ sơ pháp lý cần thiết." },
+    { title: "Thi công phần thô", description: "Kết cấu chuẩn, kiểm soát an toàn." },
+    { title: "Thi công hoàn thiện", description: "Hoàn thiện vật tư theo cam kết." },
+    { title: "Giám sát công trình", description: "Theo sát tiến độ từng hạng mục." },
+    { title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng trước bàn giao." },
+    { title: "Bảo hành & bảo trì", description: "Đồng hành sau khi sử dụng." },
+  ],
+  processSteps: [
+    { number: "01", title: "Tư vấn & khảo sát", description: "Tìm hiểu nhu cầu, khảo sát hiện trạng" },
+    { number: "02", title: "Lên phương án", description: "Thiết kế sơ bộ, phương án công năng" },
+    { number: "03", title: "Báo giá chi tiết", description: "Dự toán minh bạch, cam kết rõ ràng" },
+    { number: "04", title: "Ký hợp đồng", description: "Thống nhất điều khoản và tiến độ" },
+    { number: "05", title: "Thi công", description: "Thi công phần thô và hoàn thiện" },
+    { number: "06", title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng, bàn giao công trình" },
+    { number: "07", title: "Bảo hành", description: "Bảo hành và hỗ trợ sau bàn giao" },
+  ],
+  whyChooseItems: [
+    { title: "Kinh nghiệm thực chiến", description: "10+ năm trong lĩnh vực thiết kế & thi công" },
+    { title: "Quy trình chuyên nghiệp", description: "Kiểm soát chặt chẽ từng giai đoạn" },
+    { title: "Chi phí minh bạch", description: "Báo giá chi tiết, hạn chế phát sinh" },
+    { title: "Vật tư chất lượng", description: "Vật tư chính hãng, nguồn gốc rõ ràng" },
+    { title: "Tận tâm đồng hành", description: "Hỗ trợ trước, trong và sau thi công" },
+    { title: "Bảo hành uy tín", description: "Chính sách rõ ràng, hỗ trợ dài hạn" },
+  ],
+  stats: [
+    { title: "10+", description: "Năm kinh nghiệm" },
+    { title: "500+", description: "Dự án hoàn thiện" },
+    { title: "98%", description: "Khách hàng hài lòng" },
+    { title: "24/7", description: "Hỗ trợ tư vấn" },
+  ],
+  testimonials: [
+    { name: "Anh Minh Tuấn", project: "Biệt thự Hà Nội", quote: "Hà Thành Home làm việc rất chuyên nghiệp, tiến độ đúng cam kết. Ngôi nhà hoàn thiện đẹp hơn mong đợi!" },
+    { name: "Chị Thu Hằng", project: "Nhà phố Hải Phòng", quote: "Từ thiết kế đến thi công đều rất chỉn chu, đội ngũ tận tâm, hỗ trợ nhiệt tình." },
+    { name: "Anh Quốc Huy", project: "Nhà phố Vĩnh Phúc", quote: "Chi phí hợp lý, chất lượng vượt mong đợi. Tôi rất hài lòng với dịch vụ trọn gói." },
+  ],
+  faqs: [
+    { question: "Xây nhà trọn gói bao gồm những gì?", answer: "Bao gồm khảo sát, tư vấn, thiết kế, dự toán, thi công phần thô, hoàn thiện, nghiệm thu, bàn giao và bảo hành theo hợp đồng." },
+    { question: "Thời gian thi công mất bao lâu?", answer: "Tùy quy mô và mức hoàn thiện, nhà phố thường từ 4-7 tháng, biệt thự có thể từ 7-12 tháng hoặc hơn." },
+    { question: "Có phát sinh chi phí trong quá trình thi công không?", answer: "Hà Thành Home bóc tách báo giá rõ ràng ngay từ đầu. Phát sinh chỉ xảy ra khi khách hàng thay đổi phạm vi, vật tư hoặc yêu cầu mới." },
+    { question: "Hà Thành Home sử dụng vật tư loại gì?", answer: "Vật tư được thống nhất theo hồ sơ báo giá, có thương hiệu, nguồn gốc rõ ràng và được nghiệm thu theo từng giai đoạn." },
+    { question: "Chính sách bảo hành như thế nào?", answer: "Công trình được bảo hành theo từng hạng mục, có biên bản bàn giao và quy trình tiếp nhận hỗ trợ sau thi công." },
+    { question: "Tôi có thể theo dõi tiến độ công trình không?", answer: "Có. Khách hàng được cập nhật tiến độ, hình ảnh thi công và các mốc nghiệm thu quan trọng trong quá trình triển khai." },
+  ],
+};
+
+function landingAdvancedJson(landing: Record<string, unknown>) {
+  return JSON.stringify({
+    introChecklist: Array.isArray(landing.introChecklist) ? landing.introChecklist : xayNhaAdvancedDefaults.introChecklist,
+    benefits: Array.isArray(landing.benefits) ? landing.benefits : xayNhaAdvancedDefaults.benefits,
+    scopeItems: Array.isArray(landing.scopeItems) ? landing.scopeItems : xayNhaAdvancedDefaults.scopeItems,
+    processSteps: Array.isArray(landing.processSteps) ? landing.processSteps : xayNhaAdvancedDefaults.processSteps,
+    whyChooseItems: Array.isArray(landing.whyChooseItems) ? landing.whyChooseItems : xayNhaAdvancedDefaults.whyChooseItems,
+    stats: Array.isArray(landing.stats) ? landing.stats : xayNhaAdvancedDefaults.stats,
+    testimonials: Array.isArray(landing.testimonials) ? landing.testimonials : xayNhaAdvancedDefaults.testimonials,
+    faqs: Array.isArray(landing.faqs) ? landing.faqs : xayNhaAdvancedDefaults.faqs,
+  }, null, 2);
+}
+
 function ThemeSettingsPanel({ roles }: { roles: string[] }) {
   const { notify } = useAdminFeedback();
   const [values, setValues] = useState<Record<string, string>>({
@@ -1593,6 +1669,33 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     processTitle: "Quy trình làm việc",
     testimonialsTitle: "Khách hàng nói gì về chúng tôi",
     newsTitle: "Tin tức & cảm hứng",
+    xayNhaHeroEyebrow: "Xây nhà trọn gói",
+    xayNhaHeroTitle: "Giải pháp xây nhà trọn gói từ thiết kế đến bàn giao",
+    xayNhaHeroDescription: "Hà Thành Home cung cấp giải pháp xây nhà trọn gói toàn diện, đảm bảo chất lượng - tiến độ - minh bạch chi phí - bảo hành dài hạn.",
+    xayNhaHeroImageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2000&q=85",
+    xayNhaPrimaryCtaLabel: "Nhận báo giá",
+    xayNhaSecondaryCtaLabel: "Tư vấn miễn phí",
+    xayNhaIntroEyebrow: "Dịch vụ xây nhà trọn gói",
+    xayNhaIntroTitle: "Xây tổ ấm bền vững. An tâm từ đầu đến cuối",
+    xayNhaIntroDescription: "Dịch vụ xây nhà trọn gói của Hà Thành Home bao gồm toàn bộ quy trình từ khảo sát, thiết kế, xin phép, thi công phần thô, hoàn thiện, bàn giao và bảo hành.",
+    xayNhaIntroImageUrl: "https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1400&q=85",
+    xayNhaProjectSectionEyebrow: "Dự án thực tế",
+    xayNhaProjectSectionTitle: "Dự án xây nhà tiêu biểu",
+    xayNhaEstimateEyebrow: "Dự toán chi phí xây nhà",
+    xayNhaEstimateTitle: "Tham khảo chi phí xây nhà trọn gói",
+    xayNhaEstimateNote: "Chi phí phụ thuộc diện tích, phong cách, vật tư và điều kiện thi công thực tế.",
+    xayNhaQuoteTitle: "Nhận báo giá & tư vấn miễn phí",
+    xayNhaQuoteDescription: "Điền thông tin để nhận tư vấn chi tiết từ chuyên gia Hà Thành Home.",
+    xayNhaWhyEyebrow: "Năng lực triển khai",
+    xayNhaWhyTitle: "Vì sao chọn Hà Thành Home?",
+    xayNhaTestimonialsEyebrow: "Khách hàng",
+    xayNhaTestimonialsTitle: "Khách hàng nói gì về chúng tôi",
+    xayNhaFaqEyebrow: "FAQ",
+    xayNhaFaqTitle: "Câu hỏi thường gặp",
+    xayNhaFinalEyebrow: "Sẵn sàng khởi công",
+    xayNhaFinalTitle: "Sẵn sàng xây tổ ấm mơ ước của bạn?",
+    xayNhaFinalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
+    xayNhaAdvancedJson: JSON.stringify(xayNhaAdvancedDefaults, null, 2),
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1607,6 +1710,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
         const identity = typeof payload["site.identity"] === "object" && payload["site.identity"] ? payload["site.identity"] as Record<string, unknown> : {};
         const theme = typeof payload["site.theme"] === "object" && payload["site.theme"] ? payload["site.theme"] as Record<string, unknown> : {};
         const homepage = typeof payload["site.homepage"] === "object" && payload["site.homepage"] ? payload["site.homepage"] as Record<string, unknown> : {};
+        const xayNhaLanding = typeof payload["site.landing.xayNhaTronGoi"] === "object" && payload["site.landing.xayNhaTronGoi"] ? payload["site.landing.xayNhaTronGoi"] as Record<string, unknown> : {};
         const heroSlides = Array.isArray(homepage.heroSlides) ? homepage.heroSlides as Array<Record<string, unknown>> : [];
         const hero = heroSlides[0] || {};
         setValues((current) => ({
@@ -1649,6 +1753,33 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           processTitle: String(homepage.processTitle || current.processTitle),
           testimonialsTitle: String(homepage.testimonialsTitle || current.testimonialsTitle),
           newsTitle: String(homepage.newsTitle || current.newsTitle),
+          xayNhaHeroEyebrow: String(xayNhaLanding.heroEyebrow || current.xayNhaHeroEyebrow),
+          xayNhaHeroTitle: String(xayNhaLanding.heroTitle || current.xayNhaHeroTitle),
+          xayNhaHeroDescription: String(xayNhaLanding.heroDescription || current.xayNhaHeroDescription),
+          xayNhaHeroImageUrl: String(xayNhaLanding.heroImageUrl || current.xayNhaHeroImageUrl),
+          xayNhaPrimaryCtaLabel: String(xayNhaLanding.primaryCtaLabel || current.xayNhaPrimaryCtaLabel),
+          xayNhaSecondaryCtaLabel: String(xayNhaLanding.secondaryCtaLabel || current.xayNhaSecondaryCtaLabel),
+          xayNhaIntroEyebrow: String(xayNhaLanding.introEyebrow || current.xayNhaIntroEyebrow),
+          xayNhaIntroTitle: String(xayNhaLanding.introTitle || current.xayNhaIntroTitle),
+          xayNhaIntroDescription: String(xayNhaLanding.introDescription || current.xayNhaIntroDescription),
+          xayNhaIntroImageUrl: String(xayNhaLanding.introImageUrl || current.xayNhaIntroImageUrl),
+          xayNhaProjectSectionEyebrow: String(xayNhaLanding.projectSectionEyebrow || current.xayNhaProjectSectionEyebrow),
+          xayNhaProjectSectionTitle: String(xayNhaLanding.projectSectionTitle || current.xayNhaProjectSectionTitle),
+          xayNhaEstimateEyebrow: String(xayNhaLanding.estimateEyebrow || current.xayNhaEstimateEyebrow),
+          xayNhaEstimateTitle: String(xayNhaLanding.estimateTitle || current.xayNhaEstimateTitle),
+          xayNhaEstimateNote: String(xayNhaLanding.estimateNote || current.xayNhaEstimateNote),
+          xayNhaQuoteTitle: String(xayNhaLanding.quoteTitle || current.xayNhaQuoteTitle),
+          xayNhaQuoteDescription: String(xayNhaLanding.quoteDescription || current.xayNhaQuoteDescription),
+          xayNhaWhyEyebrow: String(xayNhaLanding.whyEyebrow || current.xayNhaWhyEyebrow),
+          xayNhaWhyTitle: String(xayNhaLanding.whyTitle || current.xayNhaWhyTitle),
+          xayNhaTestimonialsEyebrow: String(xayNhaLanding.testimonialsEyebrow || current.xayNhaTestimonialsEyebrow),
+          xayNhaTestimonialsTitle: String(xayNhaLanding.testimonialsTitle || current.xayNhaTestimonialsTitle),
+          xayNhaFaqEyebrow: String(xayNhaLanding.faqEyebrow || current.xayNhaFaqEyebrow),
+          xayNhaFaqTitle: String(xayNhaLanding.faqTitle || current.xayNhaFaqTitle),
+          xayNhaFinalEyebrow: String(xayNhaLanding.finalEyebrow || current.xayNhaFinalEyebrow),
+          xayNhaFinalTitle: String(xayNhaLanding.finalTitle || current.xayNhaFinalTitle),
+          xayNhaFinalDescription: String(xayNhaLanding.finalDescription || current.xayNhaFinalDescription),
+          xayNhaAdvancedJson: landingAdvancedJson(xayNhaLanding),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
@@ -1720,6 +1851,43 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       testimonialsTitle: values.testimonialsTitle,
       newsTitle: values.newsTitle,
     };
+    let xayNhaAdvanced: Record<string, unknown>;
+    try {
+      xayNhaAdvanced = values.xayNhaAdvancedJson.trim() ? JSON.parse(values.xayNhaAdvancedJson) as Record<string, unknown> : {};
+    } catch {
+      notify({ tone: "error", title: "JSON landing Xây nhà không hợp lệ", description: "Kiểm tra lại dấu phẩy, dấu ngoặc kép và cấu trúc mảng trong phần nội dung nâng cao." });
+      setSaving(false);
+      return;
+    }
+    const xayNhaLanding = {
+      ...xayNhaAdvanced,
+      heroEyebrow: values.xayNhaHeroEyebrow,
+      heroTitle: values.xayNhaHeroTitle,
+      heroDescription: values.xayNhaHeroDescription,
+      heroImageUrl: values.xayNhaHeroImageUrl,
+      primaryCtaLabel: values.xayNhaPrimaryCtaLabel,
+      secondaryCtaLabel: values.xayNhaSecondaryCtaLabel,
+      introEyebrow: values.xayNhaIntroEyebrow,
+      introTitle: values.xayNhaIntroTitle,
+      introDescription: values.xayNhaIntroDescription,
+      introImageUrl: values.xayNhaIntroImageUrl,
+      projectSectionEyebrow: values.xayNhaProjectSectionEyebrow,
+      projectSectionTitle: values.xayNhaProjectSectionTitle,
+      estimateEyebrow: values.xayNhaEstimateEyebrow,
+      estimateTitle: values.xayNhaEstimateTitle,
+      estimateNote: values.xayNhaEstimateNote,
+      quoteTitle: values.xayNhaQuoteTitle,
+      quoteDescription: values.xayNhaQuoteDescription,
+      whyEyebrow: values.xayNhaWhyEyebrow,
+      whyTitle: values.xayNhaWhyTitle,
+      testimonialsEyebrow: values.xayNhaTestimonialsEyebrow,
+      testimonialsTitle: values.xayNhaTestimonialsTitle,
+      faqEyebrow: values.xayNhaFaqEyebrow,
+      faqTitle: values.xayNhaFaqTitle,
+      finalEyebrow: values.xayNhaFinalEyebrow,
+      finalTitle: values.xayNhaFinalTitle,
+      finalDescription: values.xayNhaFinalDescription,
+    };
     try {
       const responses = await Promise.all([
         apiFetch("/api/cms/settings", {
@@ -1736,6 +1904,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: "site.homepage", value: homepage }),
+        }),
+        apiFetch("/api/cms/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "site.landing.xayNhaTronGoi", value: xayNhaLanding }),
         }),
       ]);
       const failed = responses.find((response) => !response.ok);
@@ -1805,6 +1978,42 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
               <label>Tiêu đề quy trình<input value={values.processTitle} onChange={(event) => setValues({ ...values, processTitle: event.target.value })} /></label>
               <label>Tiêu đề đánh giá<input value={values.testimonialsTitle} onChange={(event) => setValues({ ...values, testimonialsTitle: event.target.value })} /></label>
               <label>Tiêu đề tin tức<input value={values.newsTitle} onChange={(event) => setValues({ ...values, newsTitle: event.target.value })} /></label>
+            </div>
+          </div>
+
+          <div className="form-section wide theme-settings-section">
+            <div className="form-section-title">
+              <span>Landing</span>
+              <div><h3>Xây nhà trọn gói</h3><p>Nội dung trang <strong>/dich-vu/xay-nha-tron-goi</strong>. Dự án tiêu biểu và bảng giá dự toán vẫn lấy dữ liệu thật từ API.</p></div>
+            </div>
+            <div className="form-grid">
+              <label>Eyebrow hero<input value={values.xayNhaHeroEyebrow} onChange={(event) => setValues({ ...values, xayNhaHeroEyebrow: event.target.value })} /></label>
+              <label className="wide">Tiêu đề hero<textarea value={values.xayNhaHeroTitle} onChange={(event) => setValues({ ...values, xayNhaHeroTitle: event.target.value })} rows={3} /></label>
+              <label className="wide">Mô tả hero<textarea value={values.xayNhaHeroDescription} onChange={(event) => setValues({ ...values, xayNhaHeroDescription: event.target.value })} rows={3} /></label>
+              <ImageUrlPicker label="Ảnh hero Xây nhà" value={values.xayNhaHeroImageUrl} onChange={(value) => setValues({ ...values, xayNhaHeroImageUrl: value })} />
+              <label>Nút báo giá<input value={values.xayNhaPrimaryCtaLabel} onChange={(event) => setValues({ ...values, xayNhaPrimaryCtaLabel: event.target.value })} /></label>
+              <label>Nút tư vấn<input value={values.xayNhaSecondaryCtaLabel} onChange={(event) => setValues({ ...values, xayNhaSecondaryCtaLabel: event.target.value })} /></label>
+              <label>Eyebrow giới thiệu<input value={values.xayNhaIntroEyebrow} onChange={(event) => setValues({ ...values, xayNhaIntroEyebrow: event.target.value })} /></label>
+              <label className="wide">Tiêu đề giới thiệu<textarea value={values.xayNhaIntroTitle} onChange={(event) => setValues({ ...values, xayNhaIntroTitle: event.target.value })} rows={2} /></label>
+              <label className="wide">Mô tả giới thiệu<textarea value={values.xayNhaIntroDescription} onChange={(event) => setValues({ ...values, xayNhaIntroDescription: event.target.value })} rows={3} /></label>
+              <ImageUrlPicker label="Ảnh giới thiệu Xây nhà" value={values.xayNhaIntroImageUrl} onChange={(value) => setValues({ ...values, xayNhaIntroImageUrl: value })} />
+              <label>Eyebrow dự án<input value={values.xayNhaProjectSectionEyebrow} onChange={(event) => setValues({ ...values, xayNhaProjectSectionEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề dự án<input value={values.xayNhaProjectSectionTitle} onChange={(event) => setValues({ ...values, xayNhaProjectSectionTitle: event.target.value })} /></label>
+              <label>Eyebrow dự toán<input value={values.xayNhaEstimateEyebrow} onChange={(event) => setValues({ ...values, xayNhaEstimateEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề dự toán<input value={values.xayNhaEstimateTitle} onChange={(event) => setValues({ ...values, xayNhaEstimateTitle: event.target.value })} /></label>
+              <label className="wide">Ghi chú dự toán<textarea value={values.xayNhaEstimateNote} onChange={(event) => setValues({ ...values, xayNhaEstimateNote: event.target.value })} rows={2} /></label>
+              <label>Tiêu đề form báo giá<input value={values.xayNhaQuoteTitle} onChange={(event) => setValues({ ...values, xayNhaQuoteTitle: event.target.value })} /></label>
+              <label>Mô tả form báo giá<input value={values.xayNhaQuoteDescription} onChange={(event) => setValues({ ...values, xayNhaQuoteDescription: event.target.value })} /></label>
+              <label>Eyebrow vì sao chọn<input value={values.xayNhaWhyEyebrow} onChange={(event) => setValues({ ...values, xayNhaWhyEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề vì sao chọn<input value={values.xayNhaWhyTitle} onChange={(event) => setValues({ ...values, xayNhaWhyTitle: event.target.value })} /></label>
+              <label>Eyebrow đánh giá<input value={values.xayNhaTestimonialsEyebrow} onChange={(event) => setValues({ ...values, xayNhaTestimonialsEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề đánh giá<input value={values.xayNhaTestimonialsTitle} onChange={(event) => setValues({ ...values, xayNhaTestimonialsTitle: event.target.value })} /></label>
+              <label>Eyebrow FAQ<input value={values.xayNhaFaqEyebrow} onChange={(event) => setValues({ ...values, xayNhaFaqEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề FAQ<input value={values.xayNhaFaqTitle} onChange={(event) => setValues({ ...values, xayNhaFaqTitle: event.target.value })} /></label>
+              <label>Eyebrow CTA cuối<input value={values.xayNhaFinalEyebrow} onChange={(event) => setValues({ ...values, xayNhaFinalEyebrow: event.target.value })} /></label>
+              <label>Tiêu đề CTA cuối<input value={values.xayNhaFinalTitle} onChange={(event) => setValues({ ...values, xayNhaFinalTitle: event.target.value })} /></label>
+              <label className="wide">Mô tả CTA cuối<textarea value={values.xayNhaFinalDescription} onChange={(event) => setValues({ ...values, xayNhaFinalDescription: event.target.value })} rows={2} /></label>
+              <label className="wide">Nội dung nâng cao JSON<textarea value={values.xayNhaAdvancedJson} onChange={(event) => setValues({ ...values, xayNhaAdvancedJson: event.target.value })} rows={18} spellCheck={false} /></label>
             </div>
           </div>
 

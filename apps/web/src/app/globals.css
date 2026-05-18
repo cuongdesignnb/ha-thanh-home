@@ -499,6 +499,11 @@
   cursor: pointer;
 }
 
+.xay-nha-gold-button:disabled {
+  cursor: wait;
+  opacity: .78;
+}
+
 .xay-nha-quote-form small {
   display: flex;
   justify-content: center;
@@ -506,6 +511,26 @@
   align-items: center;
   margin-top: 12px;
   color: rgba(255, 255, 255, .76);
+}
+
+.xay-nha-form-message {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: white;
+  background: rgba(255, 255, 255, .12);
+}
+
+.xay-nha-form-message.success {
+  background: rgba(46, 125, 50, .28);
+}
+
+.xay-nha-form-message.error {
+  background: rgba(183, 28, 28, .28);
 }
 
 .xay-nha-why-section {
