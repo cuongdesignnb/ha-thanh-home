@@ -63,6 +63,11 @@ export class AppController {
     return this.appService.getSettings();
   }
 
+  @Get("api/site-settings")
+  siteSettings() {
+    return this.appService.getSettings();
+  }
+
   @Post("api/leads")
   createLead(@Body() dto: CreateLeadDto) {
     return this.appService.createLead(dto);

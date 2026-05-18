@@ -43,7 +43,7 @@ type EstimateResult = {
   ctaDescription?: string;
 };
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:31875/api";
+const apiBase = "/api";
 
 export function ConstructionEstimatorWidget() {
   const [open, setOpen] = useState(false);

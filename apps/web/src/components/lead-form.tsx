@@ -31,7 +31,7 @@ export function LeadForm({ templateSlug, templateType }: LeadFormProps) {
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:31875/api"}/leads`, {
+      const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
