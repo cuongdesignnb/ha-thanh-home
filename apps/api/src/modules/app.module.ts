@@ -6,7 +6,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AiController } from "./ai.controller";
 import { AdminController } from "./admin.controller";
-import { AuthController } from "./auth.controller";
+import { AuthCompatController, AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { ConstructionEstimatorAdminController, ConstructionEstimatorPublicController } from "./construction-estimator.controller";
 import { ConstructionEstimatorService } from "./construction-estimator.service";
@@ -26,7 +26,7 @@ import { ScheduleService } from "./schedule.service";
       signOptions: { expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as never },
     }),
   ],
-  controllers: [AppController, AuthController, AdminController, PublicController, MediaController, AiController, ConstructionEstimatorPublicController, ConstructionEstimatorAdminController],
+  controllers: [AppController, AuthController, AuthCompatController, AdminController, PublicController, MediaController, AiController, ConstructionEstimatorPublicController, ConstructionEstimatorAdminController],
   providers: [AppService, AuthService, ConstructionEstimatorService, JwtGuard, RolesGuard, PrismaService, ScheduleService],
 })
 export class AppModule {}
