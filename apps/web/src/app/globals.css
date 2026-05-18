@@ -12,6 +12,808 @@
   --container-max: 1500px;
 }
 
+/* Xay nha tron goi landing page */
+.xay-nha-hero {
+  min-height: clamp(540px, 68vh, 660px);
+  display: grid;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+  isolation: isolate;
+}
+
+.xay-nha-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 18% 28%, rgba(201, 154, 74, .24), transparent 26%), linear-gradient(0deg, rgba(7, 23, 18, .4), transparent 48%);
+}
+
+.xay-nha-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 54px;
+  color: rgba(255, 255, 255, .75);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.xay-nha-breadcrumb span {
+  color: var(--gold);
+}
+
+.xay-nha-breadcrumb strong {
+  color: white;
+}
+
+.xay-nha-hero-content {
+  max-width: 760px;
+  color: white;
+  animation: fadeUp .72s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.xay-nha-hero-content h1 {
+  margin-top: 16px;
+  color: white;
+  font-size: clamp(42px, 5vw, 72px);
+  text-wrap: balance;
+}
+
+.xay-nha-hero-content p {
+  max-width: 650px;
+  margin: 22px 0 30px;
+  color: rgba(255, 255, 255, .9);
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.xay-nha-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.xay-nha-ghost-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 13px;
+  color: white;
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(10px);
+  font-weight: 900;
+  transition: transform .22s ease, background .22s ease;
+}
+
+.xay-nha-ghost-link:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, .16);
+}
+
+.xay-nha-benefit-strip {
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #fff 0%, #fffdf8 100%);
+}
+
+.xay-nha-benefits {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 26px 0;
+}
+
+.xay-nha-icon-item {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.xay-nha-icon-item > span {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(201, 154, 74, .34);
+  border-radius: 14px;
+  color: var(--gold);
+  background: rgba(248, 245, 239, .78);
+}
+
+.xay-nha-icon-item h3 {
+  font-family: var(--site-body-font);
+  color: var(--green);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.xay-nha-icon-item p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.xay-nha-intro {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(34px, 5vw, 70px);
+  align-items: center;
+}
+
+.xay-nha-intro-image {
+  min-height: 470px;
+  border-radius: 24px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 28px 80px rgba(15, 61, 46, .16);
+}
+
+.xay-nha-intro h2,
+.xay-nha-cost-card h2,
+.xay-nha-quote-form h2,
+.xay-nha-final-cta h2,
+.xay-nha-section-head h2 {
+  margin-top: 12px;
+  font-size: clamp(36px, 4vw, 54px);
+}
+
+.xay-nha-intro p,
+.xay-nha-cost-card > p,
+.xay-nha-final-cta p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.xay-nha-checklist {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.xay-nha-checklist li {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--charcoal);
+  font-weight: 800;
+}
+
+.xay-nha-checklist svg {
+  flex: 0 0 auto;
+  color: var(--green);
+}
+
+.xay-nha-scope {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  padding: 30px;
+  border: 1px solid rgba(201, 154, 74, .24);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .78);
+  box-shadow: 0 24px 70px rgba(15, 61, 46, .08);
+}
+
+.xay-nha-scope .xay-nha-icon-item {
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.xay-nha-process {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.xay-nha-process::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 33px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.xay-nha-process-step {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  text-align: center;
+}
+
+.xay-nha-process-step > span {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 4px solid rgba(201, 154, 74, .45);
+  border-radius: 50%;
+  color: white;
+  background: var(--green);
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(15, 61, 46, .18);
+}
+
+.xay-nha-process-step svg {
+  color: var(--gold);
+}
+
+.xay-nha-process-step h3 {
+  font-family: var(--site-body-font);
+  color: var(--charcoal);
+  font-size: 15px;
+}
+
+.xay-nha-process-step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.xay-nha-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 34px;
+}
+
+.xay-nha-project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.xay-nha-project-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 18px 45px rgba(15, 61, 46, .07);
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+
+.xay-nha-project-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201, 154, 74, .36);
+  box-shadow: 0 26px 68px rgba(15, 61, 46, .14);
+}
+
+.xay-nha-project-image {
+  position: relative;
+  min-height: 235px;
+  background-position: center;
+  background-size: cover;
+}
+
+.xay-nha-project-image span {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(15, 61, 46, .86);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.xay-nha-project-body {
+  padding: 18px;
+}
+
+.xay-nha-project-body h3 {
+  font-family: var(--site-body-font);
+  color: var(--charcoal);
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.xay-nha-project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.xay-nha-project-meta span,
+.xay-nha-project-body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.xay-nha-project-body a {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid rgba(201, 154, 74, .36);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.xay-nha-estimate {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.xay-nha-cost-card,
+.xay-nha-quote-form {
+  border-radius: 24px;
+  padding: clamp(24px, 3vw, 36px);
+  box-shadow: 0 22px 70px rgba(15, 61, 46, .1);
+}
+
+.xay-nha-cost-card {
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.xay-nha-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 24px 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+.xay-nha-tabs span {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.xay-nha-tabs span.active {
+  color: #fff;
+  background: var(--green);
+}
+
+.xay-nha-price-box {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.xay-nha-price-image {
+  min-height: 230px;
+  border-radius: 14px;
+  background-position: center;
+  background-size: cover;
+}
+
+.xay-nha-price-box small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.xay-nha-price-box strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--green);
+  font-size: clamp(22px, 2.4vw, 30px);
+}
+
+.xay-nha-note {
+  margin: 18px 0 0;
+  font-size: 13px;
+}
+
+.xay-nha-quote-form {
+  color: white;
+  background: linear-gradient(135deg, rgba(15, 61, 46, .96), rgba(5, 35, 26, .96)), url("https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1200&q=85") center / cover;
+}
+
+.xay-nha-quote-form h2,
+.xay-nha-quote-form .eyebrow {
+  color: white;
+}
+
+.xay-nha-quote-form p {
+  color: rgba(255, 255, 255, .78);
+  line-height: 1.7;
+}
+
+.xay-nha-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.xay-nha-quote-form input,
+.xay-nha-quote-form select,
+.xay-nha-quote-form textarea {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 11px;
+  padding: 0 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+  outline: none;
+  font: inherit;
+}
+
+.xay-nha-quote-form textarea {
+  min-height: 112px;
+  margin-top: 12px;
+  padding-top: 13px;
+  resize: vertical;
+}
+
+.xay-nha-quote-form input::placeholder,
+.xay-nha-quote-form textarea::placeholder {
+  color: rgba(255, 255, 255, .72);
+}
+
+.xay-nha-quote-form option {
+  color: var(--charcoal);
+}
+
+.xay-nha-gold-button {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, #c99a4a, #b98a3c);
+  box-shadow: 0 16px 42px rgba(201, 154, 74, .22);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.xay-nha-quote-form small {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  align-items: center;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, .76);
+}
+
+.xay-nha-why-section {
+  padding-bottom: 44px;
+}
+
+.xay-nha-why-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.xay-nha-why-grid .xay-nha-icon-item {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 18px 12px;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.xay-nha-stats-section {
+  padding: 0 0 76px;
+}
+
+.xay-nha-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(201, 154, 74, .34);
+  box-shadow: 0 24px 70px rgba(15, 61, 46, .16);
+}
+
+.xay-nha-stats .xay-nha-icon-item {
+  display: grid;
+  justify-items: center;
+  padding: 28px 18px;
+  text-align: center;
+  background: var(--green);
+}
+
+.xay-nha-stats .xay-nha-icon-item h3 {
+  color: var(--gold);
+  font-size: clamp(32px, 4vw, 46px);
+}
+
+.xay-nha-stats .xay-nha-icon-item p {
+  color: rgba(255, 255, 255, .82);
+}
+
+.xay-nha-testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.xay-nha-testimonial {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 18px 45px rgba(15, 61, 46, .07);
+}
+
+.xay-nha-avatar {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, var(--gold), var(--green));
+  font-weight: 900;
+}
+
+.xay-nha-testimonial strong,
+.xay-nha-testimonial span {
+  display: block;
+}
+
+.xay-nha-testimonial strong {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.xay-nha-testimonial span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.xay-nha-stars {
+  display: flex;
+  gap: 3px;
+  margin: 14px 0;
+  color: var(--gold);
+}
+
+.xay-nha-testimonial p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.xay-nha-faq {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.xay-nha-faq details {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 12px 34px rgba(15, 61, 46, .06);
+}
+
+.xay-nha-faq summary {
+  cursor: pointer;
+  padding: 18px 20px;
+  color: var(--green);
+  font-weight: 900;
+  list-style: none;
+}
+
+.xay-nha-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.xay-nha-faq summary::after {
+  content: "+";
+  float: right;
+  color: var(--gold);
+}
+
+.xay-nha-faq details[open] summary::after {
+  content: "-";
+}
+
+.xay-nha-faq p {
+  margin: 0;
+  padding: 0 20px 18px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.xay-nha-final-cta {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(30px, 4vw, 48px);
+  border-radius: 28px;
+  color: white;
+  background: linear-gradient(90deg, rgba(15, 61, 46, .98), rgba(15, 61, 46, .82)), url("https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=85") center / cover;
+  box-shadow: 0 28px 80px rgba(15, 61, 46, .2);
+}
+
+.xay-nha-final-cta h2,
+.xay-nha-final-cta .eyebrow {
+  color: white;
+}
+
+.xay-nha-final-cta p {
+  max-width: 720px;
+  color: rgba(255, 255, 255, .82);
+}
+
+@media (max-width: 1180px) {
+  .xay-nha-benefits,
+  .xay-nha-why-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .xay-nha-scope,
+  .xay-nha-project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .xay-nha-process {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .xay-nha-process::before {
+    left: 28px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  }
+
+  .xay-nha-process-step {
+    grid-template-columns: 58px 28px 1fr;
+    justify-items: start;
+    text-align: left;
+    column-gap: 14px;
+  }
+
+  .xay-nha-process-step p {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .xay-nha-intro,
+  .xay-nha-estimate {
+    grid-template-columns: 1fr;
+  }
+
+  .xay-nha-section-head,
+  .xay-nha-final-cta {
+    display: grid;
+    align-items: start;
+  }
+
+  .xay-nha-testimonials,
+  .xay-nha-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .xay-nha-hero {
+    min-height: 620px;
+    align-items: end;
+    padding: 40px 0;
+  }
+
+  .xay-nha-breadcrumb {
+    margin-bottom: 34px;
+    font-size: 12px;
+  }
+
+  .xay-nha-hero-content h1 {
+    font-size: clamp(34px, 11vw, 44px);
+  }
+
+  .xay-nha-hero-content p {
+    font-size: 15px;
+  }
+
+  .xay-nha-actions,
+  .xay-nha-actions .cta,
+  .xay-nha-ghost-link {
+    width: 100%;
+  }
+
+  .xay-nha-benefits,
+  .xay-nha-why-grid,
+  .xay-nha-scope,
+  .xay-nha-project-grid,
+  .xay-nha-testimonials,
+  .xay-nha-faq,
+  .xay-nha-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .xay-nha-benefits {
+    padding: 18px 0;
+  }
+
+  .xay-nha-intro-image {
+    min-height: 310px;
+  }
+
+  .xay-nha-scope {
+    padding: 14px;
+  }
+
+  .xay-nha-price-box,
+  .xay-nha-form-grid,
+  .xay-nha-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .xay-nha-price-image {
+    min-height: 190px;
+  }
+
+  .xay-nha-process-step {
+    grid-template-columns: 52px 1fr;
+  }
+
+  .xay-nha-process-step > span {
+    width: 52px;
+    height: 52px;
+  }
+
+  .xay-nha-process-step svg {
+    display: none;
+  }
+
+  .xay-nha-process-step p {
+    grid-column: 2;
+  }
+
+  .xay-nha-project-image {
+    min-height: 210px;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -2658,4 +3460,3 @@ h3 {
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
-
