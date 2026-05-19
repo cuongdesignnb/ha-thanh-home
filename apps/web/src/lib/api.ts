@@ -277,6 +277,8 @@ export type Post = {
   id: number;
   title: string;
   slug: string;
+  categoryId?: number | null;
+  categoryRef?: { id: number; name: string; slug: string } | null;
   excerpt?: string | null;
   contentHtml?: string | null;
   thumbnailMedia?: MediaFile | null;
@@ -286,6 +288,15 @@ export type Post = {
   ogTitle?: string | null;
   ogDescription?: string | null;
   publishedAt?: string | null;
+};
+
+export type PostCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
 };
 
 export type ArchitectureDesign = {

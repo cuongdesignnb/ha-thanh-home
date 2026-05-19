@@ -165,6 +165,30 @@ class ProjectCategoryDto {
   isActive?: boolean;
 }
 
+class PostCategoryDto {
+  @IsString()
+  @MinLength(2)
+  name!: string;
+
+  @IsOptional()
+  @IsString()
+  slug?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  sortOrder?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+
 class ProjectFilterOptionDto {
   @IsOptional()
   @IsEnum(ProjectFilterModule)
@@ -340,6 +364,11 @@ class PostDto {
   @IsOptional()
   @IsString()
   slug?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  categoryId?: number;
 
   @IsOptional()
   @IsString()
@@ -833,6 +862,52 @@ export class AdminController {
     return this.prisma.projectFilterOption.delete({ where: { id: Number(id) } });
   }
 
+  @Get("post-categories")
+  @Roles("Admin", "SEO Editor", "Viewer")
+  async listPostCategories(@Query() query: Record<string, string>) {
+    const { page, limit, skip } = parsePagination(query);
+    const where: Prisma.PostCategoryWhereInput = {
+      ...(query.search ? { OR: [{ name: { contains: query.search } }, { slug: { contains: query.search } }] } : {}),
+      ...(query.status === "active" ? { isActive: true } : {}),
+      ...(query.status === "inactive" ? { isActive: false } : {}),
+    };
+    const [data, total] = await Promise.all([
+      this.prisma.postCategory.findMany({ where, skip, take: limit, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }),
+      this.prisma.postCategory.count({ where }),
+    ]);
+    return { data, meta: listMeta(total, page, limit) };
+  }
+
+  @Post("post-categories")
+  @Roles("Admin", "SEO Editor")
+  async createPostCategory(@Body() dto: PostCategoryDto) {
+    const slug = await uniqueSlug(dto.name, dto.slug, (candidate) =>
+      this.prisma.postCategory.findUnique({ where: { slug: candidate } }).then(Boolean),
+    );
+    return this.prisma.postCategory.create({ data: { ...dto, slug } });
+  }
+
+  @Patch("post-categories/:id")
+  @Roles("Admin", "SEO Editor")
+  async updatePostCategory(@Param("id") id: string, @Body() dto: PostCategoryDto) {
+    const currentId = Number(id);
+    const slug = dto.slug
+      ? await uniqueSlug(dto.name, dto.slug, async (candidate) => {
+          const match = await this.prisma.postCategory.findUnique({ where: { slug: candidate } });
+          return Boolean(match && match.id !== currentId);
+        })
+      : undefined;
+    return this.prisma.postCategory.update({ where: { id: currentId }, data: { ...dto, ...(slug ? { slug } : {}) } });
+  }
+
+  @Delete("post-categories/:id")
+  @Roles("Admin", "SEO Editor")
+  async deletePostCategory(@Param("id") id: string) {
+    const categoryId = Number(id);
+    await this.prisma.post.updateMany({ where: { categoryId }, data: { categoryId: null } });
+    return this.prisma.postCategory.delete({ where: { id: categoryId } });
+  }
+
   @Get("menus")
   @Roles("Admin", "Viewer")
   async listMenus(@Query() query: Record<string, string>) {
@@ -939,10 +1014,11 @@ export class AdminController {
       ["Mẫu thiết kế kiến trúc", "/mau-thiet-ke-kien-truc"],
       ["Mẫu thiết kế nội thất", "/mau-thiet-ke-noi-that"],
     ].map(([label, url]) => ({ label, url, type: "route" }));
-    const [projects, services, posts, architectureDesigns, interiorDesigns] = await Promise.all([
+    const [projects, services, posts, postCategories, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.service.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.post.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
+      this.prisma.postCategory.findMany({ select: { id: true, name: true, slug: true, isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], take: 60 }),
       this.prisma.architectureDesignTemplate.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.interiorDesignTemplate.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
     ]);
@@ -950,6 +1026,7 @@ export class AdminController {
       ...staticRoutes,
       ...projects.map((item) => ({ label: item.title, url: `/du-an/${item.slug}`, type: "project", referenceId: item.id, status: item.status })),
       ...services.map((item) => ({ label: item.title, url: `/dich-vu/${item.slug}`, type: "service", referenceId: item.id, status: item.status })),
+      ...postCategories.map((item) => ({ label: `Danh mục: ${item.name}`, url: `/tin-tuc?category=${item.slug}`, type: "post_category", referenceId: item.id, status: item.isActive ? "active" : "inactive" })),
       ...posts.map((item) => ({ label: item.title, url: `/tin-tuc/${item.slug}`, type: "post", referenceId: item.id, status: item.status })),
       ...architectureDesigns.map((item) => ({ label: item.title, url: `/mau-thiet-ke-kien-truc/${item.slug}`, type: "architecture_design", referenceId: item.id, status: item.status })),
       ...interiorDesigns.map((item) => ({ label: item.title, url: `/mau-thiet-ke-noi-that/${item.slug}`, type: "interior_design", referenceId: item.id, status: item.status })),
@@ -1202,10 +1279,12 @@ export class AdminController {
     const { page, limit, skip } = parsePagination(query);
     const where: Prisma.PostWhereInput = {
       ...(query.status ? { status: query.status as ContentStatus } : {}),
+      ...(query.categoryId ? { categoryId: Number(query.categoryId) } : {}),
+      ...(query.category ? { categoryRef: { slug: query.category } } : {}),
       ...(query.search ? { OR: [{ title: { contains: query.search } }, { slug: { contains: query.search } }] } : {}),
     };
     const [data, total] = await Promise.all([
-      this.prisma.post.findMany({ where, skip, take: limit, include: { thumbnailMedia: true }, orderBy: { updatedAt: "desc" } }),
+      this.prisma.post.findMany({ where, skip, take: limit, include: { thumbnailMedia: true, categoryRef: true }, orderBy: { updatedAt: "desc" } }),
       this.prisma.post.count({ where }),
     ]);
     return { data, meta: listMeta(total, page, limit) };
@@ -1224,6 +1303,7 @@ export class AdminController {
     return this.prisma.post.create({
       data: {
         ...dto,
+        categoryId: dto.categoryId || null,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         status: dto.status || ContentStatus.draft,
@@ -1251,6 +1331,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        categoryId: dto.categoryId || null,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         scheduledAt: scheduledAt || null,

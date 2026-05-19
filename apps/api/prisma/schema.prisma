@@ -262,6 +262,8 @@ model Post {
   id          Int           @id @default(autoincrement())
   title       String
   slug        String        @unique
+  categoryId  Int?
+  categoryRef PostCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   excerpt     String?       @db.Text
   contentJson Json?
   contentHtml String?       @db.LongText
@@ -283,9 +285,25 @@ model Post {
   updatedAt   DateTime     @updatedAt
 
   @@index([status])
+  @@index([categoryId])
   @@index([thumbnailMediaId])
   @@index([createdAt])
   @@index([publishedAt])
+}
+
+model PostCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
 }
 
 model ArchitectureDesignTemplate {

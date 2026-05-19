@@ -28,7 +28,7 @@ export class AppService {
       }),
       this.prisma.post.findMany({
         where: { status: ContentStatus.published, isFeatured: true },
-        include: { thumbnailMedia: true },
+        include: { thumbnailMedia: true, categoryRef: true },
         take: 4,
         orderBy: { publishedAt: "desc" },
       }),

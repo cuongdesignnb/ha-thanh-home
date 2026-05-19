@@ -1,6 +1,6 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type Post, type Project, type ProjectFilters, type ProjectGroup, type Service } from "@/lib/api";
+import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service } from "@/lib/api";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -159,9 +159,22 @@ export function ServiceList({ title, services }: { title: string; services: Serv
   );
 }
 
-export function PostList({ posts }: { posts: Post[] }) {
+export function PostList({ activeCategory, categories, posts }: { activeCategory?: string; categories?: PostCategory[]; posts: Post[] }) {
   return (
-    <><PageHero title="Tin tức & cảm hứng" description="Bài viết SEO đã xuất bản từ hệ quản trị." /><section className="section"><div className="container news-grid">{posts.map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body"><h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div></section></>
+    <>
+      <PageHero title="Tin tức & cảm hứng" description="Bài viết SEO đã xuất bản từ hệ quản trị." />
+      <section className="section">
+        <div className="container">
+          {categories?.length ? (
+            <nav className="post-category-tabs" aria-label="Danh mục bài viết">
+              <a className={!activeCategory ? "active" : ""} href="/tin-tuc">Tất cả</a>
+              {categories.map((category) => <a className={activeCategory === category.slug ? "active" : ""} href={`/tin-tuc?category=${category.slug}`} key={category.id}>{category.name}</a>)}
+            </nav>
+          ) : null}
+          <div className="news-grid">{posts.map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
+        </div>
+      </section>
+    </>
   );
 }
 

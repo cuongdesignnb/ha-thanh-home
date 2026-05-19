@@ -340,18 +340,35 @@ async function main() {
     });
   }
 
-  const posts = [
-    ["Xu hướng thiết kế nội thất 2026", "xu-huong-thiet-ke-noi-that-2026"],
-    ["5 lưu ý khi xây biệt thự phố", "5-luu-y-khi-xay-biet-thu-pho"],
+  const postCategories = [
+    ["Cẩm nang xây dựng", "cam-nang-xay-dung"],
+    ["Cảm hứng nội thất", "cam-hung-noi-that"],
+    ["Kinh nghiệm thiết kế", "kinh-nghiem-thiet-ke"],
   ] as const;
 
-  for (const [title, slug] of posts) {
+  const postCategoryMap = new Map<string, number>();
+  for (const [name, slug] of postCategories) {
+    const category = await prisma.postCategory.upsert({
+      where: { slug },
+      update: {},
+      create: { name, slug, isActive: true },
+    });
+    postCategoryMap.set(slug, category.id);
+  }
+
+  const posts = [
+    ["Xu hướng thiết kế nội thất 2026", "xu-huong-thiet-ke-noi-that-2026", "cam-hung-noi-that"],
+    ["5 lưu ý khi xây biệt thự phố", "5-luu-y-khi-xay-biet-thu-pho", "cam-nang-xay-dung"],
+  ] as const;
+
+  for (const [title, slug, categorySlug] of posts) {
     await prisma.post.upsert({
       where: { slug },
       update: {},
       create: {
         title,
         slug,
+        categoryId: postCategoryMap.get(categorySlug),
         excerpt: "Góc nhìn chuyên môn từ đội ngũ Hà Thành Home.",
         status: ContentStatus.published,
         isFeatured: true,

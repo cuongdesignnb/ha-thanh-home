@@ -1674,6 +1674,41 @@ h3 {
   gap: 22px;
 }
 
+.post-category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 28px;
+}
+
+.post-category-tabs a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: var(--heading);
+  background: #fff;
+  font-weight: 800;
+}
+
+.post-category-tabs a.active,
+.post-category-tabs a:hover {
+  border-color: rgba(201, 154, 74, .55);
+  color: #fff;
+  background: var(--green);
+}
+
+.post-category-badge {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--gold);
+  background: rgba(201, 154, 74, .12);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .home-slider-grid,
 .home-template-grid,
 .project-grid.home-slider-grid,
@@ -2917,6 +2952,76 @@ h3 {
   color: var(--muted);
 }
 
+.detail-content blockquote {
+  margin: 24px 0;
+  border-left: 4px solid var(--gold);
+  border-radius: 0 14px 14px 0;
+  padding: 16px 18px;
+  color: var(--heading);
+  background: var(--cream);
+}
+
+.detail-content img {
+  max-width: 100%;
+  border-radius: 18px;
+}
+
+.detail-content pre {
+  overflow: auto;
+  border-radius: 14px;
+  padding: 18px;
+  color: white;
+  background: var(--charcoal);
+}
+
+.detail-content .content-callout,
+.detail-content .content-cta-block,
+.detail-content .content-faq-item,
+.detail-content .content-two-columns {
+  margin: 24px 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(15, 61, 46, .08);
+}
+
+.detail-content .content-callout {
+  border-color: rgba(201, 154, 74, .45);
+  background: #fffaf0;
+}
+
+.detail-content .content-cta-block {
+  color: #fff;
+  background: linear-gradient(135deg, var(--green), var(--green-deep));
+}
+
+.detail-content .content-cta-block h3,
+.detail-content .content-cta-block p {
+  color: #fff;
+}
+
+.detail-content .content-cta-block a {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 11px 18px;
+  color: var(--green);
+  background: #fff;
+  font-weight: 900;
+}
+
+.detail-content .content-faq-item summary {
+  cursor: pointer;
+  color: var(--heading);
+  font-weight: 900;
+}
+
+.detail-content .content-two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
 .copyright {
   margin-top: 34px;
   padding-top: 20px;
@@ -2986,6 +3091,12 @@ h3 {
 
   .timeline::before {
     display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .detail-content .content-two-columns {
+    grid-template-columns: 1fr;
   }
 }
 

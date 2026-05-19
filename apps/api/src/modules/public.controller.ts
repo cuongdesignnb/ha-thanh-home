@@ -167,18 +167,28 @@ export class PublicController {
     const { page, limit, skip } = parsePagination(query);
     const where: Prisma.PostWhereInput = {
       status: ContentStatus.published,
+      ...(query.category ? { categoryRef: { slug: query.category, isActive: true } } : {}),
       ...(query.search ? { title: { contains: query.search } } : {}),
     };
     const [data, total] = await Promise.all([
-      this.prisma.post.findMany({ where, skip, take: limit, include: { thumbnailMedia: true }, orderBy: { publishedAt: "desc" } }),
+      this.prisma.post.findMany({ where, skip, take: limit, include: { thumbnailMedia: true, categoryRef: true }, orderBy: { publishedAt: "desc" } }),
       this.prisma.post.count({ where }),
     ]);
     return repairPublicText({ data, meta: listMeta(total, page, limit) });
   }
 
+  @Get("post-categories")
+  async postCategories() {
+    const data = await this.prisma.postCategory.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+    return repairPublicText({ data });
+  }
+
   @Get("posts/:slug")
   async post(@Param("slug") slug: string) {
-    const data = await this.prisma.post.findFirst({ where: { slug, status: ContentStatus.published }, include: { thumbnailMedia: true } });
+    const data = await this.prisma.post.findFirst({ where: { slug, status: ContentStatus.published }, include: { thumbnailMedia: true, categoryRef: true } });
     if (!data) throw new NotFoundException("Post not found");
     return repairPublicText(data);
   }

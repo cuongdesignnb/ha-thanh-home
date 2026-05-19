@@ -25,28 +25,40 @@ import {
   ChevronRight,
   Check,
   CheckCircle2,
+  Code2,
   Copy,
   ExternalLink,
   FileText,
   FolderKanban,
   GripVertical,
+  Heading1,
   Heading2,
+  Heading3,
+  Heading4,
   Image,
   ImagePlus,
   Italic,
   LayoutDashboard,
   LinkIcon,
   List,
+  ListOrdered,
   LogOut,
   Menu as MenuIcon,
+  Minus,
   Newspaper,
+  Pilcrow,
   PenTool,
   PhoneCall,
   Plus,
+  Quote,
+  Redo2,
   Search,
   Settings,
   Sofa,
   Sparkles,
+  Strikethrough,
+  Table2,
+  Undo2,
   UploadCloud,
   Users,
   X,
@@ -57,7 +69,7 @@ import { adminApiFetch, adminUrl } from "@/lib/client-path";
 const apiFetch = adminApiFetch;
 
 type User = { email: string; roles: string[] };
-type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "services" | "posts" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings";
+type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "services" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings";
 type CmsItem = Record<string, unknown> & {
   id: number;
   title?: string;
@@ -86,6 +98,7 @@ type CmsItem = Record<string, unknown> & {
   category?: string;
   categoryId?: number | null;
   categoryRef?: CmsItem | null;
+  postCategoryId?: number | null;
   excerpt?: string;
   description?: string;
   contentHtml?: string;
@@ -235,6 +248,7 @@ const modules = [
     group: "Nội dung",
     items: [
       { id: "posts", label: "Bài viết SEO", description: "Draft, scheduled, published", icon: Newspaper, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
+      { id: "post-categories", label: "Danh mục bài viết", description: "Nhóm chủ đề để chọn khi viết bài", icon: List, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
       { id: "media", label: "Media Library", description: "Ảnh WebP và thư viện dùng lại", icon: Image, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
       { id: "ai", label: "AI Content Studio", description: "Outline, meta, bài viết draft", icon: Sparkles, roles: ["Super Admin", "Admin", "SEO Editor"] },
     ],
@@ -263,6 +277,7 @@ const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?
   "interior-designs": { title: "Mẫu thiết kế nội thất", subtitle: "Catalog phong cách nội thất, loại phòng, diện tích và ngân sách.", createLabel: "Thêm mẫu nội thất" },
   services: { title: "Quản lý dịch vụ", subtitle: "Dịch vụ công trình, nội thất và nội dung SEO.", createLabel: "Thêm dịch vụ" },
   posts: { title: "Bài viết SEO", subtitle: "Soạn bài, lưu nháp, đặt lịch và xuất bản.", createLabel: "Thêm bài viết" },
+  "post-categories": { title: "Danh mục bài viết", subtitle: "Tạo nhóm chủ đề để chọn đúng danh mục khi viết bài SEO.", createLabel: "Thêm danh mục" },
   leads: { title: "Lead tư vấn", subtitle: "Theo dõi nguồn lead, trạng thái xử lý và ghi chú nội bộ." },
   media: { title: "Media Library", subtitle: "Upload, chuyển WebP, tạo thumbnail và tái sử dụng ảnh." },
   ai: { title: "AI Content Studio", subtitle: "Tạo outline, meta SEO và bài viết draft bằng AI theo cấu hình hệ thống." },
@@ -280,6 +295,7 @@ const entitySingular: Record<Entity, string> = {
   "interior-designs": "mẫu nội thất",
   services: "dịch vụ",
   posts: "bài viết",
+  "post-categories": "danh mục bài viết",
   leads: "lead",
   media: "media",
   ai: "AI content",
@@ -294,6 +310,8 @@ const statusLabels: Record<string, string> = {
   scheduled: "Đặt lịch",
   published: "Đã xuất bản",
   archived: "Lưu trữ",
+  active: "Đang bật",
+  inactive: "Đang tắt",
   new: "Mới",
   contacted: "Đã liên hệ",
   consulting: "Đang tư vấn",
@@ -2173,6 +2191,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   const [view, setView] = useState<"table" | "calendar">("table");
   const [scheduledRows, setScheduledRows] = useState<CmsItem[]>([]);
   const [projectCategories, setProjectCategories] = useState<CmsItem[]>([]);
+  const [postCategories, setPostCategories] = useState<CmsItem[]>([]);
   const [filterOptions, setFilterOptions] = useState<CmsItem[]>([]);
   const [calendarDate, setCalendarDate] = useState(() => new Date());
   const canWrite = canWriteEntity(entity, roles);
@@ -2184,6 +2203,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       const params = new URLSearchParams({ page: String(page), limit: "10" });
       if (search) params.set("search", search);
       if (group && ["projects", "services", "project-categories", "project-filter-options"].includes(entity)) params.set("group", group);
+      if (filterOne && entity === "posts") params.set("categoryId", filterOne);
       if (filterOne && entity === "project-filter-options") params.set("type", filterOne);
       if (filterTwo && entity === "project-filter-options") params.set("module", filterTwo);
       if (filterOne && entity === "architecture-designs") params.set("houseType", filterOne);
@@ -2229,6 +2249,17 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     }
   }
 
+  async function loadPostCategories() {
+    try {
+      const response = await apiFetch("/api/cms/post-categories?limit=200");
+      if (!response.ok) throw new Error(await readApiError(response, "Không tải được danh mục bài viết."));
+      const payload: ListResponse<CmsItem> = await response.json();
+      setPostCategories(payload.data || []);
+    } catch (error) {
+      notify({ tone: "error", title: "Không tải được danh mục bài viết", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
+    }
+  }
+
   async function loadFilterOptions() {
     try {
       const response = await apiFetch("/api/cms/project-filter-options?limit=500");
@@ -2249,6 +2280,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     form.reset(defaultValues(entity));
     load(1);
     if (["projects", "project-categories"].includes(entity)) loadProjectCategories();
+    if (["posts", "post-categories"].includes(entity)) loadPostCategories();
     if (["projects", "project-filter-options", "architecture-designs", "interior-designs"].includes(entity)) loadFilterOptions();
   }, [entity]);
 
@@ -2315,6 +2347,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     }
     await load(meta.page);
     await loadScheduled();
+    if (["posts", "post-categories"].includes(entity)) await loadPostCategories();
     backToList();
     notify({ tone: "success", title: editing ? "Đã cập nhật dữ liệu" : "Đã tạo dữ liệu mới" });
   }
@@ -2407,7 +2440,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
           </div>
           {canWrite ? (
             <form className="cms-form editor-form" onSubmit={form.handleSubmit(submit)}>
-              <EntityFields entity={entity} filterOptions={filterOptions} form={form} projectCategories={projectCategories} />
+              <EntityFields entity={entity} filterOptions={filterOptions} form={form} postCategories={postCategories} projectCategories={projectCategories} />
               <div className="form-actions sticky-actions">
                 <button className="secondary-button" type="button" onClick={editing ? () => startEdit(editing) : startCreate}>Làm mới</button>
                 <button className="primary-button" type="submit">Lưu thay đổi</button>
@@ -2481,9 +2514,15 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
               <select value={filterTwo} onChange={(event) => setFilterTwo(event.target.value)}><option value="">Tất cả loại phòng</option><option>Phòng khách</option><option>Phòng ngủ</option><option>Bếp</option><option>Trọn gói</option></select>
             </>
           ) : null}
+          {entity === "posts" ? (
+            <select value={filterOne} onChange={(event) => setFilterOne(event.target.value)}>
+              <option value="">Tất cả danh mục</option>
+              {postCategories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}
+            </select>
+          ) : null}
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">Tất cả trạng thái</option>
-            {(entity === "leads" ? ["new", "contacted", "consulting", "won", "lost", "spam"] : ["draft", "pending_review", "scheduled", "published", "archived"]).map((item) => (
+            {(entity === "leads" ? ["new", "contacted", "consulting", "won", "lost", "spam"] : entity === "post-categories" ? ["active", "inactive"] : ["draft", "pending_review", "scheduled", "published", "archived"]).map((item) => (
               <option value={item} key={item}>{statusLabels[item] || item}</option>
             ))}
           </select>
@@ -2499,7 +2538,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   );
 }
 
-function EntityFields({ entity, filterOptions, form, projectCategories }: { entity: Entity; filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; projectCategories: CmsItem[] }) {
+function EntityFields({ entity, filterOptions, form, postCategories, projectCategories }: { entity: Entity; filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; postCategories: CmsItem[]; projectCategories: CmsItem[] }) {
   if (entity === "leads") {
     return (
       <>
@@ -2542,6 +2581,20 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
       </>
     );
   }
+  if (entity === "post-categories") {
+    return (
+      <section className="form-section">
+        <div className="form-section-title"><span>01</span><div><h3>Danh mục bài viết</h3><p>Dùng để phân loại bài SEO, lọc ngoài frontend và chọn khi soạn bài.</p></div></div>
+        <div className="form-grid">
+          <label>Tên danh mục<input {...form.register("name")} placeholder="Cẩm nang xây dựng, Cảm hứng nội thất..." /></label>
+          <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
+          <label>Thứ tự<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
+          <label className="wide">Mô tả<textarea {...form.register("description")} rows={4} /></label>
+          <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> Đang hiển thị ngoài website</label>
+        </div>
+      </section>
+    );
+  }
   return (
     <>
       <section className="form-section">
@@ -2554,6 +2607,7 @@ function EntityFields({ entity, filterOptions, form, projectCategories }: { enti
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} /> : null}
           {["projects", "services"].includes(entity) ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label> : null}
           {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} /> : null}
+          {entity === "posts" ? <label>Danh mục bài viết<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{postCategories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label> : null}
           {entity === "posts" ? <label className="wide">Tóm tắt bài viết<textarea {...form.register("excerpt")} rows={3} /></label> : null}
           {entity !== "posts" ? <label className="wide">Mô tả ngắn<textarea {...form.register("description")} rows={4} /></label> : null}
         </div>
@@ -2919,6 +2973,16 @@ function RichTextField({ value, onChange }: { value: string; onChange: (value: s
     if (url) editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }
 
+  function insertPreset(type: "callout" | "cta" | "faq" | "twoColumns") {
+    const snippets = {
+      callout: `<blockquote><p><strong>Ghi chú chuyên gia:</strong> Nhập nội dung nhấn mạnh, lưu ý kỹ thuật hoặc thông tin quan trọng tại đây.</p></blockquote>`,
+      cta: `<h3>Nhận tư vấn từ Hà Thành Home</h3><p>Đội ngũ chuyên gia sẽ hỗ trợ phương án phù hợp với nhu cầu và ngân sách.</p><p><a href="/lien-he">Liên hệ tư vấn</a></p>`,
+      faq: `<h3>Câu hỏi thường gặp</h3><p><strong>Câu hỏi:</strong> Nhập câu hỏi tại đây.</p><p><strong>Trả lời:</strong> Nhập câu trả lời chi tiết tại đây.</p>`,
+      twoColumns: `<h3>Bố cục so sánh</h3><ul><li><strong>Ý chính 1:</strong> Nhập nội dung...</li><li><strong>Ý chính 2:</strong> Nhập nội dung...</li></ul>`,
+    };
+    editor?.chain().focus().insertContent(snippets[type]).run();
+  }
+
   function insertImage(media: CmsItem) {
     const src = String(media.webpUrl || media.largeUrl || media.mediumUrl || media.thumbUrl || "");
     if (!src) return;
@@ -2929,12 +2993,28 @@ function RichTextField({ value, onChange }: { value: string; onChange: (value: s
   return (
     <div className="editor-shell">
       <div className="editor-toolbar">
+        <button className={editor.isActive("paragraph") ? "active" : ""} onClick={() => editor.chain().focus().setParagraph().run()} type="button"><Pilcrow size={15} /> P</button>
+        <button className={editor.isActive("heading", { level: 1 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} type="button"><Heading1 size={15} /> H1</button>
         <button className={editor.isActive("bold") ? "active" : ""} onClick={() => editor.chain().focus().toggleBold().run()} type="button"><Bold size={15} /> B</button>
         <button className={editor.isActive("italic") ? "active" : ""} onClick={() => editor.chain().focus().toggleItalic().run()} type="button"><Italic size={15} /> I</button>
+        <button className={editor.isActive("underline") ? "active" : ""} onClick={() => editor.chain().focus().toggleUnderline().run()} type="button">U</button>
+        <button className={editor.isActive("strike") ? "active" : ""} onClick={() => editor.chain().focus().toggleStrike().run()} type="button"><Strikethrough size={15} /> S</button>
         <button className={editor.isActive("heading", { level: 2 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} type="button"><Heading2 size={15} /> H2</button>
-        <button onClick={() => editor.chain().focus().toggleBulletList().run()} type="button"><List size={15} /> List</button>
+        <button className={editor.isActive("heading", { level: 3 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} type="button"><Heading3 size={15} /> H3</button>
+        <button className={editor.isActive("heading", { level: 4 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()} type="button"><Heading4 size={15} /> H4</button>
+        <button className={editor.isActive("bulletList") ? "active" : ""} onClick={() => editor.chain().focus().toggleBulletList().run()} type="button"><List size={15} /> List</button>
+        <button className={editor.isActive("orderedList") ? "active" : ""} onClick={() => editor.chain().focus().toggleOrderedList().run()} type="button"><ListOrdered size={15} /> 1.2</button>
+        <button className={editor.isActive("blockquote") ? "active" : ""} onClick={() => editor.chain().focus().toggleBlockquote().run()} type="button"><Quote size={15} /> Quote</button>
+        <button className={editor.isActive("codeBlock") ? "active" : ""} onClick={() => editor.chain().focus().toggleCodeBlock().run()} type="button"><Code2 size={15} /> Code</button>
+        <button onClick={() => editor.chain().focus().setHorizontalRule().run()} type="button"><Minus size={15} /> HR</button>
         <button onClick={addLink} type="button"><LinkIcon size={15} /> Link</button>
         <button onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={15} /> Ảnh</button>
+        <button onClick={() => insertPreset("callout")} type="button"><BadgeCheck size={15} /> Callout</button>
+        <button onClick={() => insertPreset("cta")} type="button"><Sparkles size={15} /> CTA</button>
+        <button onClick={() => insertPreset("faq")} type="button"><Table2 size={15} /> FAQ</button>
+        <button onClick={() => insertPreset("twoColumns")} type="button">2 cột</button>
+        <button disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()} type="button"><Undo2 size={15} /> Undo</button>
+        <button disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()} type="button"><Redo2 size={15} /> Redo</button>
       </div>
       <EditorContent editor={editor} />
       <p className="editor-hint">Chèn ảnh trực tiếp từ Media Library, có thể upload nhanh ngay trong popup chọn ảnh.</p>
@@ -3074,9 +3154,9 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
   const helper = createColumnHelper<CmsItem>();
   const columns = useMemo(
     () => [
-      helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Khách hàng" : entity === "project-categories" || entity === "project-filter-options" ? "Tên" : "Tiêu đề" }),
-      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
-      helper.accessor((row) => row.status || "-", { id: "status", header: "Trạng thái", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
+      helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Khách hàng" : ["project-categories", "project-filter-options", "post-categories"].includes(entity) ? "Tên" : "Tiêu đề" }),
+      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "posts" ? row.categoryRef?.name || "Chưa chọn" : entity === "post-categories" ? row.slug || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "posts" ? "Danh mục" : entity === "post-categories" ? "Slug" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
+      helper.accessor((row) => entity === "post-categories" ? row.isActive === false ? "inactive" : "active" : row.status || "-", { id: "status", header: "Trạng thái", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
       helper.display({
         id: "actions",
         header: "",
@@ -3335,7 +3415,7 @@ function canWriteEntity(entity: Entity, roles: string[]) {
   if (roles.includes("Super Admin")) return true;
   if (["projects", "project-categories", "project-filter-options", "services", "architecture-designs", "interior-designs", "menus"].includes(entity)) return roles.includes("Admin");
   if (entity === "estimator") return roles.includes("Admin");
-  if (entity === "posts") return roles.includes("Admin") || roles.includes("SEO Editor");
+  if (["posts", "post-categories"].includes(entity)) return roles.includes("Admin") || roles.includes("SEO Editor");
   if (entity === "leads") return roles.includes("Admin") || roles.includes("Sales");
   return false;
 }
