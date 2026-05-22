@@ -2316,7 +2316,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     }
     let response: Response;
     try {
-      response = await fetch(editing ? `/api/cms/${entity}/${editing.id}` : `/api/cms/${entity}`, {
+      response = await apiFetch(editing ? `/api/cms/${entity}/${editing.id}` : `/api/cms/${entity}`, {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(normalizePayload(entity, values)),
