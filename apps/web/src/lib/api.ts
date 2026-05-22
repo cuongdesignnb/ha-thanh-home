@@ -1,4 +1,4 @@
-export type ProjectGroup = "construction" | "interior";
+export type ProjectGroup = "construction" | "interior" | "xay_nha_tron_goi";
 
 export type MediaFile = {
   id: number;
@@ -263,9 +263,13 @@ export type Service = {
   title: string;
   slug: string;
   group: ProjectGroup;
+  icon?: string | null;
   description?: string | null;
   contentHtml?: string | null;
   thumbnailMedia?: MediaFile | null;
+  galleryMediaIds?: number[] | null;
+  galleryMedia?: MediaFile[] | null;
+  publishedAt?: string | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
   canonicalUrl?: string | null;

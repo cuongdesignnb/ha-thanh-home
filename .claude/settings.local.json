@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test -d \"D:\\\\\\\\HT\\\\\\\\ha-thanh-home\\\\\\\\storage\")",
+      "Bash(grep -A 40 \"^CREATE TABLE \\\\`news\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`news\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`cat_news\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`projects\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`project_cat\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`products\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`images\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`cauhinh\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep -A 5 \"INSERT INTO \\\\`products\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(awk '/^INSERT INTO `products`/,/^;/' \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep -A 10 \"^CREATE TABLE \\\\`images\\\\`\" \"d:\\\\Ha Thanh\\\\sql_hathanhhome_.sql\")",
+      "Bash(grep -A 1 \"INSERT INTO \\\\`images\\\\`\" \"d:/Ha Thanh/sql_hathanhhome_.sql\")",
+      "Bash(grep -A 1 \"INSERT INTO \\\\`projects\\\\`\" \"d:/Ha Thanh/sql_hathanhhome_.sql\")",
+      "Bash(grep -A 1 \"INSERT INTO \\\\`products\\\\`\" \"d:/Ha Thanh/sql_hathanhhome_.sql\")",
+      "Bash(grep -A 0 \"INSERT INTO \\\\`images\\\\`\" \"d:/Ha Thanh/sql_hathanhhome_.sql\")",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@127.0.0.1:31906/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\\\\apps\\\\api\"; npx tsx scripts/migrate-legacy.ts --dry-run 2>&1 | Select-Object -First 80)",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@127.0.0.1:31906/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\\\\apps\\\\api\"; npx prisma migrate status 2>&1 | Select-Object -First 30)",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@127.0.0.1:31906/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\\\\apps\\\\api\"; npx prisma migrate deploy 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@127.0.0.1:31906/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\\\\apps\\\\api\"; npx tsx scripts/migrate-legacy.ts --dry-run 2>&1 | Select-Object -Last 100)",
+      "PowerShell(docker exec hathanh-mysql mysql -u hathanh -phathanh_secure_password ha_thanh_home -e \"SELECT id, LEFT\\(originalName,40\\) name, LEFT\\(altText,40\\) alt, type FROM MediaFile ORDER BY id DESC LIMIT 5;\" 2>$null)",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:31875/api/posts?limit=3\" -UseBasicParsing\\).Content.Substring\\(0, 500\\) } catch { $_.Exception.Message })",
+      "PowerShell(docker exec hathanh-mysql mysql -u hathanh -phathanh_secure_password ha_thanh_home -e \"SELECT id, status, LEFT\\(title,40\\) title FROM Post WHERE status='published' ORDER BY id;\" 2>$null)",
+      "PowerShell(docker exec hathanh-mysql mysql -u hathanh -phathanh_secure_password ha_thanh_home -e \"SELECT id, webpUrl FROM MediaFile WHERE id <= 3 OR webpUrl LIKE 'http%' LIMIT 5;\" 2>$null)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:31875/uploads/202605/s0qjwj8x_thumb.webp\" -UseBasicParsing -Method Head; \"$\\($r.StatusCode\\) $\\($r.Headers.'Content-Type'\\) $\\($r.Headers.'Content-Length'\\)b\" } catch { $_.Exception.Message }; try { $r2 = Invoke-WebRequest -Uri \"http://localhost:31875/api/admin/media?limit=2\" -UseBasicParsing -Headers @{Cookie=\"\\(test\\)\"}; $r2.Content.Substring\\(0,300\\) } catch { \"api err: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:31875/api/admin/post-categories?page=1&limit=10\" -UseBasicParsing -Method Get -Headers @{\"Authorization\"=\"Bearer none\"}\\).StatusCode } catch { \"$\\($_.Exception.Response.StatusCode.value__\\) $\\($_.Exception.Message\\)\" })",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@mysql:3306/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\"; docker compose up -d api 2>&1 | Out-String)",
+      "PowerShell(Start-Sleep -Seconds 8; docker logs hathanh-api 2>&1 | Select-String \"post-categor\" | Select-Object -First 5; \"---\"; try { \\(Invoke-WebRequest -Uri \"http://localhost:31875/api/admin/post-categories?page=1&limit=10\" -UseBasicParsing\\).StatusCode } catch { \"$\\($_.Exception.Response.StatusCode.value__\\): $\\($_.Exception.Message\\)\" })",
+      "Bash(docker exec *)",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:31874/api/cms/scheduled-posts?from=2026-04-30T17:00:00.000Z&to=2026-05-31T16:59:59.999Z\" -UseBasicParsing\\).StatusCode } catch { \"Status: $\\($_.Exception.Response.StatusCode.value__\\) | $\\($_.Exception.Message\\)\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:31874/admin/api/cms/scheduled-posts?from=2026-04-30T17:00:00.000Z&to=2026-05-31T16:59:59.999Z\" -UseBasicParsing; \"OK: $\\($r.StatusCode\\)\" } catch { \"Status: $\\($_.Exception.Response.StatusCode.value__\\)\" }; try { \\(Invoke-WebRequest -Uri \"http://localhost:31874/\" -UseBasicParsing\\).StatusCode } catch { \"root: $\\($_.Exception.Response.StatusCode.value__\\)\" }; try { \\(Invoke-WebRequest -Uri \"http://localhost:31874/admin\" -UseBasicParsing -MaximumRedirection 0\\).StatusCode } catch { \"/admin: $\\($_.Exception.Response.StatusCode.value__\\)\" })",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:31874/login\" -UseBasicParsing -MaximumRedirection 0 -ErrorAction SilentlyContinue; \"/login: $\\($r.StatusCode\\)\"; docker logs hathanh-admin --tail 20 2>&1 | Select-Object -Last 20)",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:31875/api/admin/scheduled-posts\" -UseBasicParsing -Headers @{Authorization=\"Bearer none\"}\\).StatusCode } catch { \"external: $\\($_.Exception.Response.StatusCode.value__\\)\" })",
+      "PowerShell($env:DATABASE_URL = \"mysql://hathanh:hathanh_secure_password@mysql:3306/ha_thanh_home\"; Set-Location \"D:\\\\HT\\\\ha-thanh-home\"; docker compose up -d admin 2>&1 | Out-String; Start-Sleep -Seconds 6; try { \\(Invoke-WebRequest -Uri \"http://localhost:31874/api/cms/scheduled-posts?from=2026-04-30T17:00:00.000Z&to=2026-05-31T16:59:59.999Z\" -UseBasicParsing\\).StatusCode } catch { \"admin/api/cms: $\\($_.Exception.Response.StatusCode.value__\\)\" }; try { \\(Invoke-WebRequest -Uri \"http://localhost:31874/login\" -UseBasicParsing\\).StatusCode } catch { \"/login: $\\($_.Exception.Response.StatusCode.value__\\)\" })"
+    ]
+  }
+}

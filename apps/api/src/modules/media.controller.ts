@@ -55,6 +55,12 @@ export class MediaController {
   @Get()
   @Roles("Admin", "SEO Editor", "Viewer")
   async list(@Query() query: Record<string, string>) {
+    if (query.ids) {
+      const ids = String(query.ids).split(",").map((s) => Number(s.trim())).filter((n) => Number.isInteger(n) && n > 0);
+      if (!ids.length) return { data: [], meta: { total: 0, page: 1, limit: 0, totalPages: 0 } };
+      const data = await this.prisma.mediaFile.findMany({ where: { id: { in: ids } } });
+      return { data, meta: { total: data.length, page: 1, limit: data.length, totalPages: 1 } };
+    }
     const { page, limit, skip } = parsePagination(query);
     const where: Prisma.MediaFileWhereInput = {
       ...(query.type ? { type: query.type as MediaType } : {}),

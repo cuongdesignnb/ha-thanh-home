@@ -180,7 +180,7 @@ const contentSchema = z.object({
   name: z.string().optional(),
   module: z.string().optional(),
   type: z.string().optional(),
-  group: z.enum(["construction", "interior"]).optional(),
+  group: z.enum(["construction", "interior", "xay_nha_tron_goi"]).optional(),
   status: z.string().optional(),
   location: z.string().optional(),
   category: z.string().optional(),
@@ -788,7 +788,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
           <label className="wide">Chủ đề<input value={form.topic} onChange={(event) => setForm({ ...form, topic: event.target.value })} /></label>
           <label>Từ khóa chính<input value={form.focusKeyword} onChange={(event) => setForm({ ...form, focusKeyword: event.target.value })} /></label>
           <label>Từ khóa phụ<input value={form.secondaryKeywords} onChange={(event) => setForm({ ...form, secondaryKeywords: event.target.value })} /></label>
-          <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+          <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
           <label>Loại bài<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })}><option>Cẩm nang</option><option>Dịch vụ</option><option>Dự án/case study</option><option>So sánh</option><option>Báo giá tham khảo</option></select></label>
           <label>Giọng văn<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })}><option>Chuyên gia</option><option>Thân thiện</option><option>Sang trọng</option><option>Tư vấn bán hàng</option><option>Chuyên gia, sang trọng, tư vấn bán hàng</option></select></label>
           <label>Độ dài<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })}><option>800 từ</option><option>1200 từ</option><option>1800 từ</option><option>2500 từ</option></select></label>
@@ -2474,6 +2474,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
               <option value="">Tất cả nhóm</option>
               <option value="construction">Công trình</option>
               <option value="interior">Nội thất</option>
+              <option value="xay_nha_tron_goi">Xây nhà trọn gói</option>
             </select>
           ) : null}
           {entity === "project-filter-options" ? (
@@ -2555,7 +2556,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           <div className="form-grid">
             <label>Tên danh mục<input {...form.register("name")} placeholder="Biệt thự, nhà phố, căn hộ..." /></label>
             <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
-            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
             <label>Thứ tự<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
             <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> Đang hiển thị ngoài website</label>
           </div>
@@ -2572,7 +2573,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
             <label>Tên option<input {...form.register("name")} placeholder="Hiện đại, quy mô vừa, Hà Nội..." /></label>
             <label>Module<select {...form.register("module")}><option value="project">Dự án đã thực hiện</option><option value="architecture_design">Mẫu thiết kế kiến trúc</option><option value="interior_design">Mẫu thiết kế nội thất</option></select></label>
             <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
-            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label>
+            <label>Nhóm<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
             <label>Loại filter<select {...form.register("type")}><option value="project_type">Loại dự án</option><option value="house_type">Loại nhà</option><option value="interior_style">Phong cách nội thất</option><option value="style">Phong cách</option><option value="scale">Quy mô</option><option value="location">Địa điểm</option><option value="space">Không gian</option><option value="room_type">Loại phòng</option><option value="roof_type">Kiểu mái</option><option value="floors">Số tầng</option><option value="layout_type">Layout</option><option value="material_tone">Tone vật liệu</option><option value="budget_range">Ngân sách</option></select></label>
             <label>Thứ tự<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label>
             <label className="check-row wide"><input type="checkbox" {...form.register("isActive")} /> Đang hiển thị ngoài website</label>
@@ -2605,7 +2606,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
           {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} /> : null}
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} /> : null}
-          {["projects", "services"].includes(entity) ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option></select></label> : null}
+          {["projects", "services"].includes(entity) ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label> : null}
           {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} /> : null}
           {entity === "posts" ? <label>Danh mục bài viết<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{postCategories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label> : null}
           {entity === "posts" ? <label className="wide">Tóm tắt bài viết<textarea {...form.register("excerpt")} rows={3} /></label> : null}
@@ -2617,7 +2618,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
         <div className="form-section-title"><span>02</span><div><h3>Ảnh & SEO</h3><p>Ảnh đại diện, metadata và dữ liệu Open Graph cho Google/social.</p></div></div>
         <div className="form-grid">
           <ThumbnailPickerField form={form} />
-          {["projects", "architecture-designs", "interior-designs"].includes(entity) ? <GalleryPickerField form={form} /> : null}
+          {["projects", "architecture-designs", "interior-designs", "services"].includes(entity) ? <GalleryPickerField form={form} /> : null}
           <label>Meta title<input {...form.register("metaTitle")} placeholder="Tối đa khoảng 60 ký tự" /></label>
           <label>Canonical URL<input {...form.register("canonicalUrl")} placeholder="https://domain.com/duong-dan-chuan" /></label>
           <label className="wide">Meta description<textarea {...form.register("metaDescription")} rows={3} placeholder="Tối đa khoảng 155 ký tự" /></label>
@@ -2927,11 +2928,33 @@ function ThumbnailPickerField({ form }: { form: ReturnType<typeof useForm<Record
 
 function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [mediaMap, setMediaMap] = useState<Record<number, CmsItem>>({});
+  const [loading, setLoading] = useState(false);
   const gallery = (form.watch("galleryMediaIds") as number[] | undefined) || [];
+  const galleryKey = gallery.join(",");
+
+  useEffect(() => {
+    const missing = gallery.filter((id) => !mediaMap[id]);
+    if (!missing.length) return;
+    setLoading(true);
+    apiFetch(`/api/cms/media?ids=${missing.join(",")}`)
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((payload) => {
+        const next: Record<number, CmsItem> = { ...mediaMap };
+        for (const item of (payload?.data || []) as CmsItem[]) {
+          next[Number(item.id)] = item;
+        }
+        setMediaMap(next);
+      })
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [galleryKey]);
 
   function addMedia(media: CmsItem) {
     const next = Array.from(new Set([...gallery, media.id]));
     form.setValue("galleryMediaIds", next);
+    setMediaMap((prev) => ({ ...prev, [media.id]: media }));
     setPickerOpen(false);
   }
 
@@ -2939,13 +2962,43 @@ function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<s
     form.setValue("galleryMediaIds", gallery.filter((item) => item !== id));
   }
 
+  function move(id: number, direction: -1 | 1) {
+    const idx = gallery.indexOf(id);
+    const target = idx + direction;
+    if (idx < 0 || target < 0 || target >= gallery.length) return;
+    const next = [...gallery];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    form.setValue("galleryMediaIds", next);
+  }
+
   return (
     <div className="form-field thumbnail-field">
-      <span>Gallery ảnh</span>
-      <div className="thumbnail-picker">
-        <div className="gallery-id-list">
-          {gallery.length ? gallery.map((id) => <button className="secondary-button" key={id} onClick={() => removeMedia(id)} type="button">Ảnh #{id} ×</button>) : <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chưa chọn gallery</strong><small>Chọn nhiều ảnh từ Media Library để hiển thị trong trang chi tiết.</small></div>}
-        </div>
+      <span>Gallery ảnh {gallery.length ? `(${gallery.length})` : ""}</span>
+      <div className="gallery-picker">
+        {gallery.length ? (
+          <div className="gallery-thumb-grid">
+            {gallery.map((id, idx) => {
+              const media = mediaMap[id];
+              const url = media ? String(media.thumbUrl || media.mediumUrl || media.webpUrl || "") : "";
+              const name = media ? String(media.altText || media.originalName || `Ảnh #${id}`) : `Ảnh #${id}`;
+              return (
+                <div className="gallery-thumb-item" key={id}>
+                  {url ? <img alt={name} src={url} /> : <div className="gallery-thumb-placeholder">{loading ? "..." : `#${id}`}</div>}
+                  <div className="gallery-thumb-meta">
+                    <span title={name}>{idx + 1}. {name.slice(0, 28)}{name.length > 28 ? "…" : ""}</span>
+                    <div className="gallery-thumb-actions">
+                      <button onClick={() => move(id, -1)} disabled={idx === 0} type="button" title="Lên">↑</button>
+                      <button onClick={() => move(id, 1)} disabled={idx === gallery.length - 1} type="button" title="Xuống">↓</button>
+                      <button onClick={() => removeMedia(id)} type="button" title="Xoá khỏi gallery">×</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="thumbnail-empty"><ImagePlus size={22} /><strong>Chưa chọn gallery</strong><small>Chọn nhiều ảnh từ Media Library để hiển thị trong trang chi tiết.</small></div>
+        )}
         <div><button className="secondary-button" onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={16} /> Thêm ảnh gallery</button></div>
       </div>
       {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={addMedia} /> : null}
@@ -3155,7 +3208,7 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
   const columns = useMemo(
     () => [
       helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Khách hàng" : ["project-categories", "project-filter-options", "post-categories"].includes(entity) ? "Tên" : "Tiêu đề" }),
-      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "posts" ? row.categoryRef?.name || "Chưa chọn" : entity === "post-categories" ? row.slug || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "posts" ? "Danh mục" : entity === "post-categories" ? "Slug" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
+      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "posts" ? row.categoryRef?.name || "Chưa chọn" : entity === "post-categories" ? row.slug || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : row.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "posts" ? "Danh mục" : entity === "post-categories" ? "Slug" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
       helper.accessor((row) => entity === "post-categories" ? row.isActive === false ? "inactive" : "active" : row.status || "-", { id: "status", header: "Trạng thái", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
       helper.display({
         id: "actions",

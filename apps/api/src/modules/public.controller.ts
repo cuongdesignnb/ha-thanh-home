@@ -159,7 +159,8 @@ export class PublicController {
   async service(@Param("slug") slug: string) {
     const data = await this.prisma.service.findFirst({ where: { slug, status: ContentStatus.published }, include: { thumbnailMedia: true } });
     if (!data) throw new NotFoundException("Service not found");
-    return repairPublicText(data);
+    const withGallery = await this.withGalleryMedia(data);
+    return repairPublicText(withGallery);
   }
 
   @Get("posts")

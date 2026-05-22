@@ -153,6 +153,83 @@ export function ProjectDetail({ project }: { project: Project }) {
   );
 }
 
+export function ServiceDetail({ service }: { service: Service }) {
+  const fallback = service.group === "interior" ? interiorImages[0] : projectImages[0];
+  const image = thumbnailUrl(service, fallback);
+  const albumImages = buildServiceAlbum(service);
+  const groupLabel = service.group === "interior" ? "Nội thất" : service.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình";
+  const publishedAt = service.publishedAt ? new Date(service.publishedAt).toLocaleDateString("vi-VN", { year: "numeric", month: "long" }) : null;
+  const specs = [
+    ["Loại dịch vụ", groupLabel],
+    ["Phụ trách", "Đội ngũ Hà Thành Home"],
+    ["Hỗ trợ", "Khảo sát · Báo giá · Thi công"],
+    publishedAt ? ["Cập nhật", publishedAt] as [string, string] : null,
+  ].filter(Boolean) as Array<[string, string]>;
+
+  return (
+    <main>
+      <section className="template-detail-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,61,46,.84), rgba(15,61,46,.2)), url(${image})` }}>
+        <div className="container template-detail-hero-content">
+          <span>Dịch vụ — {groupLabel}</span>
+          <h1>{service.title}</h1>
+          {service.description ? <p>{service.description}</p> : null}
+          <div className="template-detail-actions">
+            <a className="cta" href={`/lien-he?dich-vu=${service.slug}`}>Đặt lịch tư vấn miễn phí</a>
+            <a className="cta secondary" href="tel:0966123456">Gọi 0966 123 456</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="section template-detail-summary">
+        <div className="container template-detail-grid">
+          <aside className="template-specs-card">
+            <div className="template-specs-heading"><span>Thông tin dịch vụ</span><strong>{groupLabel}</strong></div>
+            <div className="template-specs">{specs.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
+            <a className="template-side-cta" href={`/lien-he?dich-vu=${service.slug}`}>Yêu cầu báo giá <ArrowRight size={16} /></a>
+          </aside>
+
+          <div className="template-detail-main">
+            {albumImages.length > 0 ? (
+              <section className="template-album">
+                <div className="template-section-heading"><span><Building2 size={18} /> Album dịch vụ</span><h2>Hình ảnh thực tế và phối cảnh dịch vụ</h2></div>
+                <TemplateGalleryModal images={albumImages} title={service.title} />
+              </section>
+            ) : null}
+
+            <article className="template-article">
+              <div className="template-section-heading"><span>Mô tả chi tiết</span><h2>Nội dung dịch vụ và quy trình triển khai</h2></div>
+              <div className="detail-content" dangerouslySetInnerHTML={{ __html: service.contentHtml || `<p>${service.description || "Nội dung dịch vụ đang được cập nhật."}</p>` }} />
+            </article>
+
+            <section className="template-lead-box">
+              <div><span>Tư vấn dịch vụ này</span><h2>Cần triển khai dịch vụ tương tự?</h2><p>Hà Thành Home tư vấn miễn phí theo diện tích, vị trí, ngân sách và yêu cầu thực tế của anh/chị.</p></div>
+              <div className="template-lead-actions"><a className="cta" href={`/lien-he?dich-vu=${service.slug}`}>Đặt lịch tư vấn</a><a className="outline-cta" href="tel:0966123456">Gọi ngay</a></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function buildServiceAlbum(service: Service) {
+  const mediaImages = (service.galleryMedia || [])
+    .map((media) => media.largeUrl || media.mediumUrl || media.webpUrl || media.thumbUrl)
+    .filter(Boolean) as string[];
+  const thumb = thumbnailUrl(service, "");
+  const contentImages = extractContentImages(service.contentHtml || "");
+  return Array.from(new Set([thumb, ...mediaImages, ...contentImages].filter(Boolean))).slice(0, 12);
+}
+
+function extractContentImages(html: string): string[] {
+  if (!html) return [];
+  const re = /<img[^>]+src=["']([^"']+)["']/gi;
+  const urls: string[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) { if (m[1]) urls.push(m[1]); }
+  return urls;
+}
+
 export function ServiceList({ title, services }: { title: string; services: Service[] }) {
   return (
     <><PageHero title={title} description="Dịch vụ công trình và nội thất đang được xuất bản trên website." /><section className="section"><div className="container services">{services.map((service) => <a className="service-card" href={`/dich-vu/${service.slug}`} key={service.id}><h3>{service.title}</h3><p>{service.description}</p><span>Tìm hiểu thêm <ArrowRight size={14} /></span></a>)}</div></section></>

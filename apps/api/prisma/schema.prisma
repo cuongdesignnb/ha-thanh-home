@@ -10,6 +10,7 @@ datasource db {
 enum ProjectGroup {
   construction
   interior
+  xay_nha_tron_goi
 }
 
 enum ContentStatus {
@@ -241,6 +242,7 @@ model Service {
   contentHtml String?       @db.LongText
   thumbnailMediaId Int?
   thumbnailMedia   MediaFile? @relation("ServiceThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  galleryMediaIds Json?
   metaTitle   String?
   metaDescription String? @db.Text
   canonicalUrl String?

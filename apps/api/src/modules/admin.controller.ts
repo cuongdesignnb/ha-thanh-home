@@ -342,6 +342,11 @@ class ServiceDto {
   thumbnailMediaId?: number;
 
   @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  galleryMediaIds?: number[];
+
+  @IsOptional()
   @IsEnum(ContentStatus)
   status?: ContentStatus;
 
