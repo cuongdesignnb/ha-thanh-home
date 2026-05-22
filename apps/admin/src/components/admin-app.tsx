@@ -651,7 +651,7 @@ function MediaLibrary({ roles }: { roles: string[] }) {
         <div className="media-grid">
           {rows.map((media) => (
             <button className={`media-tile ${selected?.id === media.id ? "active" : ""}`} key={media.id} onClick={() => setSelected(media)} type="button">
-              <img alt={String(media.altText || media.originalName || "Media")} src={String(media.thumbUrl || media.webpUrl)} />
+              <img alt={String(media.altText || media.originalName || "Media")} loading="lazy" src={String(media.thumbUrl || media.mediumUrl || media.webpUrl)} />
               <span>{String(media.originalName || media.fileName)}</span>
             </button>
           ))}
@@ -3172,7 +3172,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
             {loading ? <div className="empty-state">Đang tải thư viện ảnh...</div> : null}
             {!loading && rows.map((media) => (
               <button className={`media-tile ${selected?.id === media.id ? "active" : ""}`} key={media.id} onClick={() => setSelected(media)} onDoubleClick={() => onSelect(media)} type="button">
-                <img alt={String(media.altText || media.originalName || "Media")} src={String(media.thumbUrl || media.webpUrl)} />
+                <img alt={String(media.altText || media.originalName || "Media")} loading="lazy" src={String(media.thumbUrl || media.mediumUrl || media.webpUrl)} />
                 <span>{String(media.originalName || media.fileName)}</span>
               </button>
             ))}

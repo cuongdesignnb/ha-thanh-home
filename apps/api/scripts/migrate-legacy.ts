@@ -37,6 +37,11 @@ function md5(s: string) {
   return crypto.createHash("md5").update(s).digest("hex");
 }
 
+function cleanSlug(raw: unknown): string {
+  if (raw == null) return "";
+  return String(raw).trim().replace(/\//g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 function slugify(text: string): string {
   return text
     .normalize("NFD")
@@ -317,7 +322,7 @@ async function migratePosts(src: mysql.Connection, prisma: PrismaClient) {
   for (const row of rows as any[]) {
     const title = String(row.tintuc_name_vn ?? "").trim();
     if (!title) continue;
-    const slug = (row.tintuc_url && String(row.tintuc_url).trim()) || slugify(title);
+    const slug = (cleanSlug(row.tintuc_url) || slugify(title));
 
     const catId = Number(row.tintuc_cat);
     const catSlug = legacyCatIdToSlug.get(catId);
@@ -400,7 +405,7 @@ async function migrateProjects(src: mysql.Connection, prisma: PrismaClient) {
   for (const row of rows as any[]) {
     const title = String(row.project_name ?? "").trim();
     if (!title) continue;
-    const slug = (row.project_url && String(row.project_url).trim()) || slugify(title);
+    const slug = (cleanSlug(row.project_url) || slugify(title));
 
     const status: ContentStatus =
       String(row.project_status) === "1" ? ContentStatus.published : ContentStatus.draft;
@@ -518,7 +523,7 @@ async function migrateArchitectureTemplates(src: mysql.Connection, prisma: Prism
 
     const title = String(row.product_name ?? "").trim();
     if (!title) continue;
-    const slug = (row.product_url && String(row.product_url).trim()) || slugify(title);
+    const slug = (cleanSlug(row.product_url) || slugify(title));
 
     const status: ContentStatus =
       String(row.product_status) === "1" ? ContentStatus.published : ContentStatus.draft;
@@ -638,7 +643,7 @@ async function migrateServices(src: mysql.Connection, prisma: PrismaClient) {
 
     const title = String(row.product_name ?? "").trim();
     if (!title) continue;
-    const slug = (row.product_url && String(row.product_url).trim()) || slugify(title);
+    const slug = (cleanSlug(row.product_url) || slugify(title));
 
     const status: ContentStatus =
       String(row.product_status) === "1" ? ContentStatus.published : ContentStatus.draft;

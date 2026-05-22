@@ -1983,7 +1983,7 @@ select {
 
 .media-tile img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   display: block;
   object-fit: cover;
   background: #eee6d8;
@@ -2418,13 +2418,25 @@ select {
   min-height: 0;
   overflow: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(142px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   align-content: start;
-  gap: 12px;
+  gap: 14px;
   padding: 16px;
   background:
     radial-gradient(circle at top left, rgba(201, 154, 74, 0.08), transparent 20rem),
     #fffdf8;
+}
+
+.media-picker-grid .media-tile {
+  display: flex;
+  flex-direction: column;
+}
+
+.media-picker-grid .media-tile img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover;
+  height: auto;
+  min-height: 0;
 }
 
 .media-picker-preview {

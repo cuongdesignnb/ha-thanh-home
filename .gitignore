@@ -10,3 +10,6 @@ coverage
 storage/uploads/*
 !storage/uploads/.gitkeep
 backups
+db-dump.sql
+db-dump-prod.sql
+uploads.tar.gz
