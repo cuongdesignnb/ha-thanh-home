@@ -66,6 +66,8 @@ import {
 } from "lucide-react";
 import { adminApiFetch, adminUrl } from "@/lib/client-path";
 import { ServicePagesPanel } from "@/components/service-pages-panel";
+import { ServicePageEditor } from "@/components/service-page-editor";
+import { SERVICE_PAGE_REGISTRY } from "@/lib/service-page-registry";
 
 const apiFetch = adminApiFetch;
 
@@ -241,8 +243,16 @@ const modules = [
       { id: "project-filter-options", label: "Bộ lọc dự án", description: "Option filter động cho public", icon: Search, roles: ["Super Admin", "Admin", "Viewer"] },
       { id: "architecture-designs", label: "Mẫu kiến trúc", description: "Catalog biệt thự, nhà phố, nhà cấp 4", icon: Building2, roles: ["Super Admin", "Admin", "Viewer"] },
       { id: "interior-designs", label: "Mẫu nội thất", description: "Catalog phong cách, loại phòng, diện tích", icon: Sofa, roles: ["Super Admin", "Admin", "Viewer"] },
-      { id: "service-pages", label: "Dịch vụ", description: "Cấu hình các landing page dịch vụ", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"] },
       { id: "estimator", label: "Dự toán công trình", description: "Cấu hình công thức và lượt tính", icon: Calculator, roles: ["Super Admin", "Admin", "Sales", "Viewer"] },
+    ],
+  },
+  {
+    group: "Dịch vụ",
+    items: [
+      { id: "service-pages", label: "Xây nhà trọn gói", description: "Landing /dich-vu/xay-nha-tron-goi", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "xay-nha-tron-goi" },
+      { id: "service-pages", label: "Sản Xuất Thi Công Nội Thất", description: "Landing /dich-vu/san-xuat-thi-cong-noi-that", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "san-xuat-thi-cong-noi-that" },
+      { id: "service-pages", label: "Thi Công Nhà Xưởng", description: "Landing /dich-vu/thi-cong-nha-xuong", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "thi-cong-nha-xuong" },
+      { id: "service-pages", label: "Thi Công Nội Thất Văn Phòng", description: "Landing /dich-vu/thi-cong-noi-that-van-phong", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "thi-cong-noi-that-van-phong" },
     ],
   },
   {
@@ -267,7 +277,7 @@ const modules = [
       { id: "settings", label: "Cấu hình", description: "Thông tin website", icon: Settings, roles: ["Super Admin", "Admin"] },
     ],
   },
-] satisfies Array<{ group: string; items: Array<{ id: string; label: string; description: string; icon: LucideIcon; roles: string[] }> }>;
+] satisfies Array<{ group: string; items: Array<{ id: string; label: string; description: string; icon: LucideIcon; roles: string[]; serviceSlug?: string }> }>;
 
 const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?: string }> = {
   dashboard: { title: "Tổng quan vận hành", subtitle: "Theo dõi dữ liệu thật từ CMS, lead và lịch đăng bài." },
@@ -333,10 +343,14 @@ const FeedbackContext = createContext<FeedbackContextValue | null>(null);
 
 export function AdminApp({ user }: { user: User }) {
   const [active, setActive] = useState<Entity>("dashboard");
+  const [activeServiceSlug, setActiveServiceSlug] = useState<string>(SERVICE_PAGE_REGISTRY[0]?.slug ?? "");
   const visibleGroups = (repairVietnamese(modules) as typeof modules)
     .map((group) => ({ ...group, items: group.items.filter((item) => can(user.roles, item.roles)) }))
     .filter((group) => group.items.length > 0);
-  const meta = repairVietnamese(moduleMeta[active]) as typeof moduleMeta[Entity];
+  const activeServicePage = SERVICE_PAGE_REGISTRY.find((page) => page.slug === activeServiceSlug);
+  const meta = active === "service-pages" && activeServicePage
+    ? { title: activeServicePage.label, subtitle: activeServicePage.description }
+    : (repairVietnamese(moduleMeta[active]) as typeof moduleMeta[Entity]);
 
   async function logout() {
     await apiFetch("/api/auth/logout", { method: "POST" });
@@ -359,13 +373,22 @@ export function AdminApp({ user }: { user: User }) {
           {visibleGroups.map((group) => (
             <div className="admin-nav-group" key={group.group}>
               <p>{T(group.group)}</p>
-              {group.items.map((item) => (
-                <button className={`admin-nav-item ${active === item.id ? "active" : ""}`} key={item.id} onClick={() => setActive(item.id as Entity)} type="button">
-                  <span className="nav-icon"><item.icon size={18} /></span>
-                  <span><strong>{T(item.label)}</strong><small>{T(item.description)}</small></span>
-                  <ChevronRight className="nav-chevron" size={15} />
-                </button>
-              ))}
+              {group.items.map((item) => {
+                const itemSlug = (item as { serviceSlug?: string }).serviceSlug;
+                const isActive = itemSlug
+                  ? active === "service-pages" && activeServiceSlug === itemSlug
+                  : active === item.id;
+                const onClick = itemSlug
+                  ? () => { setActive("service-pages"); setActiveServiceSlug(itemSlug); }
+                  : () => setActive(item.id as Entity);
+                return (
+                  <button className={`admin-nav-item ${isActive ? "active" : ""}`} key={`${item.id}:${itemSlug ?? ""}`} onClick={onClick} type="button">
+                    <span className="nav-icon"><item.icon size={18} /></span>
+                    <span><strong>{T(item.label)}</strong><small>{T(item.description)}</small></span>
+                    <ChevronRight className="nav-chevron" size={15} />
+                  </button>
+                );
+              })}
             </div>
           ))}
         </nav>
@@ -382,7 +405,7 @@ export function AdminApp({ user }: { user: User }) {
       <main className="admin-main">
         <header className="admin-topbar">
           <div>
-            <span className="breadcrumb">Admin / {meta.title}</span>
+            <span className="breadcrumb">Admin{active === "service-pages" ? " / Dịch vụ" : ""} / {meta.title}</span>
             <h1>{meta.title}</h1>
             <p>{meta.subtitle}</p>
           </div>
@@ -405,7 +428,7 @@ export function AdminApp({ user }: { user: User }) {
         ) : active === "settings" ? (
           <ThemeSettingsPanel roles={user.roles} />
         ) : active === "service-pages" ? (
-          <ServicePagesPanel />
+          activeServicePage ? <ServicePageEditor page={activeServicePage} /> : <ServicePagesPanel />
         ) : (
           <EntityPanel entity={active} roles={user.roles} />
         )}
