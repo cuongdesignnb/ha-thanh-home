@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -3083,12 +3083,17 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const pageSize = 48;
 
-  async function load() {
-    setLoading(true);
+  async function load(pageNum = 1, append = false) {
+    if (append) setLoadingMore(true); else setLoading(true);
     try {
-      const params = new URLSearchParams({ page: "1", limit: "80" });
+      const params = new URLSearchParams({ page: String(pageNum), limit: String(pageSize) });
       if (search) params.set("search", search);
       if (type) params.set("type", type);
       const response = await apiFetch(`/api/cms/media?${params}`);
@@ -3098,18 +3103,37 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
       }
       if (!response.ok) throw new Error(await readApiError(response, "Không tải được thư viện ảnh."));
       const payload: ListResponse<CmsItem> = await response.json();
-      setRows(payload.data || []);
-      setSelected((current) => current && payload.data?.some((item) => item.id === current.id) ? current : payload.data?.[0] || null);
+      const incoming = payload.data || [];
+      setRows((prev) => append ? [...prev, ...incoming] : incoming);
+      setPage(pageNum);
+      const totalPages = payload?.meta?.totalPages ?? 1;
+      setHasMore(pageNum < totalPages);
+      if (!append) {
+        setSelected((current) => current && incoming.some((item) => item.id === current.id) ? current : incoming[0] || null);
+      }
     } catch (error) {
       notify({ tone: "error", title: "Không tải được thư viện ảnh", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
     } finally {
-      setLoading(false);
+      if (append) setLoadingMore(false); else setLoading(false);
     }
   }
 
   useEffect(() => {
-    load();
+    load(1, false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    function onScroll() {
+      if (!el || loading || loadingMore || !hasMore) return;
+      const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+      if (remaining < 200) load(page + 1, true);
+    }
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [page, hasMore, loading, loadingMore]);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -3140,7 +3164,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
       }
     }
     setUploading(false);
-    await load();
+    await load(1, false);
     if (failed < files.length) notify({ tone: "success", title: "Upload hoàn tất", description: failed ? `Đã upload ${files.length - failed}/${files.length} ảnh.` : "Bạn có thể chọn ảnh vừa upload trong thư viện." });
   }
 
@@ -3158,17 +3182,17 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
         </header>
 
         <div className="media-picker-toolbar">
-          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") load(); }} placeholder="Tìm tên file, alt, caption..." /></div>
+          <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") load(1, false); }} placeholder="Tìm tên file, alt, caption..." /></div>
           <select value={type} onChange={(event) => setType(event.target.value)}>
             <option value="">Tất cả loại ảnh</option>
             {["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
-          <button className="secondary-button" onClick={load} type="button">Lọc</button>
+          <button className="secondary-button" onClick={() => load(1, false)} type="button">Lọc</button>
           <label className="primary-button upload-control">{uploading ? "Đang upload..." : "Upload ảnh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label>
         </div>
 
         <div className="media-picker-body">
-          <div className="media-picker-grid">
+          <div className="media-picker-grid" ref={gridRef}>
             {loading ? <div className="empty-state">Đang tải thư viện ảnh...</div> : null}
             {!loading && rows.map((media) => (
               <button className={`media-tile ${selected?.id === media.id ? "active" : ""}`} key={media.id} onClick={() => setSelected(media)} onDoubleClick={() => onSelect(media)} type="button">
@@ -3177,6 +3201,8 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
               </button>
             ))}
             {!loading && rows.length === 0 ? <div className="empty-state">Chưa có ảnh phù hợp. Upload ảnh mới hoặc đổi bộ lọc.</div> : null}
+            {loadingMore ? <div className="media-loading-more">Đang tải thêm...</div> : null}
+            {!hasMore && !loading && rows.length > 0 ? <div className="media-loading-more muted">Đã hiển thị toàn bộ {rows.length} ảnh</div> : null}
           </div>
 
           <aside className="media-picker-preview">
