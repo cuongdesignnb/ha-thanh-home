@@ -117,13 +117,18 @@ export function buildServiceSchema(input: {
 }
 
 export function buildFAQSchema(
-  items: { question: string; answer: string }[],
+  items?: { question?: string; answer?: string }[] | null,
 ) {
-  if (!items.length) return null;
+  if (!items || !items.length) return null;
+  const validItems = items.filter(
+    (faq): faq is { question: string; answer: string } =>
+      Boolean(faq.question && faq.answer),
+  );
+  if (!validItems.length) return null;
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: items.map((faq) => ({
+    mainEntity: validItems.map((faq) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
