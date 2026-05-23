@@ -1,18 +1,32 @@
 import type { Metadata } from "next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { LeadForm } from "@/components/lead-form";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { buildBreadcrumbSchema, buildContactPageSchema, buildLocalBusinessSchema } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Liên hệ tư vấn | Hà Thành Home",
+  title: "Liên hệ tư vấn",
   description: "Đặt lịch tư vấn thiết kế kiến trúc, thi công công trình và nội thất cùng Hà Thành Home.",
+  alternates: { canonical: "/lien-he" },
 };
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ mau?: string; loai?: string }> }) {
   const params = await searchParams;
+
+  const schemas = [
+    buildBreadcrumbSchema([
+      { name: "Trang chủ", url: "/" },
+      { name: "Liên hệ", url: "/lien-he" },
+    ]),
+    buildContactPageSchema(),
+    buildLocalBusinessSchema(),
+  ];
+
   return (
     <>
       <SiteHeader />
+      <JsonLd data={schemas} />
       <main>
         <section className="contact-hero">
           <div className="container contact-hero-grid">

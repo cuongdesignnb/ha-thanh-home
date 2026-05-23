@@ -24,6 +24,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
@@ -35,10 +36,12 @@ import {
   type LandingProjectCard,
   type LandingTestimonial,
 } from "@/lib/api";
+import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Thi công nhà xưởng trọn gói | Hà Thành Home",
+  title: "Thi công nhà xưởng trọn gói",
   description: "Giải pháp thi công nhà xưởng trọn gói, tối ưu công năng, kết cấu bền vững, tiến độ rõ ràng và chi phí minh bạch.",
+  alternates: { canonical: "/dich-vu/thi-cong-nha-xuong" },
 };
 
 const benefitIcons: LucideIcon[] = [DraftingCompass, ShieldCheck, Clock3, Banknote, HardHat, UserRoundCheck];
@@ -54,9 +57,25 @@ export default async function ThiCongNhaXuongPage() {
   const landing = nhaXuongLandingWithDefaults(settings["site.servicePages.thiCongNhaXuong"]);
   const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "construction" });
 
+  const schemas = [
+    buildBreadcrumbSchema([
+      { name: "Trang chủ", url: "/" },
+      { name: "Dịch vụ", url: "/dich-vu" },
+      { name: "Thi công nhà xưởng", url: "/dich-vu/thi-cong-nha-xuong" },
+    ]),
+    buildServiceSchema({
+      name: "Thi công nhà xưởng trọn gói",
+      description: "Giải pháp thi công nhà xưởng trọn gói.",
+      url: "/dich-vu/thi-cong-nha-xuong",
+      serviceType: "Thi công nhà xưởng",
+    }),
+    buildFAQSchema(landing.faqs),
+  ].filter(Boolean);
+
   return (
     <>
       <SiteHeader />
+      <JsonLd data={schemas as Record<string, unknown>[]} />
       <main>
         <Hero landing={landing} />
         <BenefitStrip items={landing.benefits} />

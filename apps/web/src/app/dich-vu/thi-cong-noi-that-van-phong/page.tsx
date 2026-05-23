@@ -24,6 +24,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
@@ -35,10 +36,12 @@ import {
   type LandingProjectCard,
   type LandingTestimonial,
 } from "@/lib/api";
+import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Thi công nội thất văn phòng | Hà Thành Home",
+  title: "Thi công nội thất văn phòng",
   description: "Dịch vụ thi công nội thất văn phòng trọn gói — chuẩn công năng, đúng tiến độ, nâng tầm thương hiệu cho doanh nghiệp.",
+  alternates: { canonical: "/dich-vu/thi-cong-noi-that-van-phong" },
 };
 
 const benefitIcons: LucideIcon[] = [DraftingCompass, BadgeCheck, Clock3, ShieldCheck, Medal, UserRoundCheck];
@@ -54,9 +57,25 @@ export default async function ThiCongNoiThatVanPhongPage() {
   const landing = vanPhongLandingWithDefaults(settings["site.servicePages.thiCongNoiThatVanPhong"]);
   const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "interior" });
 
+  const schemas = [
+    buildBreadcrumbSchema([
+      { name: "Trang chủ", url: "/" },
+      { name: "Dịch vụ", url: "/dich-vu" },
+      { name: "Thi công nội thất văn phòng", url: "/dich-vu/thi-cong-noi-that-van-phong" },
+    ]),
+    buildServiceSchema({
+      name: "Thi công nội thất văn phòng",
+      description: "Dịch vụ thi công nội thất văn phòng trọn gói.",
+      url: "/dich-vu/thi-cong-noi-that-van-phong",
+      serviceType: "Thi công nội thất văn phòng",
+    }),
+    buildFAQSchema(landing.faqs),
+  ].filter(Boolean);
+
   return (
     <>
       <SiteHeader />
+      <JsonLd data={schemas as Record<string, unknown>[]} />
       <main>
         <Hero landing={landing} />
         <BenefitStrip items={landing.benefits} />

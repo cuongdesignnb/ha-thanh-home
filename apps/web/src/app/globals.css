@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --green: #0f3d2e;
   --green-deep: #0b3026;
   --gold: #c99a4a;
@@ -3595,4 +3595,118 @@ h3 {
   .footer {
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
+}
+
+/* ========= 404 Not Found ========= */
+.not-found-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: var(--cream);
+}
+
+.not-found-card {
+  max-width: 640px;
+  width: 100%;
+  padding: clamp(32px, 5vw, 56px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 28px 80px rgba(15, 61, 46, .1);
+  text-align: center;
+}
+
+.not-found-code {
+  display: block;
+  font-family: var(--site-heading-font);
+  font-size: clamp(80px, 16vw, 140px);
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--green), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: .7;
+}
+
+.not-found-card h1 {
+  margin: 12px 0 0;
+  color: var(--heading);
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.not-found-card > p {
+  margin: 14px 0 28px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.not-found-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.not-found-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--green);
+  background: var(--cream);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+
+.not-found-link:first-child {
+  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.not-found-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+}
+
+.not-found-suggest {
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+
+.not-found-suggest strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--heading);
+  font-size: 14px;
+}
+
+.not-found-suggest ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.not-found-suggest a {
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.not-found-suggest a:hover {
+  text-decoration: underline;
 }

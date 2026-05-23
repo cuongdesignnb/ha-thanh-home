@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Cormorant_Garamond, Inter, Playfair_Display, Roboto } from "next/font/google";
 import { ConstructionEstimatorWidget } from "@/components/construction-estimator-widget";
+import { JsonLd } from "@/components/seo/json-ld";
 import { ThemeRuntimeSync } from "@/components/theme-runtime-sync";
 import { getSiteSettings, type SiteTheme } from "@/lib/api";
+import { buildOrganizationSchema, buildLocalBusinessSchema, buildWebSiteSchema } from "@/lib/seo/jsonld";
+import { siteConfig } from "@/lib/seo/site";
 import "./globals.css";
 
 const heading = Cormorant_Garamond({
@@ -34,14 +37,30 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Hà Thành Home | Thiết kế - Thi công - Nội thất",
+  title: {
+    default: "Hà Thành Home | Thiết kế - Thi công - Nội thất",
+    template: "%s | Hà Thành Home",
+  },
   description:
     "Hà Thành Home mang đến giải pháp thiết kế kiến trúc, thi công công trình và nội thất trọn gói cho nhà ở, biệt thự, văn phòng và showroom.",
+  metadataBase: new URL(siteConfig.url),
   openGraph: {
-    title: "Hà Thành Home",
+    title: "Hà Thành Home | Thiết kế - Thi công - Nội thất",
     description: "Kiến tạo không gian sống và công trình đẳng cấp.",
     type: "website",
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    url: siteConfig.url,
+    images: [{ url: siteConfig.defaultOgImage, width: 1200, height: 630 }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hà Thành Home | Thiết kế - Thi công - Nội thất",
+    description: "Kiến tạo không gian sống và công trình đẳng cấp.",
+    images: [siteConfig.defaultOgImage],
+  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: siteConfig.url },
 };
 
 export const dynamic = "force-dynamic";
@@ -102,6 +121,11 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeRuntimeSync />
+        <JsonLd data={[
+          buildOrganizationSchema(),
+          buildLocalBusinessSchema(),
+          buildWebSiteSchema(),
+        ]} />
         {children}
         <ConstructionEstimatorWidget />
       </body>

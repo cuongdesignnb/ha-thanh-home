@@ -24,6 +24,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
@@ -35,10 +36,12 @@ import {
   type LandingProjectCard,
   type LandingTestimonial,
 } from "@/lib/api";
+import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Sản xuất thi công nội thất | Hà Thành Home",
+  title: "Sản xuất thi công nội thất",
   description: "Dịch vụ sản xuất và thi công nội thất trọn gói tại Hà Thành Home — xưởng sản xuất riêng, thi công chuẩn thiết kế, bảo hành dài hạn.",
+  alternates: { canonical: "/dich-vu/san-xuat-thi-cong-noi-that" },
 };
 
 const benefitIcons: LucideIcon[] = [DraftingCompass, Factory, BadgeCheck, Clock3, ShieldCheck, UserRoundCheck];
@@ -54,9 +57,25 @@ export default async function SanXuatThiCongNoiThatPage() {
   const landing = noiThatLandingWithDefaults(settings["site.servicePages.sanXuatThiCongNoiThat"]);
   const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "interior" });
 
+  const schemas = [
+    buildBreadcrumbSchema([
+      { name: "Trang chủ", url: "/" },
+      { name: "Dịch vụ", url: "/dich-vu" },
+      { name: "Sản xuất thi công nội thất", url: "/dich-vu/san-xuat-thi-cong-noi-that" },
+    ]),
+    buildServiceSchema({
+      name: "Sản xuất thi công nội thất",
+      description: "Dịch vụ sản xuất và thi công nội thất trọn gói.",
+      url: "/dich-vu/san-xuat-thi-cong-noi-that",
+      serviceType: "Sản xuất thi công nội thất",
+    }),
+    buildFAQSchema(landing.faqs),
+  ].filter(Boolean);
+
   return (
     <>
       <SiteHeader />
+      <JsonLd data={schemas as Record<string, unknown>[]} />
       <main>
         <Hero landing={landing} />
         <BenefitStrip items={landing.benefits} />

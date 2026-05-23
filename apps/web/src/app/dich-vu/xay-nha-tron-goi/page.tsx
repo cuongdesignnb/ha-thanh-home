@@ -24,6 +24,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
@@ -40,10 +41,12 @@ import {
   type Project,
   xayNhaLandingWithDefaults,
 } from "@/lib/api";
+import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Xây nhà trọn gói | Hà Thành Home",
+  title: "Xây nhà trọn gói",
   description: "Dịch vụ xây nhà trọn gói từ thiết kế, thi công phần thô, hoàn thiện đến bàn giao bởi Hà Thành Home.",
+  alternates: { canonical: "/dich-vu/xay-nha-tron-goi" },
 };
 
 const benefitIcons = [DraftingCompass, Banknote, Clock3, ShieldCheck, Medal, UserRoundCheck];
@@ -60,9 +63,25 @@ export default async function XayNhaTronGoiPage() {
   ]);
   const landing = xayNhaLandingWithDefaults(settings["site.landing.xayNhaTronGoi"]);
 
+  const schemas = [
+    buildBreadcrumbSchema([
+      { name: "Trang chủ", url: "/" },
+      { name: "Dịch vụ", url: "/dich-vu" },
+      { name: "Xây nhà trọn gói", url: "/dich-vu/xay-nha-tron-goi" },
+    ]),
+    buildServiceSchema({
+      name: "Xây nhà trọn gói",
+      description: "Dịch vụ xây nhà trọn gói từ thiết kế, thi công phần thô, hoàn thiện đến bàn giao.",
+      url: "/dich-vu/xay-nha-tron-goi",
+      serviceType: "Xây nhà trọn gói",
+    }),
+    buildFAQSchema(landing.faqs),
+  ].filter(Boolean);
+
   return (
     <>
       <SiteHeader />
+      <JsonLd data={schemas as Record<string, unknown>[]} />
       <main>
         <XayNhaHero landing={landing} />
         <BenefitStrip items={landing.benefits} />
