@@ -13,6 +13,7 @@ import {
   Headphones,
   MapPin,
   Medal,
+  MessageCircle,
   PhoneCall,
   Ruler,
   ShieldCheck,
@@ -31,7 +32,9 @@ import {
   interiorImages,
   noiThatLandingWithDefaults,
   thumbnailUrl,
+  type LandingFaq,
   type LandingListItem,
+  type LandingTestimonial,
   type Project,
 } from "@/lib/api";
 
@@ -45,6 +48,8 @@ const scopeIcons: LucideIcon[] = [UserRoundCheck, DraftingCompass, Factory, Hard
 const processIcons: LucideIcon[] = [UserRoundCheck, DraftingCompass, Banknote, ClipboardCheck, Factory, HardHat, ShieldCheck];
 const whyIcons: LucideIcon[] = [Factory, Medal, ShieldCheck, Clock3, BadgeCheck, Headphones];
 const statIcons: LucideIcon[] = [TimerReset, Building2, Sparkles, Headphones];
+
+type LandingType = ReturnType<typeof noiThatLandingWithDefaults>;
 
 export default async function SanXuatThiCongNoiThatPage() {
   const [settings, projectPayload] = await Promise.all([
@@ -75,7 +80,17 @@ export default async function SanXuatThiCongNoiThatPage() {
   );
 }
 
-type LandingType = ReturnType<typeof noiThatLandingWithDefaults>;
+function IconText({ icon: Icon, item }: { icon: LucideIcon; item: LandingListItem }) {
+  return (
+    <article className="xay-nha-icon-item">
+      <span><Icon size={23} /></span>
+      <div>
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+      </div>
+    </article>
+  );
+}
 
 function Hero({ landing }: { landing: LandingType }) {
   return (
@@ -95,18 +110,6 @@ function Hero({ landing }: { landing: LandingType }) {
         </div>
       </div>
     </section>
-  );
-}
-
-function IconText({ icon: Icon, item }: { icon: LucideIcon; item: LandingListItem }) {
-  return (
-    <article className="xay-nha-icon-text">
-      <span><Icon size={22} /></span>
-      <div>
-        <strong>{item.title}</strong>
-        {item.description ? <p>{item.description}</p> : null}
-      </div>
-    </article>
   );
 }
 
@@ -208,13 +211,8 @@ function ProjectShowcase({ projects, landing }: { projects: Project[]; landing: 
 
 function QuoteSection({ landing }: { landing: LandingType }) {
   return (
-    <section className="section xay-nha-quote-section" id="nhan-bao-gia">
-      <div className="container xay-nha-quote">
-        <div>
-          <span className="eyebrow">{landing.quoteTitle}</span>
-          <h2>Nhận báo giá & tư vấn miễn phí</h2>
-          <p>{landing.quoteDescription}</p>
-        </div>
+    <section className="section" id="nhan-bao-gia">
+      <div className="container">
         <XayNhaQuoteForm title={landing.quoteTitle} description={landing.quoteDescription} />
       </div>
     </section>
@@ -223,10 +221,10 @@ function QuoteSection({ landing }: { landing: LandingType }) {
 
 function WhyChooseSection({ landing }: { landing: LandingType }) {
   return (
-    <section className="section">
+    <section className="section xay-nha-why-section">
       <div className="container">
         <div className="section-title"><span className="eyebrow">{landing.whyEyebrow}</span><h2>{landing.whyTitle}</h2></div>
-        <div className="xay-nha-why">
+        <div className="xay-nha-why-grid">
           {landing.whyChooseItems.map((item, index) => <IconText icon={whyIcons[index % whyIcons.length]} item={item} key={`${item.title}-${index}`} />)}
         </div>
       </div>
@@ -236,37 +234,29 @@ function WhyChooseSection({ landing }: { landing: LandingType }) {
 
 function StatsStrip({ items }: { items: LandingListItem[] }) {
   return (
-    <section className="xay-nha-stats">
+    <section className="xay-nha-stats-section">
       <div className="container">
-        {items.map((item, index) => {
-          const Icon = statIcons[index % statIcons.length];
-          return (
-            <article key={`${item.title}-${index}`}>
-              <Icon size={24} />
-              <strong>{item.title}</strong>
-              <span>{item.description}</span>
-            </article>
-          );
-        })}
+        <div className="xay-nha-stats">
+          {items.map((item, index) => <IconText icon={statIcons[index % statIcons.length]} item={item} key={`${item.title}-${index}`} />)}
+        </div>
       </div>
     </section>
   );
 }
 
-function Testimonials({ items, landing }: { items: LandingType["testimonials"]; landing: LandingType }) {
+function Testimonials({ items, landing }: { items: LandingTestimonial[]; landing: LandingType }) {
   return (
-    <section className="section cream">
+    <section className="section">
       <div className="container">
         <div className="section-title"><span className="eyebrow">{landing.testimonialsEyebrow}</span><h2>{landing.testimonialsTitle}</h2></div>
         <div className="xay-nha-testimonials">
           {items.map((item, index) => (
             <article className="xay-nha-testimonial" key={`${item.name}-${index}`}>
-              <div className="xay-nha-stars">{Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+              <div className="xay-nha-avatar">{index + 1}</div>
+              <strong>{item.name}</strong>
+              <span>{item.project}</span>
+              <div className="xay-nha-stars">{Array.from({ length: 5 }, (_, star) => <Star fill="currentColor" size={16} key={star} />)}</div>
               <p>“{item.quote}”</p>
-              <footer>
-                <strong>{item.name}</strong>
-                {item.project ? <small>{item.project}</small> : null}
-              </footer>
             </article>
           ))}
         </div>
@@ -275,15 +265,15 @@ function Testimonials({ items, landing }: { items: LandingType["testimonials"]; 
   );
 }
 
-function FAQSection({ items, landing }: { items: LandingType["faqs"]; landing: LandingType }) {
+function FAQSection({ items, landing }: { items: LandingFaq[]; landing: LandingType }) {
   return (
-    <section className="section">
+    <section className="section cream">
       <div className="container">
         <div className="section-title"><span className="eyebrow">{landing.faqEyebrow}</span><h2>{landing.faqTitle}</h2></div>
-        <div className="xay-nha-faqs">
+        <div className="xay-nha-faq">
           {items.map((item, index) => (
             <details key={`${item.question}-${index}`}>
-              <summary>{index + 1}. {item.question}</summary>
+              <summary>{item.question}</summary>
               <p>{item.answer}</p>
             </details>
           ))}
@@ -295,16 +285,16 @@ function FAQSection({ items, landing }: { items: LandingType["faqs"]; landing: L
 
 function FinalCTA({ landing }: { landing: LandingType }) {
   return (
-    <section className="xay-nha-final">
-      <div className="container">
+    <section className="section">
+      <div className="container xay-nha-final-cta">
         <div>
           <span className="eyebrow">{landing.finalEyebrow}</span>
           <h2>{landing.finalTitle}</h2>
           <p>{landing.finalDescription}</p>
         </div>
         <div className="xay-nha-actions">
-          <a className="cta" href="#nhan-bao-gia">{landing.primaryCtaLabel} <ArrowRight size={18} /></a>
-          <a className="cta secondary" href="/lien-he"><PhoneCall size={18} /> {landing.secondaryCtaLabel}</a>
+          <a className="cta secondary" href="#nhan-bao-gia">{landing.primaryCtaLabel}</a>
+          <a className="cta" href="/lien-he"><MessageCircle size={18} /> {landing.secondaryCtaLabel}</a>
         </div>
       </div>
     </section>
