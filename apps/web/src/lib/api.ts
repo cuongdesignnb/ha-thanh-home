@@ -206,6 +206,7 @@ export type XayNhaLanding = {
 
 export type NoiThatLanding = XayNhaLanding;
 export type NhaXuongLanding = XayNhaLanding;
+export type VanPhongLanding = XayNhaLanding;
 
 export type SiteSettings = {
   "site.identity"?: SiteIdentity;
@@ -214,6 +215,7 @@ export type SiteSettings = {
   "site.landing.xayNhaTronGoi"?: XayNhaLanding;
   "site.servicePages.sanXuatThiCongNoiThat"?: NoiThatLanding;
   "site.servicePages.thiCongNhaXuong"?: NhaXuongLanding;
+  "site.servicePages.thiCongNoiThatVanPhong"?: VanPhongLanding;
 };
 
 export type EstimatorFieldOption = {
@@ -838,6 +840,113 @@ export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Required
     stats: mergeList(landing?.stats, defaultNhaXuongLanding.stats),
     testimonials: mergeList(landing?.testimonials, defaultNhaXuongLanding.testimonials),
     faqs: mergeList(landing?.faqs, defaultNhaXuongLanding.faqs),
+  };
+}
+
+export const defaultVanPhongLanding: Required<VanPhongLanding> = {
+  heroEyebrow: "Thi công nội thất văn phòng",
+  heroTitle: "Kiến tạo không gian làm việc hiện đại",
+  heroDescription: "Hà Thành Home đồng hành cùng doanh nghiệp trong thi công nội thất văn phòng trọn gói, đảm bảo chất lượng – tiến độ – thẩm mỹ, kiến tạo môi trường làm việc truyền cảm hứng và hiệu quả.",
+  heroImageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2000&q=85",
+  primaryCtaLabel: "Nhận báo giá",
+  secondaryCtaLabel: "Tư vấn miễn phí",
+  introEyebrow: "Dịch vụ thi công nội thất văn phòng",
+  introTitle: "Thi công trọn gói – Chuẩn công năng – Nâng tầm môi trường làm việc",
+  introDescription: "Chúng tôi cung cấp giải pháp thi công nội thất văn phòng trọn gói, dành cho mọi loại hình doanh nghiệp, từ startup, SME đến tập đoàn lớn.",
+  introImageUrl: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1400&q=85",
+  introChecklist: [
+    "Thi công theo bản vẽ, đảm bảo độ chính xác cao",
+    "Tối ưu không gian làm việc, nâng cao hiệu suất làm việc",
+    "Vật liệu bền vững, an toàn và thân thiện môi trường",
+    "Quản lý dự án chặt chẽ, minh bạch chi phí",
+    "Bảo hành dài hạn, đồng hành cùng doanh nghiệp",
+  ],
+  scopeEyebrow: "Phạm vi công việc",
+  scopeTitle: "Trọn gói từ tư vấn, thiết kế đến hoàn thiện văn phòng",
+  processEyebrow: "Quy trình thi công nội thất văn phòng",
+  processTitle: "Rõ việc, rõ tiến độ – 7 bước chuẩn",
+  projectsEyebrow: "Dự án văn phòng tiêu biểu",
+  projectsTitle: "Công trình văn phòng đã triển khai",
+  estimateEyebrow: "Chi phí thi công nội thất văn phòng",
+  estimateTitle: "Báo giá tham khảo theo quy mô",
+  quoteTitle: "Nhận báo giá & tư vấn miễn phí",
+  quoteDescription: "Điền thông tin để đội ngũ Hà Thành Home liên hệ và tư vấn chi tiết.",
+  whyEyebrow: "Vì sao chọn Hà Thành Home?",
+  whyTitle: "Nâng tầm môi trường làm việc cho doanh nghiệp",
+  testimonialsEyebrow: "Khách hàng nói gì về chúng tôi",
+  testimonialsTitle: "Niềm tin từ đối tác doanh nghiệp",
+  faqEyebrow: "Câu hỏi thường gặp",
+  faqTitle: "Những điều khách hàng thường hỏi",
+  finalEyebrow: "Bắt đầu cùng Hà Thành Home",
+  finalTitle: "Sẵn sàng nâng tầm không gian làm việc của bạn?",
+  finalDescription: "Hà Thành Home đồng hành kiến tạo văn phòng hiện đại – hiệu quả – đậm dấu ấn thương hiệu.",
+  benefits: [
+    { title: "Thi công chuẩn bản vẽ", description: "Đúng thiết kế – đúng chất lượng" },
+    { title: "Tối ưu công năng", description: "Hiệu quả – linh hoạt – thoải mái" },
+    { title: "Tiến độ rõ ràng", description: "Cam kết đúng thời hạn" },
+    { title: "Vật liệu minh bạch", description: "Nguồn gốc rõ ràng" },
+    { title: "Bảo hành tận tâm", description: "Bảo hành 12 – 24 tháng" },
+    { title: "Đội ngũ chuyên môn", description: "Kinh nghiệm, tận tâm" },
+  ],
+  scopeItems: [
+    { title: "Khảo sát & tư vấn", description: "Phân tích nhu cầu và không gian." },
+    { title: "Thiết kế kỹ thuật & triển khai", description: "Bản vẽ chi tiết cho thi công." },
+    { title: "Sản xuất nội thất", description: "Bàn ghế, vách ngăn, tủ chế tác." },
+    { title: "Thi công lắp đặt", description: "Lắp đặt chuẩn xác, an toàn." },
+    { title: "Hoàn thiện chi tiết", description: "Tỉ mỉ từng chi tiết hoàn thiện." },
+    { title: "Bàn giao & nghiệm thu", description: "Kiểm tra chất lượng kỹ lưỡng." },
+    { title: "Bảo hành", description: "Đồng hành sau khi sử dụng." },
+  ],
+  processSteps: [
+    { number: "01", title: "Tiếp nhận yêu cầu", description: "Khảo sát hiện trạng, trao đổi nhu cầu" },
+    { number: "02", title: "Tư vấn & đề xuất", description: "Định hướng giải pháp, báo giá sơ bộ" },
+    { number: "03", title: "Thiết kế & triển khai", description: "Thiết kế 2D/3D, hồ sơ kỹ thuật thi công" },
+    { number: "04", title: "Ký hợp đồng", description: "Thống nhất phạm vi, tiến độ, chi phí" },
+    { number: "05", title: "Sản xuất nội thất", description: "Sản xuất tại xưởng, kiểm soát chất lượng" },
+    { number: "06", title: "Thi công lắp đặt", description: "Thi công tại công trình, đảm bảo an toàn" },
+    { number: "07", title: "Nghiệm thu & bàn giao", description: "Nghiệm thu, bàn giao và hướng dẫn bảo hành" },
+  ],
+  whyChooseItems: [
+    { title: "Kinh nghiệm thực chiến", description: "10+ năm trong lĩnh vực thi công văn phòng" },
+    { title: "Giải pháp tối ưu", description: "Công năng hiệu quả, trải nghiệm nhân viên tốt hơn" },
+    { title: "Thi công chuẩn xác", description: "Đảm bảo chất lượng, đúng thiết kế" },
+    { title: "Cam kết tiến độ", description: "Quản lý dự án chặt chẽ" },
+    { title: "Bảo hành dài hạn", description: "Hỗ trợ doanh nghiệp lâu dài" },
+    { title: "Đội ngũ chuyên môn", description: "Đội thi công nhiều kinh nghiệm" },
+  ],
+  stats: [
+    { title: "10+", description: "Năm kinh nghiệm" },
+    { title: "500+", description: "Dự án văn phòng" },
+    { title: "98%", description: "Khách hàng hài lòng" },
+    { title: "24/7", description: "Hỗ trợ tư vấn" },
+  ],
+  testimonials: [
+    { name: "Anh Nguyễn Quốc Bảo", project: "Giám đốc – FPT Software", quote: "Hà Thành Home làm việc chuyên nghiệp, đúng tiến độ và chất lượng. Không gian văn phòng sau thi công rất hiện đại, tối ưu công năng." },
+    { name: "Chị Trần Minh Hằng", project: "HR Director – Unilever Việt Nam", quote: "Đội ngũ thi công tỉ mỉ, phối hợp nhịp nhàng, đảm bảo tiêu chuẩn cao của chúng tôi. Rất hài lòng!" },
+    { name: "Anh Lê Hoàng Nam", project: "CEO – StartupX", quote: "Chi phí hợp lý, thiết kế sáng tạo và thi công rất chỉn chu. Văn phòng của chúng tôi giờ đây truyền cảm hứng hơn rất nhiều." },
+  ],
+  faqs: [
+    { question: "Thời gian thi công nội thất văn phòng là bao lâu?", answer: "Tùy quy mô, thường 30 – 60 ngày cho văn phòng nhỏ, 60 – 90 ngày cho văn phòng lớn." },
+    { question: "Hà Thành Home có thiết kế 2D/3D trước khi thi công không?", answer: "Có. Toàn bộ phương án được thiết kế chi tiết và duyệt trước khi triển khai thi công." },
+    { question: "Chi phí thi công bao gồm những gì?", answer: "Bao gồm khảo sát, thiết kế, sản xuất, thi công lắp đặt, vật liệu và nghiệm thu bàn giao." },
+    { question: "Doanh nghiệp có thể thi công ngoài giờ hành chính không?", answer: "Có. Hà Thành Home hỗ trợ thi công ngoài giờ, cuối tuần để không ảnh hưởng vận hành doanh nghiệp." },
+    { question: "Chính sách bảo hành nội thất văn phòng như thế nào?", answer: "Bảo hành 12 – 24 tháng theo từng hạng mục. Bảo trì miễn phí trọn đời." },
+    { question: "Có hỗ trợ cải tạo, nâng cấp văn phòng đang sử dụng không?", answer: "Có. Hà Thành Home tư vấn và thi công cải tạo, nâng cấp nội thất văn phòng hiện hữu." },
+  ],
+};
+
+export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): Required<VanPhongLanding> {
+  return {
+    ...defaultVanPhongLanding,
+    ...(landing || {}),
+    introChecklist: mergeList(landing?.introChecklist, defaultVanPhongLanding.introChecklist),
+    benefits: mergeList(landing?.benefits, defaultVanPhongLanding.benefits),
+    scopeItems: mergeList(landing?.scopeItems, defaultVanPhongLanding.scopeItems),
+    processSteps: mergeList(landing?.processSteps, defaultVanPhongLanding.processSteps),
+    whyChooseItems: mergeList(landing?.whyChooseItems, defaultVanPhongLanding.whyChooseItems),
+    stats: mergeList(landing?.stats, defaultVanPhongLanding.stats),
+    testimonials: mergeList(landing?.testimonials, defaultVanPhongLanding.testimonials),
+    faqs: mergeList(landing?.faqs, defaultVanPhongLanding.faqs),
   };
 }
 

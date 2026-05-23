@@ -6,6 +6,7 @@ import { getWebBaseUrl, type ServicePageRegistryItem, type ServicePageStatus } f
 import { XayNhaTronGoiEditor } from "@/components/xay-nha-tron-goi-editor";
 import { SanXuatNoiThatEditor } from "@/components/san-xuat-noi-that-editor";
 import { ThiCongNhaXuongEditor } from "@/components/thi-cong-nha-xuong-editor";
+import { ThiCongVanPhongEditor } from "@/components/thi-cong-van-phong-editor";
 
 const STATUS_LABEL: Record<ServicePageStatus, string> = {
   existing: "Đã có route",
@@ -36,7 +37,7 @@ export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryIt
   const [activeSection, setActiveSection] = useState<string>(SECTIONS[0].key);
   const webBase = getWebBaseUrl();
   const activeSectionMeta = SECTIONS.find((s) => s.key === activeSection);
-  const hasDedicatedEditor = page.slug === "xay-nha-tron-goi" || page.slug === "san-xuat-thi-cong-noi-that" || page.slug === "thi-cong-nha-xuong";
+  const hasDedicatedEditor = page.slug === "xay-nha-tron-goi" || page.slug === "san-xuat-thi-cong-noi-that" || page.slug === "thi-cong-nha-xuong" || page.slug === "thi-cong-noi-that-van-phong";
 
   return (
     <section className="service-page-editor">
@@ -69,6 +70,8 @@ export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryIt
           <SanXuatNoiThatEditor roles={roles} />
         ) : hasDedicatedEditor && page.slug === "thi-cong-nha-xuong" ? (
           <ThiCongNhaXuongEditor roles={roles} />
+        ) : hasDedicatedEditor && page.slug === "thi-cong-noi-that-van-phong" ? (
+          <ThiCongVanPhongEditor roles={roles} />
         ) : (
         <div className="service-page-editor-body">
           <nav className="service-page-section-list" aria-label="Sections">

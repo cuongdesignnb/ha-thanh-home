@@ -39,8 +39,8 @@ export const SERVICE_PAGE_REGISTRY: ServicePageRegistryItem[] = [
     label: "Thi Công Nội Thất Văn Phòng",
     route: "/dich-vu/thi-cong-noi-that-van-phong",
     settingKey: "site.servicePages.thiCongNoiThatVanPhong",
-    status: "planned",
-    description: "Landing page thi công nội thất văn phòng.",
+    status: "existing",
+    description: "Landing page thi công nội thất văn phòng trọn gói.",
   },
 ];
 
