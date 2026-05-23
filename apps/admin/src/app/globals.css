@@ -2698,6 +2698,190 @@ select {
   border: 1px solid var(--admin-line-strong);
 }
 
+.landing-advanced {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  background: #fbf7ef;
+}
+
+.landing-section {
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+  background: #fffdf8;
+  overflow: hidden;
+}
+
+.landing-section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.landing-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.landing-section-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--admin-charcoal);
+}
+
+.landing-section-icon {
+  font-size: 16px;
+}
+
+.landing-section-count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(201, 154, 74, 0.18);
+  color: #8a5d1a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.landing-section-chev {
+  transition: transform 160ms ease;
+  color: var(--admin-muted);
+}
+
+.landing-section[open] .landing-section-chev {
+  transform: rotate(180deg);
+}
+
+.landing-section-body {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--admin-line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.landing-row > input,
+.landing-row > textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-card-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+  background: #fffdf8;
+}
+
+.landing-card-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.landing-card-grid.landing-grid-3 {
+  grid-template-columns: 80px minmax(0, 1fr) minmax(0, 2fr);
+}
+
+.landing-card-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--admin-muted);
+}
+
+.landing-card-grid input,
+.landing-card-grid textarea {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.landing-row-delete {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(220, 53, 69, 0.08);
+  color: #c0392b;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.landing-row-delete:hover {
+  background: #c0392b;
+  color: #fff;
+}
+
+.landing-repeater-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.landing-repeater-actions .secondary-button,
+.landing-pricing-items .secondary-button {
+  font-size: 12px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.landing-pricing-row {
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.landing-pricing-row > .landing-row-delete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.landing-pricing-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px dashed var(--admin-line-strong);
+  border-radius: 8px;
+  background: #fbf7ef;
+}
+
+.landing-pricing-items-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--admin-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
 .media-loading-more {
   grid-column: 1 / -1;
   text-align: center;

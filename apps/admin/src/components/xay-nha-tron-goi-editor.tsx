@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { adminApiFetch } from "@/lib/client-path";
 import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
+import { LandingAdvancedEditor, type LandingAdvancedData } from "@/components/landing-advanced-editor";
 
 const apiFetch = adminApiFetch;
 
@@ -89,7 +90,7 @@ type XayNhaValues = {
   finalEyebrow: string;
   finalTitle: string;
   finalDescription: string;
-  advancedJson: string;
+  advancedData: LandingAdvancedData;
 };
 
 const defaults: XayNhaValues = {
@@ -119,7 +120,7 @@ const defaults: XayNhaValues = {
   finalEyebrow: "Sẵn sàng khởi công",
   finalTitle: "Sẵn sàng xây tổ ấm mơ ước của bạn?",
   finalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
-  advancedJson: JSON.stringify(xayNhaAdvancedDefaults, null, 2),
+  advancedData: xayNhaAdvancedDefaults as LandingAdvancedData,
 };
 
 export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
@@ -175,7 +176,7 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
           finalEyebrow: String(landing.finalEyebrow ?? current.finalEyebrow),
           finalTitle: String(landing.finalTitle ?? current.finalTitle),
           finalDescription: String(landing.finalDescription ?? current.finalDescription),
-          advancedJson: JSON.stringify(advanced, null, 2),
+          advancedData: advanced as LandingAdvancedData,
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình Xây nhà trọn gói", description: error instanceof Error ? error.message : String(error) }))
@@ -188,17 +189,8 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
     if (!canSave) return;
     setSaving(true);
 
-    let advanced: Record<string, unknown>;
-    try {
-      advanced = values.advancedJson.trim() ? JSON.parse(values.advancedJson) as Record<string, unknown> : {};
-    } catch {
-      notify({ tone: "error", title: "JSON nội dung nâng cao không hợp lệ", description: "Kiểm tra dấu phẩy, ngoặc kép và cấu trúc mảng." });
-      setSaving(false);
-      return;
-    }
-
     const landing = {
-      ...advanced,
+      ...(values.advancedData as Record<string, unknown>),
       heroEyebrow: values.heroEyebrow,
       heroTitle: values.heroTitle,
       heroDescription: values.heroDescription,
@@ -286,7 +278,7 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
         <label>Tiêu đề CTA cuối<input value={values.finalTitle} onChange={(e) => setValues({ ...values, finalTitle: e.target.value })} /></label>
         <label className="wide">Mô tả CTA cuối<textarea value={values.finalDescription} onChange={(e) => setValues({ ...values, finalDescription: e.target.value })} rows={2} /></label>
 
-        <label className="wide">Nội dung nâng cao JSON (benefits, scopeItems, processSteps, whyChooseItems, stats, testimonials, faqs, introChecklist)<textarea value={values.advancedJson} onChange={(e) => setValues({ ...values, advancedJson: e.target.value })} rows={18} spellCheck={false} /></label>
+        <LandingAdvancedEditor value={values.advancedData} onChange={(next) => setValues({ ...values, advancedData: next })} />
       </div>
 
       <div className="form-actions wide">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { adminApiFetch } from "@/lib/client-path";
 import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
+import { LandingAdvancedEditor, type LandingAdvancedData } from "@/components/landing-advanced-editor";
 
 const apiFetch = adminApiFetch;
 
@@ -90,7 +91,7 @@ type Values = {
   testimonialsEyebrow: string; testimonialsTitle: string;
   faqEyebrow: string; faqTitle: string;
   finalEyebrow: string; finalTitle: string; finalDescription: string;
-  advancedJson: string;
+  advancedData: LandingAdvancedData;
 };
 
 const defaults: Values = {
@@ -123,7 +124,7 @@ const defaults: Values = {
   finalEyebrow: "Bắt đầu cùng Hà Thành Home",
   finalTitle: "Sẵn sàng nâng tầm không gian làm việc của bạn?",
   finalDescription: "Hà Thành Home đồng hành kiến tạo văn phòng hiện đại – hiệu quả – đậm dấu ấn thương hiệu.",
-  advancedJson: JSON.stringify(advancedDefaults, null, 2),
+  advancedData: advancedDefaults as LandingAdvancedData,
 };
 
 export function ThiCongVanPhongEditor({ roles }: { roles: string[] }) {
@@ -174,7 +175,7 @@ export function ThiCongVanPhongEditor({ roles }: { roles: string[] }) {
           finalEyebrow: String(landing.finalEyebrow ?? current.finalEyebrow),
           finalTitle: String(landing.finalTitle ?? current.finalTitle),
           finalDescription: String(landing.finalDescription ?? current.finalDescription),
-          advancedJson: JSON.stringify(advanced, null, 2),
+          advancedData: advanced as LandingAdvancedData,
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình Thi công Văn phòng", description: error instanceof Error ? error.message : String(error) }))
@@ -187,17 +188,8 @@ export function ThiCongVanPhongEditor({ roles }: { roles: string[] }) {
     if (!canSave) return;
     setSaving(true);
 
-    let advanced: Record<string, unknown>;
-    try {
-      advanced = values.advancedJson.trim() ? JSON.parse(values.advancedJson) as Record<string, unknown> : {};
-    } catch {
-      notify({ tone: "error", title: "JSON nội dung nâng cao không hợp lệ", description: "Kiểm tra dấu phẩy, ngoặc kép và cấu trúc mảng." });
-      setSaving(false);
-      return;
-    }
-
     const landing = {
-      ...advanced,
+      ...(values.advancedData as Record<string, unknown>),
       heroEyebrow: values.heroEyebrow, heroTitle: values.heroTitle, heroDescription: values.heroDescription, heroImageUrl: values.heroImageUrl,
       primaryCtaLabel: values.primaryCtaLabel, secondaryCtaLabel: values.secondaryCtaLabel,
       introEyebrow: values.introEyebrow, introTitle: values.introTitle, introDescription: values.introDescription, introImageUrl: values.introImageUrl,
@@ -276,7 +268,7 @@ export function ThiCongVanPhongEditor({ roles }: { roles: string[] }) {
         <label>Tiêu đề CTA cuối<input value={values.finalTitle} onChange={(e) => setValues({ ...values, finalTitle: e.target.value })} /></label>
         <label className="wide">Mô tả CTA cuối<textarea value={values.finalDescription} onChange={(e) => setValues({ ...values, finalDescription: e.target.value })} rows={2} /></label>
 
-        <label className="wide">Nội dung nâng cao JSON (benefits, scopeItems, processSteps, whyChooseItems, stats, testimonials, faqs, introChecklist, pricingTabs)<textarea value={values.advancedJson} onChange={(e) => setValues({ ...values, advancedJson: e.target.value })} rows={20} spellCheck={false} /></label>
+        <LandingAdvancedEditor value={values.advancedData} onChange={(next) => setValues({ ...values, advancedData: next })} includePricingTabs />
       </div>
 
       <div className="form-actions wide">
