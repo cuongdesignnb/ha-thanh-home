@@ -85,7 +85,7 @@ type Values = {
 
 const defaults: Values = {
   heroEyebrow: "Sản xuất thi công nội thất",
-  heroTitle: "Giải pháp sản xuất & thi công nội thất trọn gói, chuẩn thẩm mỹ – chuẩn công năng",
+  heroTitle: "Sản xuất & thi công nội thất trọn gói",
   heroDescription: "Hà Thành Home cung cấp giải pháp nội thất trọn gói — từ thiết kế, sản xuất tại xưởng đến thi công hoàn thiện.",
   heroImageUrl: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2000&q=85",
   primaryCtaLabel: "Nhận báo giá",
