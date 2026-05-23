@@ -2256,7 +2256,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
           </div>
           {canWrite ? (
             <form className="cms-form editor-form" onSubmit={form.handleSubmit(submit)}>
-              <EntityFields entity={entity} filterOptions={filterOptions} form={form} postCategories={postCategories} projectCategories={projectCategories} />
+              <EntityFields entity={entity} filterOptions={filterOptions} form={form} postCategories={postCategories} projectCategories={projectCategories} onTaxonomyCreated={loadFilterOptions} />
               <div className="form-actions sticky-actions">
                 <button className="secondary-button" type="button" onClick={editing ? () => startEdit(editing) : startCreate}>Làm mới</button>
                 <button className="primary-button" type="submit">Lưu thay đổi</button>
@@ -2355,7 +2355,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   );
 }
 
-function EntityFields({ entity, filterOptions, form, postCategories, projectCategories }: { entity: Entity; filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; postCategories: CmsItem[]; projectCategories: CmsItem[] }) {
+function EntityFields({ entity, filterOptions, form, postCategories, projectCategories, onTaxonomyCreated }: { entity: Entity; filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; postCategories: CmsItem[]; projectCategories: CmsItem[]; onTaxonomyCreated?: () => void | Promise<void> }) {
   if (entity === "leads") {
     return (
       <>
@@ -2420,10 +2420,10 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           <label>Tiêu đề<input {...form.register("title")} placeholder="Nhập tiêu đề hiển thị" /></label>
           <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
           {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
-          {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} /> : null}
-          {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} /> : null}
+          {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
+          {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "projects" ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label> : null}
-          {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} /> : null}
+          {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "posts" ? <label>Danh mục bài viết<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{postCategories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label> : null}
           {entity === "posts" ? <label className="wide">Tóm tắt bài viết<textarea {...form.register("excerpt")} rows={3} /></label> : null}
           {entity !== "posts" ? <label className="wide">Mô tả ngắn<textarea {...form.register("description")} rows={4} /></label> : null}
@@ -2462,57 +2462,57 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
   );
 }
 
-function ProjectFields({ filterOptions, form, projectCategories }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; projectCategories: CmsItem[] }) {
+function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreated }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; projectCategories: CmsItem[]; onTaxonomyCreated?: () => void | Promise<void> }) {
   const group = String(form.watch("group") || "construction");
   const categories = projectCategories.filter((category) => String(category.group) === group);
   return (
     <>
       <label>Danh mục dự án<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{categories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label>
       <label>Danh mục fallback<input {...form.register("category")} placeholder="Biệt thự, căn hộ, showroom..." /></label>
-      <TaxonomySelect form={form} name="projectType" label="Loại dự án" module="project" group={group} type="project_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="style" label="Phong cách" module="project" group={group} type="style" options={filterOptions} />
-      <TaxonomySelect form={form} name="location" label="Địa điểm" module="project" group={group} type="location" options={filterOptions} />
+      <TaxonomySelect form={form} name="projectType" label="Loại dự án" module="project" group={group} type="project_type" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="style" label="Phong cách" module="project" group={group} type="style" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="location" label="Địa điểm" module="project" group={group} type="location" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Diện tích hiển thị<input {...form.register("area")} placeholder="225m2, 1.200m2..." /></label>
       <label>Diện tích số m2<input type="number" min={0} {...form.register("areaValue", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="scale" label="Quy mô" module="project" group={group} type="scale" options={filterOptions} />
+      <TaxonomySelect form={form} name="scale" label="Quy mô" module="project" group={group} type="scale" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Chủ đầu tư / khách hàng<input {...form.register("clientName")} placeholder="Gia đình tư nhân, doanh nghiệp..." /></label>
-      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="project" group={group} type="budget_range" options={filterOptions} />
+      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="project" group={group} type="budget_range" options={filterOptions} onCreated={onTaxonomyCreated} />
     </>
   );
 }
 
-function ArchitectureDesignFields({ filterOptions, form }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
+function ArchitectureDesignFields({ filterOptions, form, onTaxonomyCreated }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; onTaxonomyCreated?: () => void | Promise<void> }) {
   return (
     <>
-      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="architecture_design" group="construction" type="house_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="style" label="Phong cách" module="architecture_design" group="construction" type="style" options={filterOptions} />
+      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="architecture_design" group="construction" type="house_type" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="style" label="Phong cách" module="architecture_design" group="construction" type="style" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Diện tích m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="floors" label="Số tầng" module="architecture_design" group="construction" type="floors" options={filterOptions} numeric />
+      <TaxonomySelect form={form} name="floors" label="Số tầng" module="architecture_design" group="construction" type="floors" options={filterOptions} numeric onCreated={onTaxonomyCreated} />
       <label>Mặt tiền m<input type="number" min={0} step="0.1" {...form.register("facadeWidth", { valueAsNumber: true })} /></label>
       <label>Chiều sâu m<input type="number" min={0} step="0.1" {...form.register("depth", { valueAsNumber: true })} /></label>
       <label>Phòng ngủ<input type="number" min={0} {...form.register("bedrooms", { valueAsNumber: true })} /></label>
       <label>WC<input type="number" min={0} {...form.register("bathrooms", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="roofType" label="Kiểu mái" module="architecture_design" group="construction" type="roof_type" options={filterOptions} />
+      <TaxonomySelect form={form} name="roofType" label="Kiểu mái" module="architecture_design" group="construction" type="roof_type" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Ngân sách dự kiến triệu VND<input type="number" min={0} {...form.register("estimatedBudget", { valueAsNumber: true })} /></label>
       <label>Thời gian<input {...form.register("constructionTime")} placeholder="4 - 6 tháng" /></label>
-      <TaxonomySelect form={form} name="location" label="Vị trí" module="architecture_design" group="construction" type="location" options={filterOptions} />
+      <TaxonomySelect form={form} name="location" label="Vị trí" module="architecture_design" group="construction" type="location" options={filterOptions} onCreated={onTaxonomyCreated} />
     </>
   );
 }
 
-function InteriorDesignFields({ filterOptions, form }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
+function InteriorDesignFields({ filterOptions, form, onTaxonomyCreated }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; onTaxonomyCreated?: () => void | Promise<void> }) {
   return (
     <>
-      <TaxonomySelect form={form} name="interiorStyle" label="Phong cách nội thất" module="interior_design" group="interior" type="interior_style" options={filterOptions} />
-      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="interior_design" group="interior" type="house_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="roomType" label="Loại phòng" module="interior_design" group="interior" type="room_type" options={filterOptions} />
+      <TaxonomySelect form={form} name="interiorStyle" label="Phong cách nội thất" module="interior_design" group="interior" type="interior_style" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="houseType" label="Loại nhà" module="interior_design" group="interior" type="house_type" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="roomType" label="Loại phòng" module="interior_design" group="interior" type="room_type" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Diện tích m2<input type="number" min={0} {...form.register("area", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="layoutType" label="Layout" module="interior_design" group="interior" type="layout_type" options={filterOptions} />
-      <TaxonomySelect form={form} name="materialTone" label="Tone vật liệu" module="interior_design" group="interior" type="material_tone" options={filterOptions} />
-      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="interior_design" group="interior" type="budget_range" options={filterOptions} />
+      <TaxonomySelect form={form} name="layoutType" label="Layout" module="interior_design" group="interior" type="layout_type" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="materialTone" label="Tone vật liệu" module="interior_design" group="interior" type="material_tone" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="interior_design" group="interior" type="budget_range" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Ngân sách từ triệu VND<input type="number" min={0} {...form.register("budgetMin", { valueAsNumber: true })} /></label>
       <label>Ngân sách đến triệu VND<input type="number" min={0} {...form.register("budgetMax", { valueAsNumber: true })} /></label>
-      <TaxonomySelect form={form} name="location" label="Vị trí" module="interior_design" group="interior" type="location" options={filterOptions} />
+      <TaxonomySelect form={form} name="location" label="Vị trí" module="interior_design" group="interior" type="location" options={filterOptions} onCreated={onTaxonomyCreated} />
     </>
   );
 }
@@ -2526,6 +2526,7 @@ function TaxonomySelect({
   numeric,
   options,
   type,
+  onCreated,
 }: {
   form: ReturnType<typeof useForm<Record<string, unknown>>>;
   group: string;
@@ -2535,10 +2536,65 @@ function TaxonomySelect({
   numeric?: boolean;
   options: CmsItem[];
   type: string;
+  onCreated?: () => void | Promise<void>;
 }) {
+  const { notify } = useAdminFeedback();
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [saving, setSaving] = useState(false);
   const items = options.filter((item) => String(item.module || "project") === module && String(item.group) === group && String(item.type) === type && item.isActive !== false);
+
+  async function createOption() {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setSaving(true);
+    try {
+      const response = await apiFetch("/api/cms/project-filter-options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module, group, type, name: trimmed, isActive: true }),
+      });
+      if (!response.ok) {
+        notify({ tone: "error", title: `Không tạo được ${label.toLowerCase()}`, description: await readApiError(response, "Kiểm tra quyền hoặc trùng tên.") });
+        return;
+      }
+      form.setValue(name, numeric ? Number(trimmed) : trimmed);
+      setNewName("");
+      setCreating(false);
+      await onCreated?.();
+      notify({ tone: "success", title: `Đã tạo ${label.toLowerCase()}: ${trimmed}` });
+    } catch (error) {
+      notify({ tone: "error", title: `Không tạo được ${label.toLowerCase()}`, description: describeClientError(error, "Không kết nối được API.") });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <label>{label}<select {...form.register(name, numeric ? { valueAsNumber: true } : undefined)}><option value="">Chọn {label.toLowerCase()}</option>{items.map((item) => <option key={item.id} value={String(item.name)}>{String(item.name)}</option>)}</select></label>
+    <label>
+      {label}
+      {creating ? (
+        <div className="taxonomy-create-row">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); createOption(); } if (e.key === "Escape") { setCreating(false); setNewName(""); } }}
+            placeholder={`Nhập ${label.toLowerCase()} mới`}
+            autoFocus
+          />
+          <button type="button" className="secondary-button" onClick={createOption} disabled={saving || !newName.trim()}>{saving ? "..." : "Lưu"}</button>
+          <button type="button" className="secondary-button ghost" onClick={() => { setCreating(false); setNewName(""); }}>Hủy</button>
+        </div>
+      ) : (
+        <div className="taxonomy-select-row">
+          <select {...form.register(name, numeric ? { valueAsNumber: true } : undefined)}>
+            <option value="">Chọn {label.toLowerCase()}</option>
+            {items.map((item) => <option key={item.id} value={String(item.name)}>{String(item.name)}</option>)}
+          </select>
+          <button type="button" className="secondary-button" onClick={() => setCreating(true)} title={`Tạo ${label.toLowerCase()} mới`}>+ Tạo mới</button>
+        </div>
+      )}
+    </label>
   );
 }
 

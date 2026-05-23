@@ -2672,6 +2672,32 @@ select {
   font-size: 11px;
 }
 
+.taxonomy-select-row,
+.taxonomy-create-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.taxonomy-select-row > select,
+.taxonomy-create-row > input {
+  flex: 1;
+  min-width: 0;
+}
+
+.taxonomy-select-row > button,
+.taxonomy-create-row > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.secondary-button.ghost {
+  background: transparent;
+  border: 1px solid var(--admin-line-strong);
+}
+
 .media-loading-more {
   grid-column: 1 / -1;
   text-align: center;
