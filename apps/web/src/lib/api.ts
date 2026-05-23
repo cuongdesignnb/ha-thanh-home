@@ -204,11 +204,14 @@ export type XayNhaLanding = {
   faqs?: LandingFaq[];
 };
 
+export type NoiThatLanding = XayNhaLanding;
+
 export type SiteSettings = {
   "site.identity"?: SiteIdentity;
   "site.theme"?: SiteTheme;
   "site.homepage"?: SiteHomepage;
   "site.landing.xayNhaTronGoi"?: XayNhaLanding;
+  "site.servicePages.sanXuatThiCongNoiThat"?: NoiThatLanding;
 };
 
 export type EstimatorFieldOption = {
@@ -619,6 +622,112 @@ export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Required<Xay
     stats: mergeList(landing?.stats, defaultXayNhaLanding.stats),
     testimonials: mergeList(landing?.testimonials, defaultXayNhaLanding.testimonials),
     faqs: mergeList(landing?.faqs, defaultXayNhaLanding.faqs),
+  };
+}
+
+export const defaultNoiThatLanding: Required<NoiThatLanding> = {
+  heroEyebrow: "Sản xuất thi công nội thất",
+  heroTitle: "Giải pháp sản xuất & thi công nội thất trọn gói, chuẩn thẩm mỹ – chuẩn công năng",
+  heroDescription: "Hà Thành Home cung cấp giải pháp nội thất trọn gói — từ thiết kế, sản xuất tại xưởng đến thi công hoàn thiện, mang đến không gian sống tinh tế và bền vững.",
+  heroImageUrl: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2000&q=85",
+  primaryCtaLabel: "Nhận báo giá",
+  secondaryCtaLabel: "Tư vấn miễn phí",
+  introEyebrow: "Dịch vụ sản xuất thi công nội thất",
+  introTitle: "Hoàn thiện không gian sống tinh tế – Đồng bộ từ xưởng đến công trình",
+  introDescription: "Hà Thành Home sở hữu xưởng sản xuất hiện đại, quy trình khép kín và đội thi công lành nghề, đảm bảo chất lượng – thẩm mỹ – tiến độ cho mọi công trình nội thất.",
+  introImageUrl: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=85",
+  introChecklist: [
+    "Thiết kế đồng bộ, tối ưu công năng và thẩm mỹ",
+    "Sản xuất trực tiếp tại xưởng, kiểm soát chất lượng",
+    "Thi công chuẩn xác, hoàn thiện tỉ mỉ đến từng chi tiết",
+    "Bảo hành dài hạn, đồng hành cùng khách hàng",
+  ],
+  scopeEyebrow: "Phạm vi công việc",
+  scopeTitle: "Trọn gói từ khảo sát, thiết kế đến hoàn thiện",
+  processEyebrow: "Quy trình sản xuất thi công nội thất",
+  processTitle: "Rõ việc, rõ tiến độ – 7 bước chuẩn",
+  projectsEyebrow: "Dự án nội thất tiêu biểu",
+  projectsTitle: "Công trình nội thất đã triển khai",
+  estimateEyebrow: "Dự toán chi phí nội thất",
+  estimateTitle: "Tham khảo chi phí nội thất",
+  quoteTitle: "Nhận báo giá & tư vấn miễn phí",
+  quoteDescription: "Điền thông tin để nhận tư vấn chi tiết từ chuyên gia Hà Thành Home.",
+  whyEyebrow: "Vì sao chọn Hà Thành Home?",
+  whyTitle: "Đồng bộ từ thiết kế – sản xuất – thi công",
+  testimonialsEyebrow: "Khách hàng nói gì về chúng tôi",
+  testimonialsTitle: "Niềm tin đến từ trải nghiệm thật",
+  faqEyebrow: "Câu hỏi thường gặp",
+  faqTitle: "Những điều khách hàng thường hỏi",
+  finalEyebrow: "Bắt đầu cùng Hà Thành Home",
+  finalTitle: "Sẵn sàng kiến tạo không gian sống mơ ước?",
+  finalDescription: "Hà Thành Home đồng hành cùng bạn từ thiết kế đến hoàn thiện nội thất – tinh tế & bền vững.",
+  benefits: [
+    { title: "Thi công chuẩn thiết kế", description: "Đúng concept, đúng vật liệu" },
+    { title: "Xưởng sản xuất trực tiếp", description: "Kiểm soát chất lượng từ gốc" },
+    { title: "Chất liệu minh bạch", description: "Nguồn gốc rõ ràng" },
+    { title: "Tiến độ rõ ràng", description: "Cam kết từng giai đoạn" },
+    { title: "Bảo hành tận tâm", description: "Đồng hành sau bàn giao" },
+    { title: "Đội ngũ lành nghề", description: "Tay nghề cao, tận tâm" },
+  ],
+  scopeItems: [
+    { title: "Khảo sát & tư vấn", description: "Hiểu nhu cầu và hiện trạng không gian." },
+    { title: "Thiết kế kỹ thuật triển khai", description: "Bản vẽ chi tiết cho sản xuất và thi công." },
+    { title: "Sản xuất tại xưởng", description: "Đồ gỗ, kệ, tủ chế tác chuyên nghiệp." },
+    { title: "Thi công lắp đặt", description: "Lắp đặt chuẩn xác, kiểm soát chất lượng." },
+    { title: "Hoàn thiện chi tiết", description: "Tỉ mỉ từng chi tiết hoàn thiện." },
+    { title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng trước bàn giao." },
+    { title: "Bảo hành & bảo trì", description: "Hỗ trợ dài hạn sau khi sử dụng." },
+  ],
+  processSteps: [
+    { number: "01", title: "Tư vấn & khảo sát", description: "Tiếp nhận nhu cầu, khảo sát hiện trạng" },
+    { number: "02", title: "Thiết kế / bóc tách", description: "Thiết kế 3D, kỹ thuật & bóc tách vật liệu" },
+    { number: "03", title: "Báo giá chi tiết", description: "Lập dự toán minh bạch, cam kết không phát sinh" },
+    { number: "04", title: "Ký hợp đồng", description: "Thống nhất điều khoản, tiến độ thi công" },
+    { number: "05", title: "Sản xuất tại xưởng", description: "Sản xuất theo tiêu chuẩn, kiểm soát chất lượng" },
+    { number: "06", title: "Thi công lắp đặt", description: "Vận chuyển, lắp đặt đúng kỹ thuật" },
+    { number: "07", title: "Nghiệm thu & bàn giao", description: "Nghiệm thu, bàn giao và bảo hành theo cam kết" },
+  ],
+  whyChooseItems: [
+    { title: "Xưởng sản xuất trực tiếp", description: "Chủ động sản xuất, kiểm soát chất lượng" },
+    { title: "Thi công chuẩn thiết kế", description: "Đảm bảo thẩm mỹ, đúng concept thiết kế" },
+    { title: "Vật liệu cao cấp", description: "Minh bạch nguồn gốc, an toàn sức khỏe" },
+    { title: "Tiến độ cam kết", description: "Đảm bảo kế hoạch rõ ràng, đúng hạn" },
+    { title: "Bảo hành dài hạn", description: "Bảo hành 12 – 24 tháng, bảo trì trọn đời" },
+    { title: "Đội ngũ lành nghề", description: "Kỹ sư, thợ tay nghề cao và tận tâm" },
+  ],
+  stats: [
+    { title: "10+", description: "Năm kinh nghiệm" },
+    { title: "500+", description: "Dự án hoàn thiện" },
+    { title: "98%", description: "Khách hàng hài lòng" },
+    { title: "24/7", description: "Hỗ trợ tư vấn" },
+  ],
+  testimonials: [
+    { name: "Anh Minh Tuấn", project: "Căn hộ Cầu Giấy – Hà Nội", quote: "Nội thất đẹp, thi công chuẩn từng chi tiết. Đội ngũ làm việc chuyên nghiệp, hỗ trợ tận tâm." },
+    { name: "Chị Thu Hằng", project: "Biệt thự Long Biên – Hà Nội", quote: "Thiết kế tinh tế, tối ưu không gian rất tốt. Sản xuất tại xưởng nên chất lượng rất đồng đều." },
+    { name: "Anh Quốc Huy", project: "Nhà phố Bắc Từ Liêm – Hà Nội", quote: "Đúng tiến độ, đúng cam kết và bảo hành rõ ràng. Rất hài lòng khi chọn Hà Thành Home." },
+  ],
+  faqs: [
+    { question: "Thời gian sản xuất nội thất mất bao lâu?", answer: "Tùy khối lượng và mức hoàn thiện, thông thường 30-60 ngày cho căn hộ và 60-90 ngày cho biệt thự, văn phòng." },
+    { question: "Hà Thành Home có xưởng sản xuất riêng không?", answer: "Có. Hà Thành Home sở hữu xưởng sản xuất riêng tại Hà Nội với máy móc CNC hiện đại và đội ngũ thợ tay nghề cao." },
+    { question: "Chi phí nội thất được tính như thế nào?", answer: "Chi phí phụ thuộc vào diện tích, phong cách, vật liệu và mức hoàn thiện. Hà Thành Home tư vấn báo giá chi tiết và minh bạch." },
+    { question: "Tôi có thể xem mẫu vật liệu tại showroom không?", answer: "Có. Khách hàng được mời tới showroom xem mẫu vật liệu, gỗ, vải, đá… trước khi quyết định." },
+    { question: "Chính sách bảo hành nội thất ra sao?", answer: "Bảo hành 12 – 24 tháng cho phần nội thất, bảo trì miễn phí trọn đời cho khách hàng của Hà Thành Home." },
+    { question: "Hà Thành Home có nhận thi công nội thất theo thiết kế riêng không?", answer: "Có. Đội ngũ tiếp nhận và triển khai theo bản vẽ thiết kế riêng của khách hàng, sản xuất và thi công đảm bảo đúng concept." },
+  ],
+};
+
+export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Required<NoiThatLanding> {
+  return {
+    ...defaultNoiThatLanding,
+    ...(landing || {}),
+    introChecklist: mergeList(landing?.introChecklist, defaultNoiThatLanding.introChecklist),
+    benefits: mergeList(landing?.benefits, defaultNoiThatLanding.benefits),
+    scopeItems: mergeList(landing?.scopeItems, defaultNoiThatLanding.scopeItems),
+    processSteps: mergeList(landing?.processSteps, defaultNoiThatLanding.processSteps),
+    whyChooseItems: mergeList(landing?.whyChooseItems, defaultNoiThatLanding.whyChooseItems),
+    stats: mergeList(landing?.stats, defaultNoiThatLanding.stats),
+    testimonials: mergeList(landing?.testimonials, defaultNoiThatLanding.testimonials),
+    faqs: mergeList(landing?.faqs, defaultNoiThatLanding.faqs),
   };
 }
 

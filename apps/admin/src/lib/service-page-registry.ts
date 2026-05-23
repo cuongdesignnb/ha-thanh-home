@@ -23,8 +23,8 @@ export const SERVICE_PAGE_REGISTRY: ServicePageRegistryItem[] = [
     label: "Sản Xuất Thi Công Nội Thất",
     route: "/dich-vu/san-xuat-thi-cong-noi-that",
     settingKey: "site.servicePages.sanXuatThiCongNoiThat",
-    status: "next",
-    description: "Landing page sản xuất và thi công nội thất trọn gói theo UX/UI đã thiết kế.",
+    status: "existing",
+    description: "Landing page sản xuất và thi công nội thất trọn gói.",
   },
   {
     slug: "thi-cong-nha-xuong",
