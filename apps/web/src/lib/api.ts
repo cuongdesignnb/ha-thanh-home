@@ -164,6 +164,25 @@ export type LandingFaq = {
   answer?: string;
 };
 
+export type LandingProjectsSource = {
+  entity?: "project" | "architecture-design" | "interior-design";
+  group?: "construction" | "interior" | "xay_nha_tron_goi";
+  categorySlug?: string;
+  mode?: "latest" | "featured";
+  limit?: number;
+};
+
+export type LandingProjectCard = {
+  id: number;
+  title: string;
+  slug: string;
+  href: string;
+  thumbnailUrl: string;
+  categoryLabel?: string;
+  location?: string;
+  meta?: string;
+};
+
 export type XayNhaLanding = {
   heroEyebrow?: string;
   heroTitle?: string;
@@ -202,6 +221,7 @@ export type XayNhaLanding = {
   stats?: LandingListItem[];
   testimonials?: LandingTestimonial[];
   faqs?: LandingFaq[];
+  projectsSource?: LandingProjectsSource;
 };
 
 export type NoiThatLanding = XayNhaLanding;
@@ -414,7 +434,7 @@ export const defaultHomepage: Required<Pick<SiteHomepage, "heroSlides" | "aboutB
   newsTitle: "Tin tức & cảm hứng",
 };
 
-export const defaultXayNhaLanding: Required<XayNhaLanding> = {
+export const defaultXayNhaLanding: Omit<Required<XayNhaLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
   heroEyebrow: "Xây nhà trọn gói",
   heroTitle: "Giải pháp xây nhà trọn gói từ thiết kế đến bàn giao",
   heroDescription: "Hà Thành Home cung cấp giải pháp xây nhà trọn gói toàn diện, đảm bảo chất lượng - tiến độ - minh bạch chi phí - bảo hành dài hạn.",
@@ -581,6 +601,71 @@ export async function getDetail<T>(path: string): Promise<T | null> {
   return fetchJson<T | null>(path, null);
 }
 
+export async function fetchLandingProjects(
+  source: LandingProjectsSource | undefined,
+  fallback?: { entity?: LandingProjectsSource["entity"]; group?: LandingProjectsSource["group"] },
+): Promise<LandingProjectCard[]> {
+  const entity = source?.entity || fallback?.entity || "project";
+  const limit = source?.limit && source.limit > 0 ? source.limit : 6;
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (source?.mode === "featured") params.set("featured", "true");
+  else params.set("sort", "newest");
+  if (source?.categorySlug) params.set("category", source.categorySlug);
+
+  let url = "/projects";
+  if (entity === "project") {
+    const group = source?.group || fallback?.group;
+    if (group) params.set("group", group);
+    url = "/projects";
+  } else if (entity === "architecture-design") {
+    url = "/architecture-designs";
+  } else if (entity === "interior-design") {
+    url = "/interior-designs";
+  }
+
+  const fallbackImages = entity === "interior-design" || (entity === "project" && (source?.group === "interior")) ? interiorImages : projectImages;
+
+  if (entity === "project") {
+    const payload = await getListPayload<Project>(`${url}?${params}`);
+    return payload.data.map((p, index) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      href: `/du-an/${p.slug}`,
+      thumbnailUrl: thumbnailUrl(p, fallbackImages[index % fallbackImages.length]),
+      categoryLabel: p.categoryRef?.name || p.category || (p.group === "interior" ? "Nội thất" : "Công trình"),
+      location: p.location || undefined,
+      meta: p.area || p.scale || undefined,
+    }));
+  }
+
+  if (entity === "architecture-design") {
+    const payload = await getListPayload<ArchitectureDesign>(`${url}?${params}`);
+    return payload.data.map((t, index) => ({
+      id: t.id,
+      title: t.title,
+      slug: t.slug,
+      href: `/mau-thiet-ke-kien-truc/${t.slug}`,
+      thumbnailUrl: thumbnailUrl(t, projectImages[index % projectImages.length]),
+      categoryLabel: t.houseType || t.style || "Kiến trúc",
+      location: t.location || undefined,
+      meta: t.area ? `${t.area}m²` : (t.floors ? `${t.floors} tầng` : undefined),
+    }));
+  }
+
+  const payload = await getListPayload<InteriorDesign>(`${url}?${params}`);
+  return payload.data.map((t, index) => ({
+    id: t.id,
+    title: t.title,
+    slug: t.slug,
+    href: `/mau-thiet-ke-noi-that/${t.slug}`,
+    thumbnailUrl: thumbnailUrl(t, interiorImages[index % interiorImages.length]),
+    categoryLabel: t.interiorStyle || t.roomType || "Nội thất",
+    location: t.location || undefined,
+    meta: t.area ? `${t.area}m²` : (t.budgetRange || undefined),
+  }));
+}
+
 export const projectImages = [
   "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=85",
   "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?auto=format&fit=crop&w=800&q=85",
@@ -614,7 +699,7 @@ function mergeList<T>(value: T[] | undefined, fallback: T[]) {
   return Array.isArray(value) && value.length ? value : fallback;
 }
 
-export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Required<XayNhaLanding> {
+export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Omit<Required<XayNhaLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
   return {
     ...defaultXayNhaLanding,
     ...(landing || {}),
@@ -629,7 +714,7 @@ export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Required<Xay
   };
 }
 
-export const defaultNoiThatLanding: Required<NoiThatLanding> = {
+export const defaultNoiThatLanding: Omit<Required<NoiThatLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
   heroEyebrow: "Sản xuất thi công nội thất",
   heroTitle: "Sản xuất & thi công nội thất trọn gói",
   heroDescription: "Hà Thành Home cung cấp giải pháp nội thất trọn gói — từ thiết kế, sản xuất tại xưởng đến thi công hoàn thiện, mang đến không gian sống tinh tế và bền vững.",
@@ -720,7 +805,7 @@ export const defaultNoiThatLanding: Required<NoiThatLanding> = {
   ],
 };
 
-export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Required<NoiThatLanding> {
+export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Omit<Required<NoiThatLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
   return {
     ...defaultNoiThatLanding,
     ...(landing || {}),
@@ -735,7 +820,7 @@ export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Required<N
   };
 }
 
-export const defaultNhaXuongLanding: Required<NhaXuongLanding> = {
+export const defaultNhaXuongLanding: Omit<Required<NhaXuongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
   heroEyebrow: "Thi công nhà xưởng",
   heroTitle: "Giải pháp thi công nhà xưởng trọn gói",
   heroDescription: "Hà Thành Home cung cấp giải pháp thi công nhà xưởng trọn gói — từ tư vấn, thiết kế, sản xuất cấu kiện đến thi công hoàn thiện, bàn giao đúng tiến độ.",
@@ -828,7 +913,7 @@ export const defaultNhaXuongLanding: Required<NhaXuongLanding> = {
   ],
 };
 
-export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Required<NhaXuongLanding> {
+export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Omit<Required<NhaXuongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
   return {
     ...defaultNhaXuongLanding,
     ...(landing || {}),
@@ -843,7 +928,7 @@ export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Required
   };
 }
 
-export const defaultVanPhongLanding: Required<VanPhongLanding> = {
+export const defaultVanPhongLanding: Omit<Required<VanPhongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
   heroEyebrow: "Thi công nội thất văn phòng",
   heroTitle: "Kiến tạo không gian làm việc hiện đại",
   heroDescription: "Hà Thành Home đồng hành cùng doanh nghiệp trong thi công nội thất văn phòng trọn gói, đảm bảo chất lượng – tiến độ – thẩm mỹ, kiến tạo môi trường làm việc truyền cảm hứng và hiệu quả.",
@@ -935,7 +1020,7 @@ export const defaultVanPhongLanding: Required<VanPhongLanding> = {
   ],
 };
 
-export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): Required<VanPhongLanding> {
+export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): Omit<Required<VanPhongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
   return {
     ...defaultVanPhongLanding,
     ...(landing || {}),

@@ -28,6 +28,7 @@ export class PublicController {
     if (query.search) and.push({ OR: [{ title: { contains: query.search } }, { clientName: { contains: query.search } }, { location: { contains: query.search } }] });
     const where: Prisma.ProjectWhereInput = {
       status: ContentStatus.published,
+      ...(query.featured === "true" ? { isFeatured: true } : {}),
       ...(query.group ? { group: query.group as ProjectGroup } : {}),
       ...(query.projectType ? { projectType: query.projectType } : {}),
       ...(query.style ? { style: query.style } : {}),
@@ -89,6 +90,7 @@ export class PublicController {
     const { page, limit, skip } = parsePagination(query);
     const where: Prisma.ArchitectureDesignTemplateWhereInput = {
       status: ContentStatus.published,
+      ...(query.featured === "true" ? { isFeatured: true } : {}),
       ...(query.houseType ? { houseType: query.houseType } : {}),
       ...(query.style ? { style: query.style } : {}),
       ...(query.roofType ? { roofType: query.roofType } : {}),
@@ -117,6 +119,7 @@ export class PublicController {
     const { page, limit, skip } = parsePagination(query);
     const where: Prisma.InteriorDesignTemplateWhereInput = {
       status: ContentStatus.published,
+      ...(query.featured === "true" ? { isFeatured: true } : {}),
       ...(query.interiorStyle ? { interiorStyle: query.interiorStyle } : {}),
       ...(query.houseType ? { houseType: query.houseType } : {}),
       ...(query.roomType ? { roomType: query.roomType } : {}),

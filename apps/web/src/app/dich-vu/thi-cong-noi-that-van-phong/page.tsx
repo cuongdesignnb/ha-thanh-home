@@ -27,15 +27,13 @@ import {
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
-  getListPayload,
+  fetchLandingProjects,
   getSiteSettings,
-  interiorImages,
-  thumbnailUrl,
   vanPhongLandingWithDefaults,
   type LandingFaq,
   type LandingListItem,
+  type LandingProjectCard,
   type LandingTestimonial,
-  type Project,
 } from "@/lib/api";
 
 export const metadata: Metadata = {
@@ -52,11 +50,9 @@ const statIcons: LucideIcon[] = [TimerReset, Building2, Sparkles, Headphones];
 type LandingType = ReturnType<typeof vanPhongLandingWithDefaults>;
 
 export default async function ThiCongNoiThatVanPhongPage() {
-  const [settings, projectPayload] = await Promise.all([
-    getSiteSettings(),
-    getListPayload<Project>("/projects?group=interior&limit=6&sort=newest"),
-  ]);
+  const settings = await getSiteSettings();
   const landing = vanPhongLandingWithDefaults(settings["site.servicePages.thiCongNoiThatVanPhong"]);
+  const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "interior" });
 
   return (
     <>
@@ -67,7 +63,7 @@ export default async function ThiCongNoiThatVanPhongPage() {
         <ServiceIntro landing={landing} />
         <ScopeSection landing={landing} />
         <ProcessTimeline landing={landing} />
-        <ProjectShowcase projects={projectPayload.data} landing={landing} />
+        <ProjectShowcase projects={projects} landing={landing} />
         <QuoteSection landing={landing} />
         <WhyChooseSection landing={landing} />
         <StatsStrip items={landing.stats} />
@@ -177,7 +173,7 @@ function ProcessTimeline({ landing }: { landing: LandingType }) {
   );
 }
 
-function ProjectShowcase({ projects, landing }: { projects: Project[]; landing: LandingType }) {
+function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]; landing: LandingType }) {
   return (
     <section className="section cream">
       <div className="container">
@@ -187,16 +183,16 @@ function ProjectShowcase({ projects, landing }: { projects: Project[]; landing: 
         </div>
         {projects.length ? (
           <div className="xay-nha-project-grid">
-            {projects.map((project, index) => (
+            {projects.map((project) => (
               <article className="xay-nha-project-card" key={project.id}>
-                <div className="xay-nha-project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, interiorImages[index % interiorImages.length])})` }}><span>{project.categoryRef?.name || project.category || "Văn phòng"}</span></div>
+                <div className="xay-nha-project-image" style={{ backgroundImage: `url(${project.thumbnailUrl})` }}><span>{project.categoryLabel || "Văn phòng"}</span></div>
                 <div className="xay-nha-project-body">
                   <h3>{project.title}</h3>
                   <div className="xay-nha-project-meta">
                     <span><MapPin size={15} /> {project.location || "Đang cập nhật"}</span>
-                    <span><Ruler size={15} /> {project.area || project.scale || "Đang cập nhật"}</span>
+                    <span><Ruler size={15} /> {project.meta || "Đang cập nhật"}</span>
                   </div>
-                  <a href={`/du-an/${project.slug}`}>Xem chi tiết</a>
+                  <a href={project.href}>Xem chi tiết</a>
                 </div>
               </article>
             ))}
