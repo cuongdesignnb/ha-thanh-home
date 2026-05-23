@@ -205,6 +205,7 @@ export type XayNhaLanding = {
 };
 
 export type NoiThatLanding = XayNhaLanding;
+export type NhaXuongLanding = XayNhaLanding;
 
 export type SiteSettings = {
   "site.identity"?: SiteIdentity;
@@ -212,6 +213,7 @@ export type SiteSettings = {
   "site.homepage"?: SiteHomepage;
   "site.landing.xayNhaTronGoi"?: XayNhaLanding;
   "site.servicePages.sanXuatThiCongNoiThat"?: NoiThatLanding;
+  "site.servicePages.thiCongNhaXuong"?: NhaXuongLanding;
 };
 
 export type EstimatorFieldOption = {
@@ -728,6 +730,114 @@ export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Required<N
     stats: mergeList(landing?.stats, defaultNoiThatLanding.stats),
     testimonials: mergeList(landing?.testimonials, defaultNoiThatLanding.testimonials),
     faqs: mergeList(landing?.faqs, defaultNoiThatLanding.faqs),
+  };
+}
+
+export const defaultNhaXuongLanding: Required<NhaXuongLanding> = {
+  heroEyebrow: "Thi công nhà xưởng",
+  heroTitle: "Giải pháp thi công nhà xưởng trọn gói",
+  heroDescription: "Hà Thành Home cung cấp giải pháp thi công nhà xưởng trọn gói — từ tư vấn, thiết kế, sản xuất cấu kiện đến thi công hoàn thiện, bàn giao đúng tiến độ.",
+  heroImageUrl: "https://images.unsplash.com/photo-1565891741441-64926e441838?auto=format&fit=crop&w=2000&q=85",
+  primaryCtaLabel: "Nhận báo giá",
+  secondaryCtaLabel: "Tư vấn miễn phí",
+  introEyebrow: "Dịch vụ thi công nhà xưởng",
+  introTitle: "Giải pháp xây dựng nhà xưởng hiện đại – bền vững – hiệu quả",
+  introDescription: "Cung cấp giải pháp thi công nhà xưởng trọn gói, phù hợp với mô hình sản xuất và kinh doanh, đảm bảo vận hành hiệu quả và phát triển bền vững.",
+  introImageUrl: "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1400&q=85",
+  introChecklist: [
+    "Tư vấn & thiết kế tối ưu công năng, phù hợp nhu cầu sản xuất",
+    "Kết cấu thép chất lượng cao, tiêu chuẩn kỹ thuật rõ ràng",
+    "Thi công nhanh chóng, an toàn, đảm bảo tiến độ",
+    "Chi phí hợp lý, tối ưu hiệu quả đầu tư",
+    "Bảo hành kết cấu dài hạn, đồng hành lâu dài cùng khách hàng",
+  ],
+  scopeEyebrow: "Phạm vi công việc",
+  scopeTitle: "Trọn gói từ thiết kế đến hoàn thiện nhà xưởng",
+  processEyebrow: "Quy trình thi công nhà xưởng",
+  processTitle: "Rõ việc, rõ tiến độ – 7 bước chuẩn",
+  projectsEyebrow: "Dự án nhà xưởng tiêu biểu",
+  projectsTitle: "Công trình nhà xưởng đã triển khai",
+  estimateEyebrow: "Dự toán chi phí thi công nhà xưởng",
+  estimateTitle: "Tham khảo chi phí thi công nhà xưởng",
+  quoteTitle: "Nhận báo giá & tư vấn miễn phí",
+  quoteDescription: "Điền thông tin để nhận tư vấn chi tiết và báo giá phù hợp từ Hà Thành Home.",
+  whyEyebrow: "Vì sao chọn Hà Thành Home?",
+  whyTitle: "Đối tác tin cậy cho mọi công trình công nghiệp",
+  testimonialsEyebrow: "Khách hàng nói gì về chúng tôi",
+  testimonialsTitle: "Niềm tin đến từ trải nghiệm thật",
+  faqEyebrow: "Câu hỏi thường gặp",
+  faqTitle: "Những điều khách hàng thường hỏi",
+  finalEyebrow: "Bắt đầu cùng Hà Thành Home",
+  finalTitle: "Sẵn sàng xây dựng nhà xưởng hiện đại cho doanh nghiệp của bạn?",
+  finalDescription: "Hà Thành Home – Đối tác tin cậy cho mọi công trình công nghiệp.",
+  benefits: [
+    { title: "Thiết kế tối ưu công năng", description: "Phù hợp dây chuyền sản xuất" },
+    { title: "Kết cấu vững chắc", description: "Chuẩn kỹ thuật, bền vững" },
+    { title: "Tiến độ rõ ràng", description: "Cam kết đúng hạn" },
+    { title: "Chi phí minh bạch", description: "Không phát sinh ẩn" },
+    { title: "An toàn thi công", description: "Tuyệt đối, đúng quy trình" },
+    { title: "Đội ngũ chuyên môn", description: "Kinh nghiệm cao, tận tâm" },
+  ],
+  scopeItems: [
+    { title: "Khảo sát & tư vấn", description: "Nắm rõ nhu cầu và hiện trạng." },
+    { title: "Thiết kế kiến trúc, kết cấu", description: "Tối ưu công năng, kỹ thuật." },
+    { title: "Thi công nền móng", description: "Móng vững chắc, đúng kết cấu." },
+    { title: "Sản xuất & lắp dựng khung thép", description: "Gia công tại xưởng, lắp dựng nhanh." },
+    { title: "Thi công hoàn thiện", description: "Tường, mái, nền xưởng hoàn thiện." },
+    { title: "Hệ thống MEP", description: "Điện – Nước – PCCC đồng bộ." },
+    { title: "Hệ thống PCCC", description: "Tuân thủ quy chuẩn an toàn." },
+    { title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng trước bàn giao." },
+  ],
+  processSteps: [
+    { number: "01", title: "Tiếp nhận yêu cầu", description: "Khảo sát và thu thập thông tin dự án" },
+    { number: "02", title: "Tư vấn & thiết kế", description: "Đề xuất giải pháp, thiết kế kiến trúc, kết cấu" },
+    { number: "03", title: "Báo giá & hợp đồng", description: "Báo giá chi tiết, thống nhất điều khoản và ký kết" },
+    { number: "04", title: "Sản xuất cấu kiện", description: "Gia công cấu kiện thép tại nhà máy/xưởng" },
+    { number: "05", title: "Thi công lắp dựng", description: "Thi công nền móng và lắp dựng khung thép" },
+    { number: "06", title: "Thi công hoàn thiện", description: "Hoàn thiện hệ thống MEP, PCCC và hạng mục phụ trợ" },
+    { number: "07", title: "Nghiệm thu & bàn giao", description: "Kiểm tra chất lượng, bàn giao và bảo hành" },
+  ],
+  whyChooseItems: [
+    { title: "Kinh nghiệm thực chiến", description: "Nhiều công trình nhà xưởng, kho bãi đã bàn giao" },
+    { title: "Năng lực sản xuất mạnh", description: "Nhà máy hiện đại, chủ động sản xuất cấu kiện" },
+    { title: "Quy trình chuyên nghiệp", description: "Quản lý chặt chẽ từ thiết kế, sản xuất đến thi công" },
+    { title: "Đúng tiến độ cam kết", description: "Tối ưu tiến độ, đảm bảo bàn giao đúng hạn" },
+    { title: "An toàn là ưu tiên", description: "Thi công an toàn, tuân thủ quy trình nghiêm ngặt" },
+    { title: "Bảo hành dài hạn", description: "Đồng hành sau bàn giao công trình" },
+  ],
+  stats: [
+    { title: "10+", description: "Năm kinh nghiệm" },
+    { title: "300+", description: "Dự án nhà xưởng" },
+    { title: "98%", description: "Khách hàng hài lòng" },
+    { title: "24/7", description: "Hỗ trợ tư vấn" },
+  ],
+  testimonials: [
+    { name: "Ông Nguyễn Văn Hùng", project: "Giám đốc – Công ty ABC", quote: "Hà Thành Home thi công đúng tiến độ, chất lượng vượt mong đợi. Đội ngũ chuyên nghiệp, hỗ trợ rất tận tâm." },
+    { name: "Bà Trần Thị Mai", project: "Giám đốc – Công ty HTech", quote: "Nhà xưởng được thiết kế đúng công năng, chi phí hợp lý. Rất hài lòng với sự hợp tác." },
+    { name: "Ông Phạm Quốc Tuấn", project: "CEO – Công ty VinaFoods", quote: "Dịch vụ trọn gói chuyên nghiệp từ tư vấn đến bàn giao. Hà Thành Home là đối tác tin cậy của chúng tôi." },
+  ],
+  faqs: [
+    { question: "Thời gian thi công nhà xưởng mất bao lâu?", answer: "Tùy quy mô và yêu cầu kỹ thuật, thời gian thi công thường từ 2 – 6 tháng hoặc hơn đối với dự án lớn." },
+    { question: "Chi phí thi công nhà xưởng được tính thế nào?", answer: "Chi phí phụ thuộc diện tích, kết cấu, vật liệu, hệ thống MEP, PCCC và mức độ hoàn thiện." },
+    { question: "Hà Thành Home có hỗ trợ xin giấy phép xây dựng không?", answer: "Có. Chúng tôi có thể tư vấn hồ sơ pháp lý, giấy phép xây dựng và các thủ tục liên quan tùy theo dự án." },
+    { question: "Nhà xưởng có thể mở rộng trong tương lai không?", answer: "Có. Phương án thiết kế có thể tính trước khả năng mở rộng để tối ưu chi phí đầu tư dài hạn." },
+    { question: "Chính sách bảo hành công trình như thế nào?", answer: "Công trình được bảo hành theo từng hạng mục, đặc biệt là kết cấu, mái, hệ thống kỹ thuật và các phần hoàn thiện." },
+    { question: "Hà Thành Home có thi công trọn gói không?", answer: "Có. Chúng tôi cung cấp dịch vụ trọn gói từ tư vấn, thiết kế, sản xuất cấu kiện, thi công đến nghiệm thu bàn giao." },
+  ],
+};
+
+export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Required<NhaXuongLanding> {
+  return {
+    ...defaultNhaXuongLanding,
+    ...(landing || {}),
+    introChecklist: mergeList(landing?.introChecklist, defaultNhaXuongLanding.introChecklist),
+    benefits: mergeList(landing?.benefits, defaultNhaXuongLanding.benefits),
+    scopeItems: mergeList(landing?.scopeItems, defaultNhaXuongLanding.scopeItems),
+    processSteps: mergeList(landing?.processSteps, defaultNhaXuongLanding.processSteps),
+    whyChooseItems: mergeList(landing?.whyChooseItems, defaultNhaXuongLanding.whyChooseItems),
+    stats: mergeList(landing?.stats, defaultNhaXuongLanding.stats),
+    testimonials: mergeList(landing?.testimonials, defaultNhaXuongLanding.testimonials),
+    faqs: mergeList(landing?.faqs, defaultNhaXuongLanding.faqs),
   };
 }
 

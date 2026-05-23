@@ -31,8 +31,8 @@ export const SERVICE_PAGE_REGISTRY: ServicePageRegistryItem[] = [
     label: "Thi Công Nhà Xưởng",
     route: "/dich-vu/thi-cong-nha-xuong",
     settingKey: "site.servicePages.thiCongNhaXuong",
-    status: "planned",
-    description: "Landing page thi công nhà xưởng.",
+    status: "existing",
+    description: "Landing page thi công nhà xưởng trọn gói.",
   },
   {
     slug: "thi-cong-noi-that-van-phong",

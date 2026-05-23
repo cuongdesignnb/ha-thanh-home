@@ -5,6 +5,7 @@ import { ExternalLink, Save } from "lucide-react";
 import { getWebBaseUrl, type ServicePageRegistryItem, type ServicePageStatus } from "@/lib/service-page-registry";
 import { XayNhaTronGoiEditor } from "@/components/xay-nha-tron-goi-editor";
 import { SanXuatNoiThatEditor } from "@/components/san-xuat-noi-that-editor";
+import { ThiCongNhaXuongEditor } from "@/components/thi-cong-nha-xuong-editor";
 
 const STATUS_LABEL: Record<ServicePageStatus, string> = {
   existing: "Đã có route",
@@ -35,7 +36,7 @@ export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryIt
   const [activeSection, setActiveSection] = useState<string>(SECTIONS[0].key);
   const webBase = getWebBaseUrl();
   const activeSectionMeta = SECTIONS.find((s) => s.key === activeSection);
-  const hasDedicatedEditor = page.slug === "xay-nha-tron-goi" || page.slug === "san-xuat-thi-cong-noi-that";
+  const hasDedicatedEditor = page.slug === "xay-nha-tron-goi" || page.slug === "san-xuat-thi-cong-noi-that" || page.slug === "thi-cong-nha-xuong";
 
   return (
     <section className="service-page-editor">
@@ -66,6 +67,8 @@ export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryIt
           <XayNhaTronGoiEditor roles={roles} />
         ) : hasDedicatedEditor && page.slug === "san-xuat-thi-cong-noi-that" ? (
           <SanXuatNoiThatEditor roles={roles} />
+        ) : hasDedicatedEditor && page.slug === "thi-cong-nha-xuong" ? (
+          <ThiCongNhaXuongEditor roles={roles} />
         ) : (
         <div className="service-page-editor-body">
           <nav className="service-page-section-list" aria-label="Sections">
