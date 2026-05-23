@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ExternalLink, Save } from "lucide-react";
 import { getWebBaseUrl, type ServicePageRegistryItem, type ServicePageStatus } from "@/lib/service-page-registry";
+import { XayNhaTronGoiEditor } from "@/components/xay-nha-tron-goi-editor";
 
 const STATUS_LABEL: Record<ServicePageStatus, string> = {
   existing: "Đã có route",
@@ -29,10 +30,11 @@ const SECTIONS: Section[] = [
   { key: "finalCta", label: "Final CTA", description: "Khối kêu gọi hành động cuối trang." },
 ];
 
-export function ServicePageEditor({ page }: { page: ServicePageRegistryItem }) {
+export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryItem; roles: string[] }) {
   const [activeSection, setActiveSection] = useState<string>(SECTIONS[0].key);
   const webBase = getWebBaseUrl();
   const activeSectionMeta = SECTIONS.find((s) => s.key === activeSection);
+  const hasDedicatedEditor = page.slug === "xay-nha-tron-goi";
 
   return (
     <section className="service-page-editor">
@@ -51,12 +53,17 @@ export function ServicePageEditor({ page }: { page: ServicePageRegistryItem }) {
             <a className="secondary-button" href={`${webBase}${page.route}`} target="_blank" rel="noreferrer">
               <ExternalLink size={16} /> Xem website
             </a>
-            <button className="primary-button" type="button" disabled title="Form lưu sẽ có ở phase sau">
-              <Save size={16} /> Lưu thay đổi
-            </button>
+            {!hasDedicatedEditor ? (
+              <button className="primary-button" type="button" disabled title="Form lưu sẽ có ở phase sau">
+                <Save size={16} /> Lưu thay đổi
+              </button>
+            ) : null}
           </div>
         </header>
 
+        {hasDedicatedEditor && page.slug === "xay-nha-tron-goi" ? (
+          <XayNhaTronGoiEditor roles={roles} />
+        ) : (
         <div className="service-page-editor-body">
           <nav className="service-page-section-list" aria-label="Sections">
             {SECTIONS.map((section) => (
@@ -85,6 +92,7 @@ export function ServicePageEditor({ page }: { page: ServicePageRegistryItem }) {
             </div>
           </div>
         </div>
+        )}
       </article>
     </section>
   );
