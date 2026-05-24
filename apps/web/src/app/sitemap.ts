@@ -33,7 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/mau-thiet-ke-noi-that`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/tin-tuc`, changeFrequency: "daily", priority: 0.7 },
     { url: `${base}/lien-he`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/gioi-thieu`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
   ];
+
 
   // Dynamic routes from API
   const [projects, archDesigns, intDesigns, posts] = await Promise.all([

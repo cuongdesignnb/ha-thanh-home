@@ -1008,6 +1008,7 @@ export class AdminController {
   async menuLinkSuggestions() {
     const staticRoutes = [
       ["Trang chủ", "/"],
+      ["Giới thiệu", "/gioi-thieu"],
       ["Dự án", "/du-an"],
       ["Dự án công trình", "/du-an/cong-trinh"],
       ["Dự án nội thất", "/du-an/noi-that"],
@@ -1021,6 +1022,7 @@ export class AdminController {
       ["Mẫu thiết kế kiến trúc", "/mau-thiet-ke-kien-truc"],
       ["Mẫu thiết kế nội thất", "/mau-thiet-ke-noi-that"],
     ].map(([label, url]) => ({ label, url, type: "route" }));
+
     const [projects, services, posts, postCategories, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.service.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),

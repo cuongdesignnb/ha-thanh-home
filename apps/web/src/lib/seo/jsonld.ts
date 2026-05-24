@@ -237,3 +237,22 @@ export function buildContactPageSchema() {
     mainEntity: { "@id": `${siteConfig.url}/#localbusiness` },
   };
 }
+
+export function buildAboutPageSchema(name: string, description?: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": `${siteConfig.url}/gioi-thieu#about`,
+    "url": absoluteUrl("/gioi-thieu"),
+    "name": name,
+    "description": description,
+    "isPartOf": {
+      "@id": `${siteConfig.url}/#website`
+    },
+    "about": {
+      "@id": `${siteConfig.url}/#organization`
+    },
+    "inLanguage": "vi-VN"
+  };
+}
+

@@ -1,4 +1,8 @@
+import { AboutPageConfig } from "./about-page-config";
+import { aboutPageDefaultConfig } from "./about-page-defaults";
+
 export type ProjectGroup = "construction" | "interior" | "xay_nha_tron_goi";
+
 
 export type MediaFile = {
   id: number;
@@ -236,7 +240,9 @@ export type SiteSettings = {
   "site.servicePages.sanXuatThiCongNoiThat"?: NoiThatLanding;
   "site.servicePages.thiCongNhaXuong"?: NhaXuongLanding;
   "site.servicePages.thiCongNoiThatVanPhong"?: VanPhongLanding;
+  "site.pages.about"?: AboutPageConfig;
 };
+
 
 export type EstimatorFieldOption = {
   label: string;
@@ -577,6 +583,70 @@ export async function getSiteSettings() {
     return {};
   }
 }
+
+export async function getAboutPageConfig(): Promise<AboutPageConfig> {
+  const settings = await getSiteSettings();
+  const landing = settings["site.pages.about"];
+  if (!landing) return aboutPageDefaultConfig;
+  return {
+    ...aboutPageDefaultConfig,
+    ...landing,
+    seo: {
+      ...aboutPageDefaultConfig.seo,
+      ...(landing.seo || {}),
+    },
+    hero: {
+      ...aboutPageDefaultConfig.hero,
+      ...(landing.hero || {}),
+    },
+    intro: {
+      ...aboutPageDefaultConfig.intro,
+      ...(landing.intro || {}),
+      checklist: Array.isArray(landing.intro?.checklist) && landing.intro.checklist.length ? landing.intro.checklist : aboutPageDefaultConfig.intro.checklist,
+    },
+    identity: {
+      ...aboutPageDefaultConfig.identity,
+      ...(landing.identity || {}),
+      items: Array.isArray(landing.identity?.items) && landing.identity.items.length ? landing.identity.items : aboutPageDefaultConfig.identity.items,
+    },
+    whyChoose: {
+      ...aboutPageDefaultConfig.whyChoose,
+      ...(landing.whyChoose || {}),
+      items: Array.isArray(landing.whyChoose?.items) && landing.whyChoose.items.length ? landing.whyChoose.items : aboutPageDefaultConfig.whyChoose.items,
+    },
+    timeline: {
+      ...aboutPageDefaultConfig.timeline,
+      ...(landing.timeline || {}),
+      items: Array.isArray(landing.timeline?.items) && landing.timeline.items.length ? landing.timeline.items : aboutPageDefaultConfig.timeline.items,
+    },
+    people: {
+      ...aboutPageDefaultConfig.people,
+      ...(landing.people || {}),
+      highlights: Array.isArray(landing.people?.highlights) && landing.people.highlights.length ? landing.people.highlights : aboutPageDefaultConfig.people.highlights,
+    },
+    stats: Array.isArray(landing.stats) && landing.stats.length ? landing.stats : aboutPageDefaultConfig.stats,
+    strengths: {
+      ...aboutPageDefaultConfig.strengths,
+      ...(landing.strengths || {}),
+      items: Array.isArray(landing.strengths?.items) && landing.strengths.items.length ? landing.strengths.items : aboutPageDefaultConfig.strengths.items,
+    },
+    partners: {
+      ...aboutPageDefaultConfig.partners,
+      ...(landing.partners || {}),
+      items: Array.isArray(landing.partners?.items) && landing.partners.items.length ? landing.partners.items : aboutPageDefaultConfig.partners.items,
+    },
+    testimonials: {
+      ...aboutPageDefaultConfig.testimonials,
+      ...(landing.testimonials || {}),
+      items: Array.isArray(landing.testimonials?.items) && landing.testimonials.items.length ? landing.testimonials.items : aboutPageDefaultConfig.testimonials.items,
+    },
+    finalCta: {
+      ...aboutPageDefaultConfig.finalCta,
+      ...(landing.finalCta || {}),
+    },
+  };
+}
+
 
 export function getConstructionEstimatorConfig() {
   return fetchJson<EstimatorPublicConfig>("/construction-estimator/config", {});

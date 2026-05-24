@@ -68,11 +68,13 @@ import { adminApiFetch, adminUrl } from "@/lib/client-path";
 import { ServicePagesPanel } from "@/components/service-pages-panel";
 import { ServicePageEditor } from "@/components/service-page-editor";
 import { SERVICE_PAGE_REGISTRY } from "@/lib/service-page-registry";
+import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
+
 
 const apiFetch = adminApiFetch;
 
 type User = { email: string; roles: string[] };
-type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings";
+type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings";
 type CmsItem = Record<string, unknown> & {
   id: number;
   title?: string;
@@ -274,9 +276,11 @@ const modules = [
     group: "Hệ thống",
     items: [
       { id: "menus", label: "Menu", description: "Header, footer và kéo thả 3 cấp", icon: MenuIcon, roles: ["Super Admin", "Admin", "Viewer"] },
+      { id: "about-settings", label: "Trang giới thiệu", description: "Cấu hình trang giới thiệu", icon: FileText, roles: ["Super Admin", "Admin"] },
       { id: "settings", label: "Cấu hình", description: "Thông tin website", icon: Settings, roles: ["Super Admin", "Admin"] },
     ],
   },
+
 ] satisfies Array<{ group: string; items: Array<{ id: string; label: string; description: string; icon: LucideIcon; roles: string[]; serviceSlug?: string }> }>;
 
 const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?: string }> = {
@@ -295,6 +299,7 @@ const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?
   menus: { title: "Quản lý Menu", subtitle: "Kéo thả menu header/footer tối đa 3 cấp, chọn link gợi ý hoặc tự nhập URL." },
   estimator: { title: "Dự toán công trình", subtitle: "Cấu hình input, công thức tính chi phí và xem lượt dự toán từ website." },
   settings: { title: "Cấu hình website", subtitle: "Quản lý hotline, email, địa chỉ, social và thông tin thương hiệu." },
+  "about-settings": { title: "Trang giới thiệu", subtitle: "Quản lý nội dung, hình ảnh và SEO cho trang Giới thiệu." },
 };
 
 const entitySingular: Record<Entity, string> = {
@@ -313,7 +318,9 @@ const entitySingular: Record<Entity, string> = {
   menus: "menu",
   estimator: "dự toán công trình",
   settings: "cấu hình",
+  "about-settings": "trang giới thiệu",
 };
+
 
 const statusLabels: Record<string, string> = {
   draft: "Nháp",
@@ -427,11 +434,14 @@ export function AdminApp({ user }: { user: User }) {
           <EstimatorPanel roles={user.roles} />
         ) : active === "settings" ? (
           <ThemeSettingsPanel roles={user.roles} />
+        ) : active === "about-settings" ? (
+          <AboutPageSettingsPanel roles={user.roles} />
         ) : active === "service-pages" ? (
           activeServicePage ? <ServicePageEditor page={activeServicePage} roles={user.roles} /> : <ServicePagesPanel />
         ) : (
           <EntityPanel entity={active} roles={user.roles} />
         )}
+
       </main>
       </div>
     </FeedbackProvider>
