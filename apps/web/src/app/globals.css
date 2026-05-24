@@ -2429,7 +2429,9 @@ h3 {
 }
 
 .gallery-stage img {
-  width: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
   max-height: min(68vh, 720px);
   object-fit: contain;
 }
