@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { getList, type Service } from "@/lib/api";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildItemListSchema } from "@/lib/seo/jsonld";
-import { ArrowRight, Building2, Hammer, Sofa, Factory, Compass, Layers, Sparkles, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Compass, Layers, Sparkles, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dịch vụ Thiết kế & Thi công trọn gói - Hà Thành Home",
@@ -65,17 +64,7 @@ const whyChooseUs = [
   },
 ];
 
-function getServiceIcon(slug: string) {
-  if (slug.includes("thiet-ke-kien-truc")) return Compass;
-  if (slug.includes("thi-cong-phan-tho")) return Hammer;
-  if (slug.includes("thiet-ke-noi-that")) return Sofa;
-  if (slug.includes("san-xuat-noi-that")) return Factory;
-  return Building2;
-}
-
 export default async function ServicesPage() {
-  const dbServices = await getList<Service>("/services?limit=24");
-
   const schemas = [
     buildBreadcrumbSchema([
       { name: "Trang chủ", url: "/" },
@@ -89,7 +78,6 @@ export default async function ServicesPage() {
     }),
     buildItemListSchema([
       ...coreServices.map((s) => ({ name: s.title, url: s.href })),
-      ...dbServices.map((s) => ({ name: s.title, url: `/dich-vu/${s.slug}` })),
     ]),
   ].filter(Boolean);
 
@@ -151,36 +139,6 @@ export default async function ServicesPage() {
           </div>
         </section>
 
-        {/* Dynamic Complementary Services */}
-        {dbServices.length > 0 && (
-          <section className="section sub-services-section cream">
-            <div className="container">
-              <div className="section-title text-center">
-                <span className="eyebrow">Dịch vụ bổ trợ</span>
-                <h2>Các Dịch Vụ Chuyên Sâu Khác</h2>
-                <p className="section-subtitle">
-                  Bên cạnh các gói thầu trọn gói, Hà Thành Home cung cấp dịch vụ thiết kế, tư vấn và thi công theo từng giai đoạn hoặc hạng mục độc lập.
-                </p>
-              </div>
-
-              <div className="sub-services-grid">
-                {dbServices.map((service) => {
-                  const Icon = getServiceIcon(service.slug);
-                  return (
-                    <a className="sub-service-card" href={`/dich-vu/${service.slug}`} key={service.id}>
-                      <div className="card-icon-wrapper">
-                        <Icon size={28} strokeWidth={1.5} />
-                      </div>
-                      <h3>{service.title}</h3>
-                      <p>{service.description || "Dịch vụ trọn gói, chuyên nghiệp và kiểm soát chất lượng rõ ràng."}</p>
-                      <span className="card-link">Tìm hiểu thêm <ArrowRight size={14} /></span>
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Why Choose Us */}
         <section className="section why-choose-services">
