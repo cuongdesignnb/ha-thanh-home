@@ -23,7 +23,17 @@ export class PublicController {
   async projects(@Query() query: Record<string, string>) {
     const { page, limit, skip } = parsePagination(query);
     const and: Prisma.ProjectWhereInput[] = [];
-    if (query.category) and.push({ OR: [{ categoryRef: { slug: query.category } }, { category: { contains: query.category } }] });
+    if (query.category) {
+      const categorySlugs = query.category.split(",").map((s) => s.trim()).filter(Boolean);
+      if (categorySlugs.length > 0) {
+        and.push({
+          OR: [
+            { categoryRef: { slug: { in: categorySlugs } } },
+            { OR: categorySlugs.map((slug) => ({ category: { contains: slug } })) }
+          ]
+        });
+      }
+    }
     if (query.space) and.push({ OR: [{ projectType: query.space }, { category: { contains: query.space } }, { scale: { contains: query.space } }, { style: { contains: query.space } }] });
     if (query.search) and.push({ OR: [{ title: { contains: query.search } }, { clientName: { contains: query.search } }, { location: { contains: query.search } }] });
     const where: Prisma.ProjectWhereInput = {

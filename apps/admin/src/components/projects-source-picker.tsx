@@ -52,6 +52,8 @@ export function ProjectsSourcePicker({
     ? categories.filter((c) => !c.group || c.group === v.group)
     : categories;
 
+  const selectedSlugs = v.categorySlug ? v.categorySlug.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
   return (
     <div className="projects-source-picker">
       <header className="projects-source-head">
@@ -80,22 +82,12 @@ export function ProjectsSourcePicker({
           </label>
         ) : null}
 
-        {entity === "project" ? (
-          <label>
-            Danh mục dự án
-            <select value={v.categorySlug || ""} onChange={(e) => patch("categorySlug", e.target.value || undefined)} disabled={loadingCats}>
-              <option value="">{loadingCats ? "Đang tải..." : "Tất cả danh mục"}</option>
-              {filteredCategories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>{cat.name}</option>
-              ))}
-            </select>
-          </label>
-        ) : (
+        {entity !== "project" ? (
           <label>
             Lọc theo slug (tùy chọn)
             <input value={v.categorySlug || ""} onChange={(e) => patch("categorySlug", e.target.value || undefined)} placeholder="Để trống để hiển thị tất cả" />
           </label>
-        )}
+        ) : null}
 
         <label>
           Chế độ
@@ -115,6 +107,38 @@ export function ProjectsSourcePicker({
             onChange={(e) => patch("limit", Number(e.target.value) || undefined)}
           />
         </label>
+
+        {entity === "project" ? (
+          <div className="projects-source-categories-container">
+            <span className="picker-label">Danh mục dự án</span>
+            {loadingCats ? (
+              <div className="picker-loading">Đang tải danh mục...</div>
+            ) : (
+              <div className="picker-checkbox-grid">
+                {filteredCategories.map((cat) => {
+                  const isChecked = selectedSlugs.includes(cat.slug);
+                  return (
+                    <label key={cat.id} className="picker-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const nextSlugs = e.target.checked
+                            ? [...selectedSlugs, cat.slug]
+                            : selectedSlugs.filter((s) => s !== cat.slug);
+                          const joined = nextSlugs.join(",");
+                          patch("categorySlug", joined || undefined);
+                        }}
+                      />
+                      <span>{cat.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+            <small className="picker-help">Chọn một hoặc nhiều danh mục. Để trống để lấy tất cả các danh mục.</small>
+          </div>
+        ) : null}
       </div>
       <footer className="projects-source-foot">
         <small>

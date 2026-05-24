@@ -3222,3 +3222,59 @@ select {
     min-height: auto;
   }
 }
+
+/* Projects Source Picker Custom Styling */
+.projects-source-categories-container {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--admin-line);
+}
+
+.picker-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--admin-muted);
+}
+
+.picker-loading {
+  font-size: 13px;
+  color: var(--admin-muted);
+  font-style: italic;
+}
+
+.picker-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  background: #ffffff;
+  padding: 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+}
+
+.picker-checkbox-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  font-weight: normal !important;
+  color: var(--admin-charcoal) !important;
+  font-size: 13px !important;
+}
+
+.picker-checkbox-label input {
+  margin: 0 !important;
+  width: auto !important;
+  cursor: pointer;
+}
+
+.picker-help {
+  font-size: 11px;
+  color: var(--admin-muted);
+  opacity: 0.8;
+}
