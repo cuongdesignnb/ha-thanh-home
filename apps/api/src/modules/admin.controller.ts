@@ -839,11 +839,32 @@ export class AdminController {
   @Roles("Admin")
   async createProjectFilterOption(@Body() dto: ProjectFilterOptionDto) {
     const module = dto.module || ProjectFilterModule.project;
-    const baseSlug = `${module}-${dto.group}-${dto.type}-${dto.slug || dto.name}`;
-    const slug = await uniqueSlug(dto.name, baseSlug, (candidate) =>
+    const trimmedName = dto.name.trim();
+
+    const existing = await this.prisma.projectFilterOption.findFirst({
+      where: {
+        module,
+        group: dto.group,
+        type: dto.type,
+        name: trimmedName,
+      },
+    });
+
+    if (existing) {
+      if (!existing.isActive) {
+        return this.prisma.projectFilterOption.update({
+          where: { id: existing.id },
+          data: { isActive: true },
+        });
+      }
+      return existing;
+    }
+
+    const baseSlug = `${module}-${dto.group}-${dto.type}-${dto.slug || trimmedName}`;
+    const slug = await uniqueSlug(trimmedName, baseSlug, (candidate) =>
       this.prisma.projectFilterOption.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
-    return this.prisma.projectFilterOption.create({ data: { ...dto, module, slug, sortOrder: dto.sortOrder || 0, isActive: dto.isActive ?? true } });
+    return this.prisma.projectFilterOption.create({ data: { ...dto, name: trimmedName, module, slug, sortOrder: dto.sortOrder || 0, isActive: dto.isActive ?? true } });
   }
 
   @Patch("project-filter-options/:id")

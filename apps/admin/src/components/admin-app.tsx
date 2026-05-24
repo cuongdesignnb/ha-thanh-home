@@ -2557,6 +2557,16 @@ function TaxonomySelect({
   async function createOption() {
     const trimmed = newName.trim();
     if (!trimmed) return;
+
+    const existing = items.find((item) => String(item.name).trim().toLowerCase() === trimmed.toLowerCase());
+    if (existing) {
+      form.setValue(name, numeric ? Number(existing.name) : existing.name);
+      setNewName("");
+      setCreating(false);
+      notify({ tone: "success", title: `Đã tự động chọn ${label.toLowerCase()} có sẵn: ${existing.name}` });
+      return;
+    }
+
     setSaving(true);
     try {
       const response = await apiFetch("/api/cms/project-filter-options", {
@@ -2568,10 +2578,10 @@ function TaxonomySelect({
         notify({ tone: "error", title: `Không tạo được ${label.toLowerCase()}`, description: await readApiError(response, "Kiểm tra quyền hoặc trùng tên.") });
         return;
       }
+      await onCreated?.();
       form.setValue(name, numeric ? Number(trimmed) : trimmed);
       setNewName("");
       setCreating(false);
-      await onCreated?.();
       notify({ tone: "success", title: `Đã tạo ${label.toLowerCase()}: ${trimmed}` });
     } catch (error) {
       notify({ tone: "error", title: `Không tạo được ${label.toLowerCase()}`, description: describeClientError(error, "Không kết nối được API.") });
