@@ -232,7 +232,7 @@ export function ThiCongNhaXuongEditor({ roles }: { roles: string[] }) {
   if (loading) return <div className="empty-state">Đang tải cấu hình...</div>;
 
   return (
-    <form onSubmit={submit} className="cms-form xay-nha-form">
+    <form onSubmit={submit} id="thi-cong-nha-xuong-editor-form" className="cms-form xay-nha-form">
       <div className="form-grid">
         <label>Eyebrow hero<input value={values.heroEyebrow} onChange={(e) => setValues({ ...values, heroEyebrow: e.target.value })} /></label>
         <label className="wide">Tiêu đề hero<textarea value={values.heroTitle} onChange={(e) => setValues({ ...values, heroTitle: e.target.value })} rows={3} /></label>

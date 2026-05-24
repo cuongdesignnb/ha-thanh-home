@@ -56,11 +56,20 @@ export function ServicePageEditor({ page, roles }: { page: ServicePageRegistryIt
             <a className="secondary-button" href={`${webBase}${page.route}`} target="_blank" rel="noreferrer">
               <ExternalLink size={16} /> Xem website
             </a>
-            {!hasDedicatedEditor ? (
+            {hasDedicatedEditor ? (
+              <button
+                className="primary-button"
+                type="submit"
+                form={`${page.slug}-editor-form`}
+                disabled={!(roles.includes("Super Admin") || roles.includes("Admin"))}
+              >
+                <Save size={16} /> Lưu thay đổi
+              </button>
+            ) : (
               <button className="primary-button" type="button" disabled title="Form lưu sẽ có ở phase sau">
                 <Save size={16} /> Lưu thay đổi
               </button>
-            ) : null}
+            )}
           </div>
         </header>
 
