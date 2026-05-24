@@ -352,7 +352,18 @@ function moneyPerM2(value: number) {
 }
 
 function shortScopeLabel(label: string) {
-  return label.split("-")[0]?.trim() || label;
+  if (label.includes("-")) {
+    return label.split("-")[0]?.trim() || label;
+  }
+  // Check if label contains a price pattern (digit + currency/unit indicator)
+  if (/\d/.test(label) && (label.includes("triệu") || label.includes("đ") || label.includes("tr/") || label.includes("đ/"))) {
+    // Find space followed by a digit or parenthesis
+    const priceMatch = label.match(/\s+[\(\d]/);
+    if (priceMatch && priceMatch.index !== undefined) {
+      return label.substring(0, priceMatch.index).trim();
+    }
+  }
+  return label;
 }
 
 function DetailedIntroSection({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
