@@ -768,7 +768,7 @@ export class AdminController {
       });
     }
     const where: Prisma.ProjectWhereInput = {
-      ...(query.group ? { group: query.group as ProjectGroup } : {}),
+      ...(query.group ? { group: { in: query.group.split(",").map((g) => g.trim() as ProjectGroup).filter(Boolean) } } : {}),
       ...(query.status ? { status: query.status as ContentStatus } : {}),
       ...(query.categoryId ? { categoryId: Number(query.categoryId) } : {}),
       ...(query.projectType ? { projectType: query.projectType } : {}),

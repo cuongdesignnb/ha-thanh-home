@@ -39,7 +39,7 @@ export class PublicController {
     const where: Prisma.ProjectWhereInput = {
       status: ContentStatus.published,
       ...(query.featured === "true" ? { isFeatured: true } : {}),
-      ...(query.group ? { group: query.group as ProjectGroup } : {}),
+      ...(query.group ? { group: { in: query.group.split(",").map((g) => g.trim() as ProjectGroup).filter(Boolean) } } : {}),
       ...(query.projectType ? { projectType: query.projectType } : {}),
       ...(query.style ? { style: query.style } : {}),
       ...(query.scale ? { scale: query.scale } : {}),

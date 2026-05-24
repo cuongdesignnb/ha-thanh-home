@@ -7,7 +7,7 @@ const apiFetch = adminApiFetch;
 
 export type ProjectsSourceValue = {
   entity?: "project" | "architecture-design" | "interior-design";
-  group?: "construction" | "interior" | "xay_nha_tron_goi";
+  group?: string;
   categorySlug?: string;
   mode?: "latest" | "featured";
   limit?: number;
@@ -48,8 +48,10 @@ export function ProjectsSourcePicker({
     onChange({ ...v, [field]: val === "" || val === undefined ? undefined : val });
   }
 
-  const filteredCategories = entity === "project" && v.group
-    ? categories.filter((c) => !c.group || c.group === v.group)
+  const selectedGroups = v.group ? v.group.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+  const filteredCategories = entity === "project" && selectedGroups.length > 0
+    ? categories.filter((c) => !c.group || selectedGroups.includes(c.group))
     : categories;
 
   const selectedSlugs = v.categorySlug ? v.categorySlug.split(",").map((s) => s.trim()).filter(Boolean) : [];
@@ -69,18 +71,6 @@ export function ProjectsSourcePicker({
             <option value="interior-design">Mẫu thiết kế nội thất</option>
           </select>
         </label>
-
-        {entity === "project" ? (
-          <label>
-            Nhóm dự án
-            <select value={v.group || ""} onChange={(e) => patch("group", (e.target.value || undefined) as ProjectsSourceValue["group"])}>
-              <option value="">Tất cả nhóm</option>
-              <option value="construction">Công trình</option>
-              <option value="interior">Nội thất</option>
-              <option value="xay_nha_tron_goi">Xây nhà trọn gói</option>
-            </select>
-          </label>
-        ) : null}
 
         {entity !== "project" ? (
           <label>
@@ -107,6 +97,38 @@ export function ProjectsSourcePicker({
             onChange={(e) => patch("limit", Number(e.target.value) || undefined)}
           />
         </label>
+
+        {entity === "project" ? (
+          <div className="projects-source-groups-container">
+            <span className="picker-label">Nhóm dự án</span>
+            <div className="picker-checkbox-grid">
+              {[
+                { label: "Công trình", value: "construction" },
+                { label: "Nội thất", value: "interior" },
+                { label: "Xây nhà trọn gói", value: "xay_nha_tron_goi" },
+              ].map((grp) => {
+                const isChecked = selectedGroups.includes(grp.value);
+                return (
+                  <label key={grp.value} className="picker-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const nextGroups = e.target.checked
+                          ? [...selectedGroups, grp.value]
+                          : selectedGroups.filter((g) => g !== grp.value);
+                        const joined = nextGroups.join(",");
+                        onChange({ ...v, group: joined || undefined, categorySlug: undefined });
+                      }}
+                    />
+                    <span>{grp.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <small className="picker-help">Chọn một hoặc nhiều nhóm. Để trống để lấy tất cả các nhóm.</small>
+          </div>
+        ) : null}
 
         {entity === "project" ? (
           <div className="projects-source-categories-container">

@@ -3224,6 +3224,7 @@ select {
 }
 
 /* Projects Source Picker Custom Styling */
+.projects-source-groups-container,
 .projects-source-categories-container {
   grid-column: 1 / -1;
   display: flex;
