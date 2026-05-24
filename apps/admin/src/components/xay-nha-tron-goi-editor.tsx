@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { adminApiFetch } from "@/lib/client-path";
 import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
 import { LandingAdvancedEditor, type LandingAdvancedData } from "@/components/landing-advanced-editor";
+import { ProjectsSourcePicker, type ProjectsSourceValue } from "@/components/projects-source-picker";
+
 
 const apiFetch = adminApiFetch;
 
@@ -91,6 +93,7 @@ type XayNhaValues = {
   finalTitle: string;
   finalDescription: string;
   advancedData: LandingAdvancedData;
+  projectsSource: ProjectsSourceValue;
 };
 
 const defaults: XayNhaValues = {
@@ -121,7 +124,9 @@ const defaults: XayNhaValues = {
   finalTitle: "Sẵn sàng xây tổ ấm mơ ước của bạn?",
   finalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
   advancedData: xayNhaAdvancedDefaults as LandingAdvancedData,
+  projectsSource: { entity: "project", group: "construction", mode: "latest", limit: 6 },
 };
+
 
 export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
   const { notify } = useAdminFeedback();
@@ -177,6 +182,7 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
           finalTitle: String(landing.finalTitle ?? current.finalTitle),
           finalDescription: String(landing.finalDescription ?? current.finalDescription),
           advancedData: advanced as LandingAdvancedData,
+          projectsSource: (typeof landing.projectsSource === "object" && landing.projectsSource ? landing.projectsSource : current.projectsSource) as ProjectsSourceValue,
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình Xây nhà trọn gói", description: error instanceof Error ? error.message : String(error) }))
@@ -217,6 +223,7 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
       finalEyebrow: values.finalEyebrow,
       finalTitle: values.finalTitle,
       finalDescription: values.finalDescription,
+      projectsSource: values.projectsSource,
     };
 
     try {
@@ -277,6 +284,8 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
         <label>Eyebrow CTA cuối<input value={values.finalEyebrow} onChange={(e) => setValues({ ...values, finalEyebrow: e.target.value })} /></label>
         <label>Tiêu đề CTA cuối<input value={values.finalTitle} onChange={(e) => setValues({ ...values, finalTitle: e.target.value })} /></label>
         <label className="wide">Mô tả CTA cuối<textarea value={values.finalDescription} onChange={(e) => setValues({ ...values, finalDescription: e.target.value })} rows={2} /></label>
+
+        <ProjectsSourcePicker value={values.projectsSource} onChange={(next) => setValues({ ...values, projectsSource: next })} />
 
         <LandingAdvancedEditor value={values.advancedData} onChange={(next) => setValues({ ...values, advancedData: next })} />
       </div>
