@@ -76,8 +76,8 @@ type XayNhaValues = {
   introTitle: string;
   introDescription: string;
   introImageUrl: string;
-  projectSectionEyebrow: string;
-  projectSectionTitle: string;
+  projectsEyebrow: string;
+  projectsTitle: string;
   estimateEyebrow: string;
   estimateTitle: string;
   estimateNote: string;
@@ -111,8 +111,8 @@ const defaults: XayNhaValues = {
   introTitle: "Xây tổ ấm bền vững. An tâm từ đầu đến cuối",
   introDescription: "Dịch vụ xây nhà trọn gói của Hà Thành Home bao gồm toàn bộ quy trình từ khảo sát, thiết kế, xin phép, thi công phần thô, hoàn thiện, bàn giao và bảo hành.",
   introImageUrl: "https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1400&q=85",
-  projectSectionEyebrow: "Dự án thực tế",
-  projectSectionTitle: "Dự án xây nhà tiêu biểu",
+  projectsEyebrow: "Dự án thực tế",
+  projectsTitle: "Dự án xây nhà tiêu biểu",
   estimateEyebrow: "Dự toán chi phí xây nhà",
   estimateTitle: "Tham khảo chi phí xây nhà trọn gói",
   estimateNote: "Chi phí phụ thuộc diện tích, phong cách, vật tư và điều kiện thi công thực tế.",
@@ -173,8 +173,8 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
           introTitle: String(landing.introTitle ?? current.introTitle),
           introDescription: String(landing.introDescription ?? current.introDescription),
           introImageUrl: String(landing.introImageUrl ?? current.introImageUrl),
-          projectSectionEyebrow: String(landing.projectSectionEyebrow ?? current.projectSectionEyebrow),
-          projectSectionTitle: String(landing.projectSectionTitle ?? current.projectSectionTitle),
+          projectsEyebrow: String(landing.projectsEyebrow ?? landing.projectSectionEyebrow ?? current.projectsEyebrow),
+          projectsTitle: String(landing.projectsTitle ?? landing.projectSectionTitle ?? current.projectsTitle),
           estimateEyebrow: String(landing.estimateEyebrow ?? current.estimateEyebrow),
           estimateTitle: String(landing.estimateTitle ?? current.estimateTitle),
           estimateNote: String(landing.estimateNote ?? current.estimateNote),
@@ -219,8 +219,8 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
       introTitle: values.introTitle,
       introDescription: values.introDescription,
       introImageUrl: values.introImageUrl,
-      projectSectionEyebrow: values.projectSectionEyebrow,
-      projectSectionTitle: values.projectSectionTitle,
+      projectsEyebrow: values.projectsEyebrow,
+      projectsTitle: values.projectsTitle,
       estimateEyebrow: values.estimateEyebrow,
       estimateTitle: values.estimateTitle,
       estimateNote: values.estimateNote,
@@ -286,8 +286,8 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
         <label>Link nút CTA<input value={values.detailedIntroCtaUrl} onChange={(e) => setValues({ ...values, detailedIntroCtaUrl: e.target.value })} /></label>
         <ImageUrlPicker label="Ảnh giới thiệu chi tiết" value={values.detailedIntroImageUrl} onChange={(v) => setValues({ ...values, detailedIntroImageUrl: v })} />
 
-        <label>Eyebrow dự án<input value={values.projectSectionEyebrow} onChange={(e) => setValues({ ...values, projectSectionEyebrow: e.target.value })} /></label>
-        <label>Tiêu đề dự án<input value={values.projectSectionTitle} onChange={(e) => setValues({ ...values, projectSectionTitle: e.target.value })} /></label>
+        <label>Eyebrow dự án<input value={values.projectsEyebrow} onChange={(e) => setValues({ ...values, projectsEyebrow: e.target.value })} /></label>
+        <label>Tiêu đề dự án<input value={values.projectsTitle} onChange={(e) => setValues({ ...values, projectsTitle: e.target.value })} /></label>
 
         <label>Eyebrow dự toán<input value={values.estimateEyebrow} onChange={(e) => setValues({ ...values, estimateEyebrow: e.target.value })} /></label>
         <label>Tiêu đề dự toán<input value={values.estimateTitle} onChange={(e) => setValues({ ...values, estimateTitle: e.target.value })} /></label>
