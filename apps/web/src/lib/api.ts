@@ -226,11 +226,23 @@ export type XayNhaLanding = {
   testimonials?: LandingTestimonial[];
   faqs?: LandingFaq[];
   projectsSource?: LandingProjectsSource;
+  detailedIntroHtml?: string;
+  detailedIntroCtaLabel?: string;
+  detailedIntroCtaUrl?: string;
+  detailedIntroImageUrl?: string;
 };
 
 export type NoiThatLanding = XayNhaLanding;
 export type NhaXuongLanding = XayNhaLanding;
 export type VanPhongLanding = XayNhaLanding;
+
+export type LandingWithDefaults<T> = Omit<Required<T>, "projectsSource" | "detailedIntroHtml" | "detailedIntroCtaLabel" | "detailedIntroCtaUrl" | "detailedIntroImageUrl"> & {
+  projectsSource?: LandingProjectsSource;
+  detailedIntroHtml?: string;
+  detailedIntroCtaLabel?: string;
+  detailedIntroCtaUrl?: string;
+  detailedIntroImageUrl?: string;
+};
 
 export type SiteSettings = {
   "site.identity"?: SiteIdentity;
@@ -440,7 +452,7 @@ export const defaultHomepage: Required<Pick<SiteHomepage, "heroSlides" | "aboutB
   newsTitle: "Tin tức & cảm hứng",
 };
 
-export const defaultXayNhaLanding: Omit<Required<XayNhaLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
+export const defaultXayNhaLanding: LandingWithDefaults<XayNhaLanding> = {
   heroEyebrow: "Xây nhà trọn gói",
   heroTitle: "Giải pháp xây nhà trọn gói từ thiết kế đến bàn giao",
   heroDescription: "Hà Thành Home cung cấp giải pháp xây nhà trọn gói toàn diện, đảm bảo chất lượng - tiến độ - minh bạch chi phí - bảo hành dài hạn.",
@@ -471,6 +483,10 @@ export const defaultXayNhaLanding: Omit<Required<XayNhaLanding>, "projectsSource
   finalEyebrow: "Bắt đầu cùng Hà Thành Home",
   finalTitle: "Sẵn sàng xây tổ ấm mơ ước của bạn?",
   finalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
+  detailedIntroHtml: "<p>Hà Thành Home tự hào là đơn vị cung cấp giải pháp xây nhà trọn gói toàn diện, với quy trình làm việc khép kín từ khâu tư vấn thiết kế, xin phép xây dựng, thi công phần thô đến hoàn thiện chìa khóa trao tay. Chúng tôi luôn cam kết tối ưu hóa chi phí cho khách hàng, sử dụng vật liệu đúng chủng loại, đảm bảo tiến độ và chất lượng thi công đạt chuẩn kỹ thuật cao nhất.</p><blockquote><p><strong>Cam kết từ Hà Thành Home:</strong> Không bán thầu, không phát sinh chi phí ngoài hợp đồng, bảo hành kết cấu lên đến 10 năm.</p></blockquote>",
+  detailedIntroCtaLabel: "Nhận báo giá & tư vấn chi tiết",
+  detailedIntroCtaUrl: "#du-toan-chi-phi",
+  detailedIntroImageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1200&q=80",
   benefits: [
     { title: "Thiết kế đồng bộ", description: "Đẹp - công năng - bền vững" },
     { title: "Tối ưu chi phí", description: "Minh bạch, hạn chế phát sinh" },
@@ -769,7 +785,7 @@ function mergeList<T>(value: T[] | undefined, fallback: T[]) {
   return Array.isArray(value) && value.length ? value : fallback;
 }
 
-export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Omit<Required<XayNhaLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
+export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): LandingWithDefaults<XayNhaLanding> {
   return {
     ...defaultXayNhaLanding,
     ...(landing || {}),
@@ -784,7 +800,7 @@ export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): Omit<Require
   };
 }
 
-export const defaultNoiThatLanding: Omit<Required<NoiThatLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
+export const defaultNoiThatLanding: LandingWithDefaults<NoiThatLanding> = {
   heroEyebrow: "Sản xuất thi công nội thất",
   heroTitle: "Sản xuất & thi công nội thất trọn gói",
   heroDescription: "Hà Thành Home cung cấp giải pháp nội thất trọn gói — từ thiết kế, sản xuất tại xưởng đến thi công hoàn thiện, mang đến không gian sống tinh tế và bền vững.",
@@ -875,7 +891,7 @@ export const defaultNoiThatLanding: Omit<Required<NoiThatLanding>, "projectsSour
   ],
 };
 
-export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Omit<Required<NoiThatLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
+export function noiThatLandingWithDefaults(landing?: NoiThatLanding): LandingWithDefaults<NoiThatLanding> {
   return {
     ...defaultNoiThatLanding,
     ...(landing || {}),
@@ -890,7 +906,7 @@ export function noiThatLandingWithDefaults(landing?: NoiThatLanding): Omit<Requi
   };
 }
 
-export const defaultNhaXuongLanding: Omit<Required<NhaXuongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
+export const defaultNhaXuongLanding: LandingWithDefaults<NhaXuongLanding> = {
   heroEyebrow: "Thi công nhà xưởng",
   heroTitle: "Giải pháp thi công nhà xưởng trọn gói",
   heroDescription: "Hà Thành Home cung cấp giải pháp thi công nhà xưởng trọn gói — từ tư vấn, thiết kế, sản xuất cấu kiện đến thi công hoàn thiện, bàn giao đúng tiến độ.",
@@ -983,7 +999,7 @@ export const defaultNhaXuongLanding: Omit<Required<NhaXuongLanding>, "projectsSo
   ],
 };
 
-export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Omit<Required<NhaXuongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
+export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): LandingWithDefaults<NhaXuongLanding> {
   return {
     ...defaultNhaXuongLanding,
     ...(landing || {}),
@@ -998,7 +1014,7 @@ export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): Omit<Req
   };
 }
 
-export const defaultVanPhongLanding: Omit<Required<VanPhongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } = {
+export const defaultVanPhongLanding: LandingWithDefaults<VanPhongLanding> = {
   heroEyebrow: "Thi công nội thất văn phòng",
   heroTitle: "Kiến tạo không gian làm việc hiện đại",
   heroDescription: "Hà Thành Home đồng hành cùng doanh nghiệp trong thi công nội thất văn phòng trọn gói, đảm bảo chất lượng – tiến độ – thẩm mỹ, kiến tạo môi trường làm việc truyền cảm hứng và hiệu quả.",
@@ -1090,7 +1106,7 @@ export const defaultVanPhongLanding: Omit<Required<VanPhongLanding>, "projectsSo
   ],
 };
 
-export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): Omit<Required<VanPhongLanding>, "projectsSource"> & { projectsSource?: LandingProjectsSource } {
+export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): LandingWithDefaults<VanPhongLanding> {
   return {
     ...defaultVanPhongLanding,
     ...(landing || {}),

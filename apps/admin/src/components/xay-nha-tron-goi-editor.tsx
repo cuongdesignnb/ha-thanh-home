@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { adminApiFetch } from "@/lib/client-path";
-import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
+import { ImageUrlPicker, useAdminFeedback, RichTextField } from "@/components/admin-app";
 import { LandingAdvancedEditor, type LandingAdvancedData } from "@/components/landing-advanced-editor";
 import { ProjectsSourcePicker, type ProjectsSourceValue } from "@/components/projects-source-picker";
 
@@ -94,6 +94,10 @@ type XayNhaValues = {
   finalDescription: string;
   advancedData: LandingAdvancedData;
   projectsSource: ProjectsSourceValue;
+  detailedIntroHtml: string;
+  detailedIntroCtaLabel: string;
+  detailedIntroCtaUrl: string;
+  detailedIntroImageUrl: string;
 };
 
 const defaults: XayNhaValues = {
@@ -125,6 +129,10 @@ const defaults: XayNhaValues = {
   finalDescription: "Hà Thành Home đồng hành cùng bạn kiến tạo ngôi nhà bền vững - đẹp - tiện nghi.",
   advancedData: xayNhaAdvancedDefaults as LandingAdvancedData,
   projectsSource: { entity: "project", group: "construction", mode: "latest", limit: 6 },
+  detailedIntroHtml: "<p>Hà Thành Home tự hào là đơn vị cung cấp giải pháp xây nhà trọn gói toàn diện, với quy trình làm việc khép kín từ khâu tư vấn thiết kế, xin phép xây dựng, thi công phần thô đến hoàn thiện chìa khóa trao tay. Chúng tôi luôn cam kết tối ưu hóa chi phí cho khách hàng, sử dụng vật liệu đúng chủng loại, đảm bảo tiến độ và chất lượng thi công đạt chuẩn kỹ thuật cao nhất.</p><blockquote><p><strong>Cam kết từ Hà Thành Home:</strong> Không bán thầu, không phát sinh chi phí ngoài hợp đồng, bảo hành kết cấu lên đến 10 năm.</p></blockquote>",
+  detailedIntroCtaLabel: "Nhận báo giá & tư vấn chi tiết",
+  detailedIntroCtaUrl: "#du-toan-chi-phi",
+  detailedIntroImageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1200&q=80",
 };
 
 
@@ -183,6 +191,10 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
           finalDescription: String(landing.finalDescription ?? current.finalDescription),
           advancedData: advanced as LandingAdvancedData,
           projectsSource: (typeof landing.projectsSource === "object" && landing.projectsSource ? landing.projectsSource : current.projectsSource) as ProjectsSourceValue,
+          detailedIntroHtml: String(landing.detailedIntroHtml ?? current.detailedIntroHtml),
+          detailedIntroCtaLabel: String(landing.detailedIntroCtaLabel ?? current.detailedIntroCtaLabel),
+          detailedIntroCtaUrl: String(landing.detailedIntroCtaUrl ?? current.detailedIntroCtaUrl),
+          detailedIntroImageUrl: String(landing.detailedIntroImageUrl ?? current.detailedIntroImageUrl),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình Xây nhà trọn gói", description: error instanceof Error ? error.message : String(error) }))
@@ -224,6 +236,10 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
       finalTitle: values.finalTitle,
       finalDescription: values.finalDescription,
       projectsSource: values.projectsSource,
+      detailedIntroHtml: values.detailedIntroHtml,
+      detailedIntroCtaLabel: values.detailedIntroCtaLabel,
+      detailedIntroCtaUrl: values.detailedIntroCtaUrl,
+      detailedIntroImageUrl: values.detailedIntroImageUrl,
     };
 
     try {
@@ -261,6 +277,14 @@ export function XayNhaTronGoiEditor({ roles }: { roles: string[] }) {
         <label className="wide">Tiêu đề giới thiệu<textarea value={values.introTitle} onChange={(e) => setValues({ ...values, introTitle: e.target.value })} rows={2} /></label>
         <label className="wide">Mô tả giới thiệu<textarea value={values.introDescription} onChange={(e) => setValues({ ...values, introDescription: e.target.value })} rows={3} /></label>
         <ImageUrlPicker label="Ảnh giới thiệu" value={values.introImageUrl} onChange={(v) => setValues({ ...values, introImageUrl: v })} />
+
+        <div className="form-section-title wide">Giới thiệu chi tiết (Rich Text / Editor)</div>
+        <div className="wide">
+          <RichTextField value={values.detailedIntroHtml} onChange={(v) => setValues({ ...values, detailedIntroHtml: v })} />
+        </div>
+        <label>Chữ hiển thị nút CTA<input value={values.detailedIntroCtaLabel} onChange={(e) => setValues({ ...values, detailedIntroCtaLabel: e.target.value })} /></label>
+        <label>Link nút CTA<input value={values.detailedIntroCtaUrl} onChange={(e) => setValues({ ...values, detailedIntroCtaUrl: e.target.value })} /></label>
+        <ImageUrlPicker label="Ảnh giới thiệu chi tiết" value={values.detailedIntroImageUrl} onChange={(v) => setValues({ ...values, detailedIntroImageUrl: v })} />
 
         <label>Eyebrow dự án<input value={values.projectSectionEyebrow} onChange={(e) => setValues({ ...values, projectSectionEyebrow: e.target.value })} /></label>
         <label>Tiêu đề dự án<input value={values.projectSectionTitle} onChange={(e) => setValues({ ...values, projectSectionTitle: e.target.value })} /></label>

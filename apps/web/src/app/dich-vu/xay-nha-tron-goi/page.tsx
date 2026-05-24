@@ -84,6 +84,7 @@ export default async function XayNhaTronGoiPage() {
         <XayNhaHero landing={landing} />
         <BenefitStrip items={landing.benefits} />
         <ServiceIntro landing={landing} />
+        <DetailedIntroSection landing={landing} />
         <ScopeSection landing={landing} />
         <ProcessTimeline landing={landing} />
         <ProjectShowcase projects={projects} landing={landing} />
@@ -352,4 +353,36 @@ function moneyPerM2(value: number) {
 
 function shortScopeLabel(label: string) {
   return label.split("-")[0]?.trim() || label;
+}
+
+function DetailedIntroSection({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
+  if (!landing.detailedIntroHtml) return null;
+
+  const hasImage = !!landing.detailedIntroImageUrl;
+
+  return (
+    <section className="section detailed-intro-section">
+      <div className={`container xay-nha-detailed-intro ${hasImage ? "has-image" : ""}`}>
+        <div className="detailed-intro-text">
+          <div className="detail-content" dangerouslySetInnerHTML={{ __html: landing.detailedIntroHtml }} />
+          {landing.detailedIntroCtaLabel && landing.detailedIntroCtaUrl && (
+            <div className="detailed-intro-actions">
+              <a className="cta" href={landing.detailedIntroCtaUrl}>
+                {landing.detailedIntroCtaLabel} <ArrowRight size={18} />
+              </a>
+            </div>
+          )}
+        </div>
+        {hasImage && (
+          <div className="detailed-intro-image-container">
+            <div
+              className="detailed-intro-image"
+              style={{ backgroundImage: `url(${landing.detailedIntroImageUrl})` }}
+              aria-label="Hình ảnh giới thiệu xây nhà trọn gói"
+            />
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }

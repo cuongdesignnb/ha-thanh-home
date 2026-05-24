@@ -2888,7 +2888,7 @@ function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<s
   );
 }
 
-function RichTextField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function RichTextField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const editor = useEditor({
     extensions: [StarterKit, Underline, Link.configure({ openOnClick: false }), ImageExtension.configure({ inline: false, allowBase64: false }), Placeholder.configure({ placeholder: "Soạn nội dung chi tiết..." })],
