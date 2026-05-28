@@ -1652,6 +1652,8 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     openaiImageModel: "gpt-image-2",
     imageProvider: "openai",
     geminiApiKey: "",
+    logoUrl: "",
+    faviconUrl: "",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1679,6 +1681,8 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           facebook: String(identity.facebook || ""),
           zalo: String(identity.zalo || ""),
           workingHours: String(identity.workingHours || ""),
+          logoUrl: String(identity.logoUrl || ""),
+          faviconUrl: String(identity.faviconUrl || ""),
           forestGreen: String(theme.forestGreen || current.forestGreen),
           gold: String(theme.gold || current.gold),
           cream: String(theme.cream || current.cream),
@@ -1727,6 +1731,8 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     const identity = {
       name: values.name,
       tagline: values.tagline,
+      logoUrl: values.logoUrl,
+      faviconUrl: values.faviconUrl,
       hotline: values.hotline,
       email: values.email,
       address: values.address,
@@ -1842,6 +1848,8 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
         <form className="cms-form two-columns" onSubmit={submit}>
           <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
           <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
+          <LogoPickerField label="Logo thương hiệu chính" value={values.logoUrl || ""} onChange={(url) => setValues({ ...values, logoUrl: url })} />
+          <LogoPickerField label="Favicon website (Biểu tượng thanh địa chỉ)" value={values.faviconUrl || ""} onChange={(url) => setValues({ ...values, faviconUrl: url })} />
           <label>Hotline<input value={values.hotline} onChange={(event) => setValues({ ...values, hotline: event.target.value })} placeholder="0966 123 456" /></label>
           <label>Email<input value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} placeholder="info@hathanhhome.vn" /></label>
           <label className="wide">Địa chỉ<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="Số 123 Nguyễn Trãi, Hà Nội" /></label>
@@ -1957,7 +1965,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
         </form>
       </article>
       <aside className="panel settings-preview">
-        <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
+        {values.logoUrl ? (
+          <img src={values.logoUrl} alt="Logo Preview" style={{ maxHeight: "60px", maxWidth: "160px", objectFit: "contain", marginBottom: "16px", background: "white", padding: "4px", borderRadius: "4px", border: "1px solid var(--admin-line, #e5e5e5)" }} />
+        ) : (
+          <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
+        )}
         <h2>{values.name || "Hà Thành Home"}</h2>
         <p>{values.tagline || "Thiết kế - Thi công - Nội thất"}</p>
         <div className="theme-preview-strip">
