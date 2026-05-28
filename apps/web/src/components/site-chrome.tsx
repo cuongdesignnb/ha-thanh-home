@@ -20,11 +20,17 @@ export async function SiteHeader() {
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="/">
-          <Building2 className="brand-mark" strokeWidth={1.5} />
-          <span>
-            <span className="brand-name">{identity.name}</span>
-            <span className="brand-tagline">{identity.tagline}</span>
-          </span>
+          {identity.logoUrl ? (
+            <img src={identity.logoUrl} alt={identity.name} style={{ height: "45px", width: "auto", objectFit: "contain", display: "block" }} />
+          ) : (
+            <>
+              <Building2 className="brand-mark" strokeWidth={1.5} />
+              <span>
+                <span className="brand-name">{identity.name}</span>
+                <span className="brand-tagline">{identity.tagline}</span>
+              </span>
+            </>
+          )}
         </a>
         <nav className="nav" aria-label="Menu chính">
           {menu.items.map((item) => <HeaderMenuItem item={item} key={item.id} />)}
@@ -61,8 +67,14 @@ export async function SiteFooter() {
       <div className="container footer-top">
         <div className="footer-brand">
           <a className="footer-logo" href="/">
-            <Building2 strokeWidth={1.5} />
-            <span>{identity.name}</span>
+            {identity.logoUrl ? (
+              <img src={identity.logoUrl} alt={identity.name} style={{ height: "48px", width: "auto", objectFit: "contain", display: "block", marginBottom: "8px" }} />
+            ) : (
+              <>
+                <Building2 strokeWidth={1.5} />
+                <span>{identity.name}</span>
+              </>
+            )}
           </a>
           <p>{identity.tagline} chuyên nghiệp, kiến tạo không gian sống và công trình đẳng cấp.</p>
           <div className="footer-socials">

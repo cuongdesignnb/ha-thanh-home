@@ -118,6 +118,9 @@ export default async function RootLayout({
     <html lang="vi" className={`${heading.variable} ${body.variable} ${playfair.variable} ${beVietnam.variable} ${roboto.variable}`}>
       <head>
         <style id="hathanh-theme" dangerouslySetInnerHTML={{ __html: themeCss(settings["site.theme"]) }} />
+        {settings["site.identity"]?.faviconUrl ? (
+          <link rel="icon" href={settings["site.identity"].faviconUrl} />
+        ) : null}
       </head>
       <body>
         <ThemeRuntimeSync />

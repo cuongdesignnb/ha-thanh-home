@@ -1974,6 +1974,50 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
   );
 }
 
+function LogoPickerField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  function selectMedia(media: CmsItem) {
+    const url = String(media.largeUrl || media.webpUrl || media.mediumUrl || media.thumbUrl || "");
+    onChange(url);
+    setPickerOpen(false);
+  }
+
+  return (
+    <div className="form-field logo-picker-field" style={{ gridColumn: "1 / -1", marginBottom: "8px" }}>
+      <span style={{ fontWeight: 500, fontSize: "14px", display: "block", marginBottom: "6px" }}>{label}</span>
+      <div className="thumbnail-picker" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        {value ? (
+          <img src={value} alt={label} style={{ maxHeight: "80px", maxWidth: "200px", objectFit: "contain", border: "1px solid var(--admin-line, #e5e5e5)", padding: "4px", borderRadius: "4px", background: "white" }} />
+        ) : (
+          <div className="thumbnail-empty" style={{ border: "1px dashed var(--admin-gold, #c5a880)", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", width: "120px", height: "80px", background: "#f9f6f0" }}>
+            <ImagePlus size={20} style={{ color: "var(--admin-gold)" }} />
+          </div>
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <button className="secondary-button" onClick={() => setPickerOpen(true)} type="button">
+            <ImagePlus size={14} /> Chọn ảnh từ thư viện
+          </button>
+          {value ? (
+            <button className="secondary-button danger" onClick={() => onChange("")} type="button">
+              Xóa ảnh
+            </button>
+          ) : null}
+        </div>
+      </div>
+      {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={selectMedia} /> : null}
+    </div>
+  );
+}
+
 function SettingsPanel({ roles }: { roles: string[] }) {
   const { notify } = useAdminFeedback();
   const [values, setValues] = useState<Record<string, string>>({
@@ -1985,6 +2029,8 @@ function SettingsPanel({ roles }: { roles: string[] }) {
     facebook: "",
     zalo: "",
     workingHours: "",
+    logoUrl: "",
+    faviconUrl: "",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -2007,6 +2053,8 @@ function SettingsPanel({ roles }: { roles: string[] }) {
           facebook: String(identity.facebook || ""),
           zalo: String(identity.zalo || ""),
           workingHours: String(identity.workingHours || ""),
+          logoUrl: String(identity.logoUrl || ""),
+          faviconUrl: String(identity.faviconUrl || ""),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
@@ -2049,6 +2097,8 @@ function SettingsPanel({ roles }: { roles: string[] }) {
         <form className="cms-form two-columns" onSubmit={submit}>
           <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
           <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
+          <LogoPickerField label="Logo thương hiệu chính" value={values.logoUrl || ""} onChange={(url) => setValues({ ...values, logoUrl: url })} />
+          <LogoPickerField label="Favicon website (Biểu tượng thanh địa chỉ)" value={values.faviconUrl || ""} onChange={(url) => setValues({ ...values, faviconUrl: url })} />
           <label>Hotline<input value={values.hotline} onChange={(event) => setValues({ ...values, hotline: event.target.value })} placeholder="0966 123 456" /></label>
           <label>Email<input value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} placeholder="info@hathanhhome.vn" /></label>
           <label className="wide">Địa chỉ<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="Số 123 Nguyễn Trãi, Hà Nội" /></label>
@@ -2061,7 +2111,11 @@ function SettingsPanel({ roles }: { roles: string[] }) {
         </form>
       </article>
       <aside className="panel settings-preview">
-        <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
+        {values.logoUrl ? (
+          <img src={values.logoUrl} alt="Logo Preview" style={{ maxHeight: "60px", maxWidth: "160px", objectFit: "contain", marginBottom: "16px", background: "white", padding: "4px", borderRadius: "4px", border: "1px solid var(--admin-line, #e5e5e5)" }} />
+        ) : (
+          <span className="admin-brand-mark"><Building2 size={28} strokeWidth={1.6} /></span>
+        )}
         <h2>{values.name || "Hà Thành Home"}</h2>
         <p>{values.tagline || "Thiết kế - Thi công - Nội thất"}</p>
         <dl>

@@ -96,6 +96,8 @@ export type SiteIdentity = {
   facebook?: string;
   zalo?: string;
   workingHours?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
 };
 
 export type SiteTheme = {
