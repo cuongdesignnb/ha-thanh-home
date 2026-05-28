@@ -162,18 +162,9 @@ export class AiController {
     const aiSettingRecord = await this.prisma.setting.findUnique({ where: { key: "site.ai" } });
     const aiSetting = (aiSettingRecord?.value as Record<string, string>) || {};
 
-    const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
-    const model = aiSetting.openaiImageModel || process.env.OPENAI_IMAGE_MODEL || process.env.OPENAI_MODEL_IMAGE;
     const provider = aiSetting.imageProvider || process.env.IMAGE_PROVIDER || "openai";
-    if (provider !== "openai") {
-      throw new BadRequestException("AI image generation currently supports IMAGE_PROVIDER=openai");
-    }
-    if (!apiKey) {
-      throw new BadRequestException("OPENAI_API_KEY is not configured");
-    }
-    if (!model) {
-      throw new BadRequestException("OPENAI_IMAGE_MODEL or OPENAI_MODEL_IMAGE is not configured");
-    }
+    const model = aiSetting.openaiImageModel || process.env.OPENAI_IMAGE_MODEL || process.env.OPENAI_MODEL_IMAGE || "gpt-image-2";
+
     if (!dto.prompt.trim()) {
       throw new BadRequestException("Image prompt is required");
     }
@@ -185,32 +176,108 @@ export class AiController {
       size: dto.size || "1536x1024",
       quality: dto.quality || "medium",
     };
+
     let status = "success";
     let output: unknown = null;
+    let imageBuffer: Buffer;
+
     try {
-      const response = await fetch("https://api.openai.com/v1/images/generations", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          prompt,
-          size: input.size,
-          quality: input.quality,
-          n: 1,
-          output_format: "png",
-        }),
-      });
-      const data = await response.json() as Record<string, unknown>;
-      if (!response.ok) {
-        status = "error";
-        output = data;
-        throw new BadRequestException(readOpenAiError(data));
+      if (provider === "gemini") {
+        const geminiApiKey = aiSetting.geminiApiKey || process.env.GEMINI_API_KEY;
+        if (!geminiApiKey) {
+          throw new BadRequestException("GEMINI_API_KEY is not configured");
+        }
+
+        const isImagen = model.startsWith("imagen-");
+        if (isImagen) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict?key=${geminiApiKey}`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              instances: [
+                {
+                  prompt,
+                },
+              ],
+              parameters: {
+                sampleCount: 1,
+                aspectRatio: dto.size === "1536x1024" ? "3:2" : dto.size === "1024x1536" ? "2:3" : "1:1",
+              },
+            }),
+          });
+          const data = await response.json() as Record<string, any>;
+          if (!response.ok) {
+            throw new Error(data.error?.message || "Gemini Imagen prediction failed");
+          }
+          const base64Image = data.predictions?.[0]?.bytesBase64Encoded;
+          if (!base64Image) {
+            throw new Error("Gemini response did not contain image data");
+          }
+          imageBuffer = Buffer.from(base64Image, "base64");
+        } else {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: prompt,
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+              },
+            }),
+          });
+          const data = await response.json() as Record<string, any>;
+          if (!response.ok) {
+            throw new Error(data.error?.message || "Gemini content generation failed");
+          }
+          const base64Image = data.candidates?.[0]?.content?.parts?.[0]?.inline_data?.data;
+          if (!base64Image) {
+            throw new Error("Gemini response did not contain inline image data");
+          }
+          imageBuffer = Buffer.from(base64Image, "base64");
+        }
+      } else {
+        // OpenAI (ChatGPT / DALL-E)
+        const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
+        if (!apiKey) {
+          throw new BadRequestException("OPENAI_API_KEY is not configured");
+        }
+
+        const response = await fetch("https://api.openai.com/v1/images/generations", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            prompt,
+            size: input.size,
+            quality: input.quality,
+            n: 1,
+            output_format: "png",
+          }),
+        });
+        const data = await response.json() as Record<string, unknown>;
+        if (!response.ok) {
+          throw new Error(readOpenAiError(data));
+        }
+        imageBuffer = await readImageBuffer(data);
       }
 
-      const imageBuffer = await readImageBuffer(data);
       const media = await this.saveGeneratedImage(imageBuffer, {
         originalName: `${dto.topic || dto.altText || "ai-hathanh-image"}.png`,
         altText: dto.altText || dto.topic || dto.prompt.slice(0, 120),
@@ -230,8 +297,9 @@ export class AiController {
       return output;
     } catch (error) {
       status = "error";
-      if (!output) output = { message: error instanceof Error ? error.message : "Unknown AI image error" };
-      throw error;
+      const errMsg = error instanceof Error ? error.message : "Unknown AI image error";
+      output = { message: errMsg };
+      throw new BadRequestException(errMsg);
     } finally {
       await this.prisma.aiGeneration.create({
         data: {

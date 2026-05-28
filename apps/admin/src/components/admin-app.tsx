@@ -1647,10 +1647,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     testimonialsTitle: "Khách hàng nói gì về chúng tôi",
     newsTitle: "Tin tức & cảm hứng",
     openaiApiKey: "",
-    openaiModelWriter: "gpt-4o-mini",
-    openaiModelFast: "gpt-4o-mini",
-    openaiImageModel: "dall-e-3",
+    openaiModelWriter: "gpt-5.4-mini",
+    openaiModelFast: "gpt-5.4-mini",
+    openaiImageModel: "gpt-image-2",
     imageProvider: "openai",
+    geminiApiKey: "",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1709,10 +1710,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           testimonialsTitle: String(homepage.testimonialsTitle || current.testimonialsTitle),
           newsTitle: String(homepage.newsTitle || current.newsTitle),
           openaiApiKey: String(ai.openaiApiKey || ""),
-          openaiModelWriter: String(ai.openaiModelWriter || "gpt-4o-mini"),
-          openaiModelFast: String(ai.openaiModelFast || "gpt-4o-mini"),
-          openaiImageModel: String(ai.openaiImageModel || "dall-e-3"),
+          openaiModelWriter: String(ai.openaiModelWriter || "gpt-5.4-mini"),
+          openaiModelFast: String(ai.openaiModelFast || "gpt-5.4-mini"),
+          openaiImageModel: String(ai.openaiImageModel || "gpt-image-2"),
           imageProvider: String(ai.imageProvider || "openai"),
+          geminiApiKey: String(ai.geminiApiKey || ""),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
@@ -1786,6 +1788,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     };
     const ai = {
       openaiApiKey: values.openaiApiKey,
+      geminiApiKey: values.geminiApiKey,
       openaiModelWriter: values.openaiModelWriter,
       openaiModelFast: values.openaiModelFast,
       openaiImageModel: values.openaiImageModel,
@@ -1906,14 +1909,45 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">
               <span>Cấu hình AI</span>
-              <div><h3>Trợ lý viết bài & Sinh ảnh (OpenAI)</h3><p>Nhập API Key và cấu hình model để sử dụng AI Content Studio trực tiếp từ Admin.</p></div>
+              <div><h3>Trợ lý viết bài & Sinh ảnh (AI Content Studio)</h3><p>Nhập API Key và cấu hình model để sử dụng AI Content Studio trực tiếp từ Admin.</p></div>
             </div>
             <div className="form-grid">
               <label className="wide">OpenAI API Key<input type="password" value={values.openaiApiKey || ""} onChange={(event) => setValues({ ...values, openaiApiKey: event.target.value })} placeholder="sk-proj-..." /></label>
-              <label>Model viết bài (Writer)<input value={values.openaiModelWriter || ""} onChange={(event) => setValues({ ...values, openaiModelWriter: event.target.value })} placeholder="gpt-4o-mini" /></label>
-              <label>Model viết nhanh (Fast)<input value={values.openaiModelFast || ""} onChange={(event) => setValues({ ...values, openaiModelFast: event.target.value })} placeholder="gpt-4o-mini" /></label>
-              <label>Model sinh ảnh (DALL-E)<select value={values.openaiImageModel || "dall-e-3"} onChange={(event) => setValues({ ...values, openaiImageModel: event.target.value })}><option value="dall-e-3">DALL-E 3 (Premium)</option><option value="dall-e-2">DALL-E 2 (Standard)</option></select></label>
-              <label>Nhà cung cấp ảnh<select value={values.imageProvider || "openai"} onChange={(event) => setValues({ ...values, imageProvider: event.target.value })}><option value="openai">OpenAI (DALL-E)</option></select></label>
+              <label className="wide">Gemini API Key<input type="password" value={values.geminiApiKey || ""} onChange={(event) => setValues({ ...values, geminiApiKey: event.target.value })} placeholder="AIzaSy..." /></label>
+              <label>Model viết bài (Writer)<input value={values.openaiModelWriter || ""} onChange={(event) => setValues({ ...values, openaiModelWriter: event.target.value })} placeholder="gpt-5.4-mini" /></label>
+              <label>Model viết nhanh (Fast)<input value={values.openaiModelFast || ""} onChange={(event) => setValues({ ...values, openaiModelFast: event.target.value })} placeholder="gpt-5.4-mini" /></label>
+              <label>Nhà cung cấp ảnh
+                <select
+                  value={values.imageProvider || "openai"}
+                  onChange={(event) => {
+                    const provider = event.target.value;
+                    const defaultModel = provider === "gemini" ? "gemini-3-pro-image-preview" : "gpt-image-2";
+                    setValues({ ...values, imageProvider: provider, openaiImageModel: defaultModel });
+                  }}
+                >
+                  <option value="openai">OpenAI (ChatGPT / DALL-E)</option>
+                  <option value="gemini">Google Gemini</option>
+                </select>
+              </label>
+              <label>Model sinh ảnh
+                <select
+                  value={values.openaiImageModel || (values.imageProvider === "gemini" ? "gemini-3-pro-image-preview" : "gpt-image-2")}
+                  onChange={(event) => setValues({ ...values, openaiImageModel: event.target.value })}
+                >
+                  {values.imageProvider === "gemini" ? (
+                    <>
+                      <option value="gemini-3-pro-image-preview">Gemini 3 Pro Image (Premium)</option>
+                      <option value="imagen-3.0-generate-002">Imagen 3 (Standard)</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="gpt-image-2">ChatGPT Image 2 (Premium)</option>
+                      <option value="dall-e-3">DALL-E 3 (Standard)</option>
+                      <option value="dall-e-2">DALL-E 2 (Legacy)</option>
+                    </>
+                  )}
+                </select>
+              </label>
             </div>
           </div>
 
