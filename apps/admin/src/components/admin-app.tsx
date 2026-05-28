@@ -2436,6 +2436,168 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   );
 }
 
+function PostAiGenerator({ form }: { form: ReturnType<typeof useForm<Record<string, unknown>>> }) {
+  const { notify } = useAdminFeedback();
+  const [loading, setLoading] = useState("");
+  const title = String(form.watch("title") || "").trim();
+
+  async function handleGenerate(withImage: boolean) {
+    if (!title) {
+      notify({ tone: "error", title: "Thiếu tiêu đề bài viết", description: "Vui lòng nhập tiêu đề bài viết trước khi sinh nội dung bằng AI." });
+      return;
+    }
+
+    setLoading(withImage ? "generating-all" : "generating-text");
+    try {
+      // 1. Sinh bài viết
+      notify({ tone: "info", title: "AI đang viết bài", description: "Vui lòng chờ khoảng 15-30 giây để AI tạo cấu trúc và nội dung bài viết..." });
+      
+      const response = await apiFetch("/api/cms/ai/generate-article", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: title,
+          focusKeyword: title,
+          group: "interior",
+          tone: "Chuyên gia, sang trọng, tư vấn bán hàng",
+          articleType: "Cẩm nang",
+          length: "1200 từ",
+          createDraft: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await readApiError(response, "Không sinh được nội dung bài viết."));
+      }
+
+      const payload = await response.json();
+      
+      form.setValue("contentHtml", payload.contentHtml || "");
+      form.setValue("metaTitle", payload.metaTitle || title);
+      form.setValue("metaDescription", payload.metaDescription || "");
+      form.setValue("focusKeyword", payload.focusKeyword || title);
+      form.setValue("excerpt", payload.excerpt || "");
+      if (payload.slug) {
+        form.setValue("slug", payload.slug);
+      }
+
+      // 2. Sinh ảnh đại diện nếu có yêu cầu
+      if (withImage) {
+        notify({ tone: "info", title: "AI đang sinh ảnh", description: "Đang tạo ảnh minh họa phong cách chuyên nghiệp và lưu vào Media Library..." });
+        
+        const imagePrompt = `Ảnh hero thực tế phong cách premium architecture & interior, biệt thự hiện đại với phòng khách sang trọng, ánh sáng tự nhiên, vật liệu gỗ đá cao cấp, không chữ, không logo cho chủ đề: ${title}`;
+        
+        const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: imagePrompt,
+            topic: title,
+            type: "blog",
+            size: "1536x1024",
+            quality: "medium",
+            altText: title,
+          }),
+        });
+
+        if (!imageResponse.ok) {
+          throw new Error(await readApiError(imageResponse, "Không sinh được ảnh đại diện bài viết."));
+        }
+
+        const imagePayload = await imageResponse.json();
+        const media = imagePayload.media;
+        if (media) {
+          form.setValue("thumbnailMediaId", media.id);
+          form.setValue("thumbnailMedia", media);
+          
+          // Chèn ảnh vào đầu bài viết
+          const mediaUrl = media.largeUrl || media.webpUrl || media.mediumUrl;
+          const imageHtml = `<p><img src="${mediaUrl}" alt="${title}" style="width:100%; max-width:800px; height:auto; border-radius:8px; display:block; margin: 0 auto 20px;" /></p>`;
+          form.setValue("contentHtml", imageHtml + (payload.contentHtml || ""));
+        }
+      }
+
+      notify({ tone: "success", title: "Hoàn tất sinh bài viết", description: withImage ? "Đã điền nội dung chi tiết và ảnh đại diện thành công!" : "Đã điền nội dung chi tiết thành công!" });
+    } catch (error) {
+      notify({ tone: "error", title: "AI chưa chạy được", description: error instanceof Error ? error.message : "Đã xảy ra lỗi không xác định." });
+    } finally {
+      setLoading("");
+    }
+  }
+
+  return (
+    <div className="wide ai-post-generator-card" style={{
+      gridColumn: "1 / -1",
+      background: "var(--admin-cream, #f9f6f0)",
+      border: "1px dashed var(--admin-gold, #c5a880)",
+      padding: "16px",
+      borderRadius: "8px",
+      marginTop: "8px",
+      marginBottom: "16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px"
+    }}>
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <Sparkles style={{ color: "var(--admin-forest-green, #1b4332)" }} size={18} />
+        <div>
+          <strong style={{ fontSize: "14px", color: "var(--admin-charcoal, #222)" }}>Trợ lý viết bài thông minh (AI Writer)</strong>
+          <p style={{ margin: 0, fontSize: "12px", color: "var(--admin-muted, #666)" }}>
+            Tự động soạn nội dung chi tiết, tóm tắt, từ khóa và bộ thẻ SEO Meta dựa trên Tiêu đề bài viết.
+          </p>
+        </div>
+      </div>
+      
+      {!title ? (
+        <span style={{ fontSize: "12px", color: "red" }}>⚠️ Vui lòng nhập Tiêu đề bài viết phía trên để mở khóa Trợ lý AI.</span>
+      ) : (
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
+          <button
+            type="button"
+            className="secondary-button"
+            disabled={Boolean(loading)}
+            onClick={() => handleGenerate(false)}
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <Sparkles size={14} />
+            {loading === "generating-text" ? "Đang viết bài..." : "Sinh bài viết"}
+          </button>
+          
+          <button
+            type="button"
+            className="primary-button"
+            disabled={Boolean(loading)}
+            onClick={() => handleGenerate(true)}
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <ImagePlus size={14} />
+            {loading === "generating-all" ? "Đang viết bài & sinh ảnh..." : "Sinh bài viết kèm ảnh"}
+          </button>
+        </div>
+      )}
+
+      {loading && (
+        <div style={{ fontSize: "12px", color: "var(--admin-forest-green, #1b4332)", fontWeight: "500", display: "flex", alignItems: "center", gap: "6px" }}>
+          <div className="spinner" style={{
+            width: "12px",
+            height: "12px",
+            border: "2px solid var(--admin-forest-green, #1b4332)",
+            borderTopColor: "transparent",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite"
+          }} />
+          {loading === "generating-all" ? "Hệ thống đang sinh bài viết bằng GPT-5.4-mini & sinh ảnh bằng AI (khoảng 30 giây)..." : "Hệ thống đang sinh bài viết bằng GPT-5.4-mini..."}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EntityFields({ entity, filterOptions, form, postCategories, projectCategories, onTaxonomyCreated }: { entity: Entity; filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; postCategories: CmsItem[]; projectCategories: CmsItem[]; onTaxonomyCreated?: () => void | Promise<void> }) {
   if (entity === "leads") {
     return (
@@ -2500,6 +2662,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
         <div className="form-grid">
           <label>Tiêu đề<input {...form.register("title")} placeholder="Nhập tiêu đề hiển thị" /></label>
           <label>Slug<input {...form.register("slug")} placeholder="Tự tạo nếu bỏ trống" /></label>
+          {entity === "posts" ? <PostAiGenerator form={form} /> : null}
           {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
           {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
