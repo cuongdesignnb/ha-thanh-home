@@ -2469,7 +2469,21 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
           {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
-          {entity === "projects" ? <label>Nhóm nội dung<select {...form.register("group")}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label> : null}
+          {entity === "projects" ? (
+            <label>
+              Nhóm nội dung
+              <select {...form.register("group")} disabled={!!form.watch("categoryId")}>
+                <option value="construction">Công trình</option>
+                <option value="interior">Nội thất</option>
+                <option value="xay_nha_tron_goi">Xây nhà trọn gói</option>
+              </select>
+              {!!form.watch("categoryId") && (
+                <span style={{ fontSize: "11px", color: "var(--admin-muted)", marginTop: "4px", display: "block" }}>
+                  * Tự động đồng bộ theo Danh mục dự án
+                </span>
+              )}
+            </label>
+          ) : null}
           {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "posts" ? <label>Danh mục bài viết<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{postCategories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label> : null}
           {entity === "posts" ? <label className="wide">Tóm tắt bài viết<textarea {...form.register("excerpt")} rows={3} /></label> : null}
@@ -2519,6 +2533,17 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
 
 function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreated }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; projectCategories: CmsItem[]; onTaxonomyCreated?: () => void | Promise<void> }) {
   const group = String(form.watch("group") || "construction");
+  const categoryId = form.watch("categoryId");
+
+  useEffect(() => {
+    if (categoryId) {
+      const selectedCat = projectCategories.find((c) => c.id === Number(categoryId));
+      if (selectedCat && selectedCat.group) {
+        form.setValue("group", selectedCat.group);
+      }
+    }
+  }, [categoryId, projectCategories, form]);
+
   const groupLabels: Record<string, string> = {
     construction: "Công trình",
     interior: "Nội thất",
