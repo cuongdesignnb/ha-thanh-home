@@ -159,9 +159,12 @@ export class AiController {
   @Post("generate-image")
   @Roles("Admin", "SEO Editor")
   async generateImage(@Body() dto: AiImageDto, @Req() request: Request & { user?: JwtUser }) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    const model = process.env.OPENAI_IMAGE_MODEL || process.env.OPENAI_MODEL_IMAGE;
-    const provider = process.env.IMAGE_PROVIDER || "openai";
+    const aiSettingRecord = await this.prisma.setting.findUnique({ where: { key: "site.ai" } });
+    const aiSetting = (aiSettingRecord?.value as Record<string, string>) || {};
+
+    const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
+    const model = aiSetting.openaiImageModel || process.env.OPENAI_IMAGE_MODEL || process.env.OPENAI_MODEL_IMAGE;
+    const provider = aiSetting.imageProvider || process.env.IMAGE_PROVIDER || "openai";
     if (provider !== "openai") {
       throw new BadRequestException("AI image generation currently supports IMAGE_PROVIDER=openai");
     }
@@ -260,8 +263,11 @@ export class AiController {
     schema: Record<string, unknown>;
     createdBy?: number;
   }) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    const model = process.env.OPENAI_MODEL_WRITER || process.env.OPENAI_MODEL_FAST;
+    const aiSettingRecord = await this.prisma.setting.findUnique({ where: { key: "site.ai" } });
+    const aiSetting = (aiSettingRecord?.value as Record<string, string>) || {};
+
+    const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
+    const model = aiSetting.openaiModelWriter || aiSetting.openaiModelFast || process.env.OPENAI_MODEL_WRITER || process.env.OPENAI_MODEL_FAST;
     if (!apiKey) {
       throw new BadRequestException("OPENAI_API_KEY is not configured");
     }

@@ -1646,6 +1646,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     processTitle: "Quy trình làm việc",
     testimonialsTitle: "Khách hàng nói gì về chúng tôi",
     newsTitle: "Tin tức & cảm hứng",
+    openaiApiKey: "",
+    openaiModelWriter: "gpt-4o-mini",
+    openaiModelFast: "gpt-4o-mini",
+    openaiImageModel: "dall-e-3",
+    imageProvider: "openai",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1660,6 +1665,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
         const identity = typeof payload["site.identity"] === "object" && payload["site.identity"] ? payload["site.identity"] as Record<string, unknown> : {};
         const theme = typeof payload["site.theme"] === "object" && payload["site.theme"] ? payload["site.theme"] as Record<string, unknown> : {};
         const homepage = typeof payload["site.homepage"] === "object" && payload["site.homepage"] ? payload["site.homepage"] as Record<string, unknown> : {};
+        const ai = typeof payload["site.ai"] === "object" && payload["site.ai"] ? payload["site.ai"] as Record<string, unknown> : {};
         const heroSlides = Array.isArray(homepage.heroSlides) ? homepage.heroSlides as Array<Record<string, unknown>> : [];
         const hero = heroSlides[0] || {};
         setValues((current) => ({
@@ -1702,6 +1708,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           processTitle: String(homepage.processTitle || current.processTitle),
           testimonialsTitle: String(homepage.testimonialsTitle || current.testimonialsTitle),
           newsTitle: String(homepage.newsTitle || current.newsTitle),
+          openaiApiKey: String(ai.openaiApiKey || ""),
+          openaiModelWriter: String(ai.openaiModelWriter || "gpt-4o-mini"),
+          openaiModelFast: String(ai.openaiModelFast || "gpt-4o-mini"),
+          openaiImageModel: String(ai.openaiImageModel || "dall-e-3"),
+          imageProvider: String(ai.imageProvider || "openai"),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
@@ -1773,6 +1784,13 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       testimonialsTitle: values.testimonialsTitle,
       newsTitle: values.newsTitle,
     };
+    const ai = {
+      openaiApiKey: values.openaiApiKey,
+      openaiModelWriter: values.openaiModelWriter,
+      openaiModelFast: values.openaiModelFast,
+      openaiImageModel: values.openaiImageModel,
+      imageProvider: values.imageProvider,
+    };
     try {
       const responses = await Promise.all([
         apiFetch("/api/cms/settings", {
@@ -1789,6 +1807,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: "site.homepage", value: homepage }),
+        }),
+        apiFetch("/api/cms/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "site.ai", value: ai }),
         }),
       ]);
       const failed = responses.find((response) => !response.ok);
@@ -1877,6 +1900,20 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
               <label>Độ rộng layout<input type="number" min={1180} max={1680} step={20} value={values.containerMax} onChange={(event) => setValues({ ...values, containerMax: event.target.value })} /></label>
               <label>Font heading<select value={values.headingFont} onChange={(event) => setValues({ ...values, headingFont: event.target.value })}><option value="cormorant">Cormorant Garamond</option><option value="playfair">Playfair Display</option><option value="roboto">Roboto</option><option value="serif">System Serif</option></select></label>
               <label>Font body<select value={values.bodyFont} onChange={(event) => setValues({ ...values, bodyFont: event.target.value })}><option value="inter">Inter</option><option value="beVietnam">Be Vietnam Pro</option><option value="roboto">Roboto</option><option value="system">System Sans</option></select></label>
+            </div>
+          </div>
+
+          <div className="form-section wide theme-settings-section">
+            <div className="form-section-title">
+              <span>Cấu hình AI</span>
+              <div><h3>Trợ lý viết bài & Sinh ảnh (OpenAI)</h3><p>Nhập API Key và cấu hình model để sử dụng AI Content Studio trực tiếp từ Admin.</p></div>
+            </div>
+            <div className="form-grid">
+              <label className="wide">OpenAI API Key<input type="password" value={values.openaiApiKey || ""} onChange={(event) => setValues({ ...values, openaiApiKey: event.target.value })} placeholder="sk-proj-..." /></label>
+              <label>Model viết bài (Writer)<input value={values.openaiModelWriter || ""} onChange={(event) => setValues({ ...values, openaiModelWriter: event.target.value })} placeholder="gpt-4o-mini" /></label>
+              <label>Model viết nhanh (Fast)<input value={values.openaiModelFast || ""} onChange={(event) => setValues({ ...values, openaiModelFast: event.target.value })} placeholder="gpt-4o-mini" /></label>
+              <label>Model sinh ảnh (DALL-E)<select value={values.openaiImageModel || "dall-e-3"} onChange={(event) => setValues({ ...values, openaiImageModel: event.target.value })}><option value="dall-e-3">DALL-E 3 (Premium)</option><option value="dall-e-2">DALL-E 2 (Standard)</option></select></label>
+              <label>Nhà cung cấp ảnh<select value={values.imageProvider || "openai"} onChange={(event) => setValues({ ...values, imageProvider: event.target.value })}><option value="openai">OpenAI (DALL-E)</option></select></label>
             </div>
           </div>
 
