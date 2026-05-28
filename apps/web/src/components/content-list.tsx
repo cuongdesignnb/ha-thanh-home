@@ -12,7 +12,11 @@ export function ProjectList({ title, projects }: { title: string; projects: Proj
 
 export function ProjectCatalog({ filters, group, meta, projects, searchParams }: { filters: ProjectFilters; group?: ProjectGroup; meta: Meta; projects: Project[]; searchParams: Record<string, string | undefined> }) {
   const basePath = group === "construction" ? "/du-an/cong-trinh" : group === "interior" ? "/du-an/noi-that" : "/du-an";
-  const categories = filters.categories.filter((item) => !group || item.group === group);
+  const categories = filters.categories.filter((item) => {
+    if (!group) return true;
+    if (group === "construction") return item.group === "construction" || item.group === "xay_nha_tron_goi";
+    return item.group === group;
+  });
   return (
     <main className="project-catalog-page">
       <div className="container breadcrumb">Trang chủ <span>/</span> Dự án</div>
@@ -71,7 +75,11 @@ function Select({ alignRight, label, labels, name, options, value }: { alignRigh
 function options(filters: ProjectFilters, type: string, group?: ProjectGroup) {
   return Array.from(new Set(
     (filters.filters[type] || [])
-      .filter((item) => !group || item.group === group)
+      .filter((item) => {
+        if (!group) return true;
+        if (group === "construction") return item.group === "construction" || item.group === "xay_nha_tron_goi";
+        return item.group === group;
+      })
       .map((item) => item.name)
       .filter(isReadableOption),
   ));

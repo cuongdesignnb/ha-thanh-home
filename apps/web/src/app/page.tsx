@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { ArchitectureCard, InteriorCard } from "@/components/design-templates";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { HorizontalSliderWrapper } from "@/components/horizontal-slider-wrapper";
 import {
   defaultHomepage,
   getHome,
@@ -145,8 +146,8 @@ function ProjectsSection({ id, title, projects, images, cream }: { id?: string; 
     <section className={`section ${cream ? "cream" : ""}`} id={id}>
       <div className="container">
         <div className="section-title"><h2>{title}</h2></div>
-        <div className="project-grid home-slider-grid">
-          {projects.slice(0, 4).map((project, index) => (
+        <HorizontalSliderWrapper className="project-grid home-slider-grid">
+          {projects.slice(0, 6).map((project, index) => (
             <a className="card" key={project.id} href={`/du-an/${project.slug}`}>
               <div className="project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, images[index % images.length])})` }} />
               <div className="card-body">
@@ -155,7 +156,7 @@ function ProjectsSection({ id, title, projects, images, cream }: { id?: string; 
               </div>
             </a>
           ))}
-        </div>
+        </HorizontalSliderWrapper>
       </div>
     </section>
   );
@@ -171,7 +172,9 @@ function ArchitectureTemplatesSection({ designs, homepage }: { designs: Architec
           <h2>{homepage.architectureTemplatesTitle || defaultHomepage.architectureTemplatesTitle}</h2>
           <a className="section-link" href="/mau-thiet-ke-kien-truc">Xem tất cả <ArrowRight size={16} /></a>
         </div>
-        <div className="template-grid home-template-grid">{designs.slice(0, 3).map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}</div>
+        <HorizontalSliderWrapper className="template-grid home-template-grid">
+          {designs.slice(0, 6).map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}
+        </HorizontalSliderWrapper>
       </div>
     </section>
   );
@@ -187,7 +190,9 @@ function InteriorTemplatesSection({ designs, homepage }: { designs: InteriorDesi
           <h2>{homepage.interiorTemplatesTitle || defaultHomepage.interiorTemplatesTitle}</h2>
           <a className="section-link" href="/mau-thiet-ke-noi-that">Xem tất cả <ArrowRight size={16} /></a>
         </div>
-        <div className="template-grid home-template-grid">{designs.slice(0, 3).map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}</div>
+        <HorizontalSliderWrapper className="template-grid home-template-grid">
+          {designs.slice(0, 6).map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}
+        </HorizontalSliderWrapper>
       </div>
     </section>
   );

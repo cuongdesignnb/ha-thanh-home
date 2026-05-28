@@ -26,6 +26,38 @@ export class PublicController {
     if (query.category) {
       const categorySlugs = query.category.split(",").map((s) => s.trim()).filter(Boolean);
       if (categorySlugs.length > 0) {
+        // Query ProjectCategory from DB to get the actual accented category names
+        const dbCategories = await this.prisma.projectCategory.findMany({
+          where: { slug: { in: categorySlugs } },
+          select: { slug: true, name: true },
+        });
+
+        const orFilters: Prisma.ProjectWhereInput[] = [
+          { categoryRef: { slug: { in: categorySlugs } } }
+        ];
+
+        for (const slug of categorySlugs) {
+          // Always allow matching by slug directly (plain text containing slug)
+          orFilters.push({ category: { contains: slug } });
+          
+          // Match by DB name if found
+          const dbCat = dbCategories.find((c) => c.slug === slug);
+          if (dbCat) {
+            const name = dbCat.name;
+            orFilters.push({ category: { contains: name } });
+            
+            // Build unaccented versions
+            const unaccented = name
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/đ/g, "d")
+              .replace(/Đ/g, "D");
+            orFilters.push({ category: { contains: unaccented } });
+            orFilters.push({ category: { contains: unaccented.toLowerCase() } });
+          }
+        }
+
+        // Keep fallback category mapping for safety
         const categoryMapping: Record<string, string[]> = {
           "nha-xuong": ["nhà xưởng", "nha xuong"],
           "biet-thu": ["biệt thự", "biet thu"],
@@ -38,12 +70,7 @@ export class PublicController {
           "showroom": ["showroom"],
         };
 
-        const orFilters: Prisma.ProjectWhereInput[] = [
-          { categoryRef: { slug: { in: categorySlugs } } }
-        ];
-
         for (const slug of categorySlugs) {
-          orFilters.push({ category: { contains: slug } });
           const mappedWords = categoryMapping[slug];
           if (mappedWords) {
             for (const text of mappedWords) {
@@ -78,7 +105,9 @@ export class PublicController {
 
   @Get("projects/filters")
   async projectFilters(@Query() query: Record<string, string>) {
-    const groups = query.group && query.group !== "all" ? [query.group as ProjectGroup] : [ProjectGroup.construction, ProjectGroup.interior];
+    const groups = query.group && query.group !== "all"
+      ? query.group.split(",").map((g) => g.trim() as ProjectGroup).filter(Boolean)
+      : [ProjectGroup.construction, ProjectGroup.interior, ProjectGroup.xay_nha_tron_goi];
     const [categories, options] = await Promise.all([
       this.prisma.projectCategory.findMany({
         where: { group: { in: groups }, isActive: true },

@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 export default async function ConstructionProjectsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const query = new URLSearchParams({ limit: "24", group: "construction", ...cleanParams(params) });
+  const query = new URLSearchParams({ limit: "24", group: "construction,xay_nha_tron_goi", ...cleanParams(params) });
   const [payload, filters] = await Promise.all([
     getListPayload<Project>(`/projects?${query}`),
-    fetchJson<ProjectFilters>("/projects/filters?group=construction", { categories: [], filters: {} }),
+    fetchJson<ProjectFilters>("/projects/filters?group=construction,xay_nha_tron_goi", { categories: [], filters: {} }),
   ]);
   const schemas = [
     buildBreadcrumbSchema([

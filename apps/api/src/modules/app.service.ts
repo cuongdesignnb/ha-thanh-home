@@ -10,7 +10,7 @@ export class AppService {
   async getHome() {
     const [constructionProjects, interiorProjects, services, posts, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({
-        where: { group: "construction", status: ContentStatus.published, isFeatured: true },
+        where: { group: { in: ["construction", "xay_nha_tron_goi"] }, status: ContentStatus.published, isFeatured: true },
         include: { thumbnailMedia: true },
         take: 6,
         orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],

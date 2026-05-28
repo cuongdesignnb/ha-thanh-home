@@ -170,7 +170,7 @@ export type LandingFaq = {
 
 export type LandingProjectsSource = {
   entity?: "project" | "architecture-design" | "interior-design";
-  group?: "construction" | "interior" | "xay_nha_tron_goi";
+  group?: string;
   categorySlug?: string;
   mode?: "latest" | "featured";
   limit?: number;

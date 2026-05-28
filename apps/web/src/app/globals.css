@@ -4183,3 +4183,59 @@ h3 {
     justify-content: center;
   }
 }
+
+/* Horizontal Slider Wrapper & Nav Buttons */
+.relative-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+
+.slider-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(15, 61, 46, 0.12);
+  z-index: 20;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.85;
+}
+
+.slider-nav-btn:hover {
+  background: var(--green);
+  color: #ffffff;
+  border-color: var(--green);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 8px 24px rgba(15, 61, 46, 0.2);
+  opacity: 1;
+}
+
+.slider-nav-btn:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.slider-nav-btn.prev {
+  left: -20px;
+}
+
+.slider-nav-btn.next {
+  right: -20px;
+}
+
+/* Ensure buttons are properly aligned for touch screen layouts and mobile screens */
+@media (max-width: 1024px) {
+  .slider-nav-btn {
+    display: none !important;
+  }
+}
+
