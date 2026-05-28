@@ -26,12 +26,33 @@ export class PublicController {
     if (query.category) {
       const categorySlugs = query.category.split(",").map((s) => s.trim()).filter(Boolean);
       if (categorySlugs.length > 0) {
-        and.push({
-          OR: [
-            { categoryRef: { slug: { in: categorySlugs } } },
-            { OR: categorySlugs.map((slug) => ({ category: { contains: slug } })) }
-          ]
-        });
+        const categoryMapping: Record<string, string[]> = {
+          "nha-xuong": ["nhà xưởng", "nha xuong"],
+          "biet-thu": ["biệt thự", "biet thu"],
+          "nha-pho": ["nhà phố", "nha pho"],
+          "truong-hoc": ["trường học", "truong hoc"],
+          "khu-do-thi": ["khu đô thị", "khu do thi"],
+          "van-phong": ["văn phòng", "van phong"],
+          "toa-nha": ["tòa nhà", "toa nha"],
+          "cau-duong": ["cầu đường", "cau duong"],
+          "showroom": ["showroom"],
+        };
+
+        const orFilters: Prisma.ProjectWhereInput[] = [
+          { categoryRef: { slug: { in: categorySlugs } } }
+        ];
+
+        for (const slug of categorySlugs) {
+          orFilters.push({ category: { contains: slug } });
+          const mappedWords = categoryMapping[slug];
+          if (mappedWords) {
+            for (const text of mappedWords) {
+              orFilters.push({ category: { contains: text } });
+            }
+          }
+        }
+
+        and.push({ OR: orFilters });
       }
     }
     if (query.space) and.push({ OR: [{ projectType: query.space }, { category: { contains: query.space } }, { scale: { contains: query.space } }, { style: { contains: query.space } }] });

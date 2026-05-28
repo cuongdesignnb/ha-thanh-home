@@ -2511,10 +2511,18 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
 
 function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreated }: { filterOptions: CmsItem[]; form: ReturnType<typeof useForm<Record<string, unknown>>>; projectCategories: CmsItem[]; onTaxonomyCreated?: () => void | Promise<void> }) {
   const group = String(form.watch("group") || "construction");
-  const categories = projectCategories.filter((category) => String(category.group) === group);
+  const groupLabels: Record<string, string> = {
+    construction: "Công trình",
+    interior: "Nội thất",
+    xay_nha_tron_goi: "Xây nhà trọn gói",
+  };
+  const categories = [...projectCategories].sort((a, b) => String(a.group).localeCompare(String(b.group)));
   return (
     <>
-      <label>Danh mục dự án<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{categories.map((category) => <option key={category.id} value={category.id}>{String(category.name)}</option>)}</select></label>
+      <label>Danh mục dự án<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{categories.map((category) => {
+        const label = groupLabels[String(category.group)] || String(category.group);
+        return <option key={category.id} value={category.id}>{String(category.name)} ({label})</option>;
+      })}</select></label>
       <label>Danh mục fallback<input {...form.register("category")} placeholder="Biệt thự, căn hộ, showroom..." /></label>
       <TaxonomySelect form={form} name="projectType" label="Loại dự án" module="project" group={group} type="project_type" options={filterOptions} onCreated={onTaxonomyCreated} />
       <TaxonomySelect form={form} name="style" label="Phong cách" module="project" group={group} type="style" options={filterOptions} onCreated={onTaxonomyCreated} />
