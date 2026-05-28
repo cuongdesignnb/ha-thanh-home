@@ -2502,7 +2502,15 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           <label>Trạng thái<select {...form.register("status")}><option value="draft">Nháp</option><option value="pending_review">Chờ duyệt</option><option value="scheduled">Đặt lịch</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
           {entity === "posts" ? <label>Lịch đăng<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
           {entity === "projects" ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
-          <label className="check-row wide"><input type="checkbox" {...form.register("isFeatured")} /> Hiển thị nổi bật trên website</label>
+          <div className="check-row-container wide">
+            <label className="check-row" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <input type="checkbox" {...form.register("isFeatured")} />
+              <span>Hiển thị nổi bật trên website</span>
+            </label>
+            <p className="editor-hint" style={{ marginTop: "6px", padding: 0, color: "var(--admin-muted)", fontSize: "12px", lineHeight: "1.4" }}>
+              💡 <strong>Lưu ý:</strong> Trang chủ hiển thị tối đa <strong>6 bài nổi bật</strong>. Nếu tích chọn nhiều hơn, hệ thống sẽ ưu tiên hiển thị các bài có <strong>Thứ tự hiển thị</strong> nhỏ nhất (ưu tiên hàng đầu) và ngày xuất bản mới nhất.
+            </p>
+          </div>
         </div>
       </section>
     </>
