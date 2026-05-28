@@ -2472,16 +2472,11 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           {entity === "projects" ? (
             <label>
               Nhóm nội dung
-              <select {...form.register("group")} disabled={!!form.watch("categoryId")}>
+              <select {...form.register("group")}>
                 <option value="construction">Công trình</option>
                 <option value="interior">Nội thất</option>
                 <option value="xay_nha_tron_goi">Xây nhà trọn gói</option>
               </select>
-              {!!form.watch("categoryId") && (
-                <span style={{ fontSize: "11px", color: "var(--admin-muted)", marginTop: "4px", display: "block" }}>
-                  * Tự động đồng bộ theo Danh mục dự án
-                </span>
-              )}
             </label>
           ) : null}
           {entity === "projects" ? <ProjectFields filterOptions={filterOptions} form={form} projectCategories={projectCategories} onTaxonomyCreated={onTaxonomyCreated} /> : null}
@@ -2535,27 +2530,31 @@ function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreat
   const group = String(form.watch("group") || "construction");
   const categoryId = form.watch("categoryId");
 
+  // Reset category if it doesn't belong to the selected group
   useEffect(() => {
     if (categoryId) {
       const selectedCat = projectCategories.find((c) => c.id === Number(categoryId));
-      if (selectedCat && selectedCat.group) {
-        form.setValue("group", selectedCat.group);
+      if (selectedCat && selectedCat.group !== group) {
+        form.setValue("categoryId", null);
       }
     }
-  }, [categoryId, projectCategories, form]);
+  }, [group, categoryId, projectCategories, form]);
 
-  const groupLabels: Record<string, string> = {
-    construction: "Công trình",
-    interior: "Nội thất",
-    xay_nha_tron_goi: "Xây nhà trọn gói",
-  };
-  const categories = [...projectCategories].sort((a, b) => String(a.group).localeCompare(String(b.group)));
+  const categories = projectCategories.filter((c) => c.group === group);
+
   return (
     <>
-      <label>Danh mục dự án<select {...form.register("categoryId", { valueAsNumber: true })}><option value="">Chọn danh mục</option>{categories.map((category) => {
-        const label = groupLabels[String(category.group)] || String(category.group);
-        return <option key={category.id} value={category.id}>{String(category.name)} ({label})</option>;
-      })}</select></label>
+      <label>
+        Danh mục dự án
+        <select {...form.register("categoryId", { valueAsNumber: true })}>
+          <option value="">Chọn danh mục</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {String(category.name)}
+            </option>
+          ))}
+        </select>
+      </label>
       <label>Danh mục fallback<input {...form.register("category")} placeholder="Biệt thự, căn hộ, showroom..." /></label>
       <TaxonomySelect form={form} name="projectType" label="Loại dự án" module="project" group={group} type="project_type" options={filterOptions} onCreated={onTaxonomyCreated} />
       <TaxonomySelect form={form} name="style" label="Phong cách" module="project" group={group} type="style" options={filterOptions} onCreated={onTaxonomyCreated} />
