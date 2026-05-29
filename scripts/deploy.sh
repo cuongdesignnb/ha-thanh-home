@@ -31,7 +31,7 @@ if [[ " $* " == *" --migrate "* || " $* " == *" --seed "* ]]; then
   done
 
   echo "==> prisma migrate deploy"
-  ${COMPOSE} exec -T api npx prisma migrate deploy
+  ${COMPOSE} exec -T api npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma
 fi
 
 if [[ " $* " == *" --seed "* ]]; then
