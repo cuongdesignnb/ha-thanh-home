@@ -788,7 +788,9 @@ export class AdminController {
   @Get("project-categories")
   @Roles("Admin", "Viewer")
   async listProjectCategories(@Query() query: Record<string, string>) {
-    const { page, limit, skip } = parsePagination(query);
+    const page = Math.max(1, Number(query.page || 1));
+    const limit = Math.min(1000, Math.max(1, Number(query.limit || 100)));
+    const skip = (page - 1) * limit;
     const where: Prisma.ProjectCategoryWhereInput = {
       ...(query.group ? { group: query.group as ProjectGroup } : {}),
       ...(query.search ? { OR: [{ name: { contains: query.search } }, { slug: { contains: query.search } }] } : {}),
@@ -831,7 +833,9 @@ export class AdminController {
   @Get("project-filter-options")
   @Roles("Admin", "Viewer")
   async listProjectFilterOptions(@Query() query: Record<string, string>) {
-    const { page, limit, skip } = parsePagination(query);
+    const page = Math.max(1, Number(query.page || 1));
+    const limit = Math.min(1000, Math.max(1, Number(query.limit || 100)));
+    const skip = (page - 1) * limit;
     const where: Prisma.ProjectFilterOptionWhereInput = {
       ...(query.module ? { module: query.module as ProjectFilterModule } : {}),
       ...(query.group ? { group: query.group as ProjectGroup } : {}),
@@ -901,7 +905,9 @@ export class AdminController {
   @Get("post-categories")
   @Roles("Admin", "SEO Editor", "Viewer")
   async listPostCategories(@Query() query: Record<string, string>) {
-    const { page, limit, skip } = parsePagination(query);
+    const page = Math.max(1, Number(query.page || 1));
+    const limit = Math.min(1000, Math.max(1, Number(query.limit || 100)));
+    const skip = (page - 1) * limit;
     const where: Prisma.PostCategoryWhereInput = {
       ...(query.search ? { OR: [{ name: { contains: query.search } }, { slug: { contains: query.search } }] } : {}),
       ...(query.status === "active" ? { isActive: true } : {}),
