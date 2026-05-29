@@ -2225,7 +2225,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
 
   async function loadFilterOptions() {
     try {
-      const response = await apiFetch("/api/cms/project-filter-options?limit=500");
+      const response = await apiFetch("/api/cms/project-filter-options?limit=1000");
       if (!response.ok) throw new Error(await readApiError(response, "Không tải được bộ lọc catalog."));
       const payload: ListResponse<CmsItem> = await response.json();
       setFilterOptions(payload.data || []);
