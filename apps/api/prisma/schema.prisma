@@ -322,7 +322,7 @@ model ArchitectureDesignTemplate {
   bedrooms          Int?
   bathrooms         Int?
   roofType          String?
-  estimatedBudget   Int?
+  estimatedBudget   Float?
   constructionTime  String?
   location          String?
   description       String?       @db.Text
@@ -367,8 +367,8 @@ model InteriorDesignTemplate {
   layoutType        String?
   materialTone      String?
   budgetRange       String?
-  budgetMin         Int?
-  budgetMax         Int?
+  budgetMin         Float?
+  budgetMax         Float?
   location          String?
   description       String?       @db.Text
   contentJson       Json?

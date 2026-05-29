@@ -492,7 +492,7 @@ class ArchitectureDesignDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   estimatedBudget?: number;
 
   @IsOptional()
@@ -599,12 +599,12 @@ class InteriorDesignDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   budgetMin?: number;
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   budgetMax?: number;
 
   @IsOptional()
