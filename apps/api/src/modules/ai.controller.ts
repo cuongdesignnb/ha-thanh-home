@@ -121,10 +121,6 @@ export class AiController {
       createdBy: request.user?.sub,
     });
 
-    if (!dto.createDraft) {
-      return output;
-    }
-
     const article = output as {
       title?: string;
       slug?: string;
@@ -134,6 +130,25 @@ export class AiController {
       metaDescription?: string;
       focusKeyword?: string;
     };
+
+    const signature = `
+<hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;" />
+<div style="padding: 20px; background-color: #f9f9f9; border-left: 4px solid #cc0000; margin-top: 30px; font-family: sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; font-weight: bold;"><strong>CÔNG TY CỔ PHẦN THIẾT KẾ VÀ XÂY DỰNG HÀ THÀNH</strong></p>
+  <p style="margin: 0 0 5px 0; font-size: 14px; color: #555;"><strong>Showroom:</strong> Số 42, Tổ 18 Khu Tập Thể Trường Cao Đẳng Du Lịch, P. Nghĩa Đô, TP. Hà Nội</p>
+  <p style="margin: 0 0 5px 0; font-size: 14px; color: #555;"><strong>Tư vấn miễn phí:</strong> <a href="tel:0898502333" style="color: #cc0000; text-decoration: none; font-weight: bold;">0898 502 333</a></p>
+  <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;"><strong>Website:</strong> <a href="https://hathanhhome.vn" target="_blank" rel="noopener" style="color: #0066cc; text-decoration: none;">hathanhhome.vn</a></p>
+  <p style="margin: 0; font-size: 13px; color: #777; font-style: italic; border-top: 1px dashed #ddd; padding-top: 10px;"><em>Thiết kế kiến trúc | Thi công xây dựng trọn gói | Bảo hành công trình</em></p>
+</div>`;
+
+    if (article && typeof article.contentHtml === "string") {
+      article.contentHtml = article.contentHtml.trim() + signature;
+    }
+
+    if (!dto.createDraft) {
+      return output;
+    }
+
     const title = article.title || dto.topic;
     const slug = await uniqueSlug(title, article.slug, (candidate) =>
       this.prisma.post.findUnique({ where: { slug: candidate } }).then(Boolean),
