@@ -8,7 +8,7 @@ export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getHome() {
-    const [constructionProjects, interiorProjects, services, posts, architectureDesigns, interiorDesigns] = await Promise.all([
+    const [constructionProjects, interiorProjects, posts, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({
         where: { group: { in: ["construction", "xay_nha_tron_goi"] }, status: ContentStatus.published, isFeatured: true },
         include: { thumbnailMedia: true },
@@ -20,11 +20,6 @@ export class AppService {
         include: { thumbnailMedia: true },
         take: 6,
         orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],
-      }),
-      this.prisma.service.findMany({
-        where: { status: ContentStatus.published, isFeatured: true },
-        include: { thumbnailMedia: true },
-        orderBy: [{ group: "asc" }, { sortOrder: "asc" }],
       }),
       this.prisma.post.findMany({
         where: { status: ContentStatus.published, isFeatured: true },
@@ -45,6 +40,45 @@ export class AppService {
         orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],
       }),
     ]);
+
+    const services = [
+      {
+        id: 1,
+        title: "Xây nhà trọn gói",
+        slug: "xay-nha-tron-goi",
+        group: "xay_nha_tron_goi",
+        description: "Giải pháp thi công trọn gói toàn diện từ khảo sát, thiết kế bản vẽ, xin phép xây dựng đến bàn giao chìa khóa trao tay.",
+        status: ContentStatus.published,
+        isFeatured: true,
+      },
+      {
+        id: 2,
+        title: "Sản xuất & Thi công nội thất",
+        slug: "san-xuat-thi-cong-noi-that",
+        group: "interior",
+        description: "Thiết kế và thi công hoàn thiện nội thất biệt thự, nhà phố, chung cư cao cấp với xưởng gỗ sản xuất trực tiếp.",
+        status: ContentStatus.published,
+        isFeatured: true,
+      },
+      {
+        id: 3,
+        title: "Thi công nhà xưởng",
+        slug: "thi-cong-nha-xuong",
+        group: "construction",
+        description: "Thiết kế và gia công lắp dựng kết cấu thép nhà xưởng, nhà kho tiền chế khẩu độ lớn, đạt chuẩn kỹ thuật công nghiệp.",
+        status: ContentStatus.published,
+        isFeatured: true,
+      },
+      {
+        id: 4,
+        title: "Thi công nội thất văn phòng",
+        slug: "thi-cong-noi-that-van-phong",
+        group: "interior",
+        description: "Giải pháp kiến tạo không gian làm việc chuyên nghiệp, hiện đại, tối ưu công suất hoạt động và nâng tầm nhận diện thương hiệu.",
+        status: ContentStatus.published,
+        isFeatured: true,
+      },
+    ];
 
     return repairPublicText({
       constructionProjects,
