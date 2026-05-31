@@ -22,4 +22,4 @@ ENV NODE_ENV=production
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "npm run prisma:deploy -w @hathanh/api && npm run prisma:seed -w @hathanh/api && npm run start:prod -w @hathanh/api"]
+CMD ["sh", "-c", "npm run prisma:deploy -w @hathanh/api && npm run start:prod -w @hathanh/api"]
