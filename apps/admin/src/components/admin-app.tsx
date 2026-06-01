@@ -74,7 +74,7 @@ import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
 const apiFetch = adminApiFetch;
 
 type User = { email: string; roles: string[] };
-type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings";
+type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings" | "pages";
 type CmsItem = Record<string, unknown> & {
   id: number;
   title?: string;
@@ -262,6 +262,7 @@ const modules = [
     items: [
       { id: "posts", label: "Bài viết SEO", description: "Draft, scheduled, published", icon: Newspaper, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
       { id: "post-categories", label: "Danh mục bài viết", description: "Nhóm chủ đề để chọn khi viết bài", icon: List, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
+      { id: "pages", label: "Chuyên trang", description: "Quản lý trang chính sách, điều khoản", icon: FileText, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
       { id: "media", label: "Media Library", description: "Ảnh WebP và thư viện dùng lại", icon: Image, roles: ["Super Admin", "Admin", "SEO Editor", "Viewer"] },
       { id: "ai", label: "AI Content Studio", description: "Outline, meta, bài viết draft", icon: Sparkles, roles: ["Super Admin", "Admin", "SEO Editor"] },
     ],
@@ -293,6 +294,7 @@ const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?
   "service-pages": { title: "Cấu hình trang dịch vụ", subtitle: "Quản lý các landing page dịch vụ cố định." },
   posts: { title: "Bài viết SEO", subtitle: "Soạn bài, lưu nháp, đặt lịch và xuất bản.", createLabel: "Thêm bài viết" },
   "post-categories": { title: "Danh mục bài viết", subtitle: "Tạo nhóm chủ đề để chọn đúng danh mục khi viết bài SEO.", createLabel: "Thêm danh mục" },
+  pages: { title: "Quản lý chuyên trang", subtitle: "Tạo và cấu hình các trang chính sách, điều khoản dịch vụ.", createLabel: "Thêm chuyên trang" },
   leads: { title: "Lead tư vấn", subtitle: "Theo dõi nguồn lead, trạng thái xử lý và ghi chú nội bộ." },
   media: { title: "Media Library", subtitle: "Upload, chuyển WebP, tạo thumbnail và tái sử dụng ảnh." },
   ai: { title: "AI Content Studio", subtitle: "Tạo outline, meta SEO và bài viết draft bằng AI theo cấu hình hệ thống." },
@@ -312,6 +314,7 @@ const entitySingular: Record<Entity, string> = {
   "service-pages": "trang dịch vụ",
   posts: "bài viết",
   "post-categories": "danh mục bài viết",
+  pages: "trang chính sách",
   leads: "lead",
   media: "media",
   ai: "AI content",
@@ -539,6 +542,7 @@ function getPublicEntityPath(entity: Entity, row: CmsItem) {
     posts: `/tin-tuc/${slug}`,
     "architecture-designs": `/mau-thiet-ke-kien-truc/${slug}`,
     "interior-designs": `/mau-thiet-ke-noi-that/${slug}`,
+    pages: `/${slug}`,
   };
   return paths[entity] || null;
 }
@@ -2773,16 +2777,18 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
         <div className="form-grid">
           <label>Trạng thái<select {...form.register("status")}><option value="draft">Nháp</option><option value="pending_review">Chờ duyệt</option><option value="scheduled">Đặt lịch</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
           {entity === "posts" ? <label>Lịch đăng<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
-          {entity === "projects" ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
-          <div className="check-row-container wide">
-            <label className="check-row" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-              <input type="checkbox" {...form.register("isFeatured")} />
-              <span>Hiển thị nổi bật trên website</span>
-            </label>
-            <p className="editor-hint" style={{ marginTop: "6px", padding: 0, color: "var(--admin-muted)", fontSize: "12px", lineHeight: "1.4" }}>
-              💡 <strong>Lưu ý:</strong> Trang chủ hiển thị tối đa <strong>6 bài nổi bật</strong>. Nếu tích chọn nhiều hơn, hệ thống sẽ ưu tiên hiển thị các bài có <strong>Thứ tự hiển thị</strong> nhỏ nhất (ưu tiên hàng đầu) và ngày xuất bản mới nhất.
-            </p>
-          </div>
+          {["projects", "pages"].includes(entity) ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
+          {["projects", "posts"].includes(entity) ? (
+            <div className="check-row-container wide">
+              <label className="check-row" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input type="checkbox" {...form.register("isFeatured")} />
+                <span>Hiển thị nổi bật trên website</span>
+              </label>
+              <p className="editor-hint" style={{ marginTop: "6px", padding: 0, color: "var(--admin-muted)", fontSize: "12px", lineHeight: "1.4" }}>
+                💡 <strong>Lưu ý:</strong> Trang chủ hiển thị tối đa <strong>6 bài nổi bật</strong>. Nếu tích chọn nhiều hơn, hệ thống sẽ ưu tiên hiển thị các bài có <strong>Thứ tự hiển thị</strong> nhỏ nhất (ưu tiên hàng đầu) và ngày xuất bản mới nhất.
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
     </>
@@ -3466,7 +3472,7 @@ function DataTable({ rows, entity, onEdit, onDelete, canWrite }: { rows: CmsItem
   const columns = useMemo(
     () => [
       helper.accessor((row) => row.title || row.name || row.fullName || `#${row.id}`, { id: "title", header: entity === "leads" ? "Khách hàng" : ["project-categories", "project-filter-options", "post-categories"].includes(entity) ? "Tên" : "Tiêu đề" }),
-      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "posts" ? row.categoryRef?.name || "Chưa chọn" : entity === "post-categories" ? row.slug || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : row.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "posts" ? "Danh mục" : entity === "post-categories" ? "Slug" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
+      helper.accessor((row) => entity === "leads" ? row.phone || "-" : entity === "posts" ? row.categoryRef?.name || "Chưa chọn" : entity === "pages" ? row.slug || "-" : entity === "post-categories" ? row.slug || "-" : entity === "project-filter-options" ? `${row.module || "project"} / ${row.type || "-"}` : entity === "architecture-designs" ? row.houseType || row.style || "-" : entity === "interior-designs" ? row.interiorStyle || row.roomType || "-" : row.group === "construction" ? "Công trình" : row.group === "interior" ? "Nội thất" : row.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "-", { id: "group", header: entity === "leads" ? "Điện thoại" : entity === "posts" ? "Danh mục" : entity === "pages" ? "Đường dẫn (Slug)" : entity === "post-categories" ? "Slug" : entity === "project-filter-options" ? "Module / Loại filter" : "Nhóm" }),
       helper.accessor((row) => entity === "post-categories" ? row.isActive === false ? "inactive" : "active" : row.status || "-", { id: "status", header: "Trạng thái", cell: (info) => <span className={`status-badge status-${info.getValue()}`}>{statusLabels[String(info.getValue())] || String(info.getValue())}</span> }),
       helper.display({
         id: "actions",
@@ -3630,6 +3636,15 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     if (Number.isNaN(payload[key]) || payload[key] === "") payload[key] = null;
   });
   if (entity === "leads") return { status: payload.status, note: payload.note };
+  if (entity === "pages") {
+    delete payload.group;
+    delete payload.location;
+    delete payload.category;
+    delete payload.excerpt;
+    delete payload.focusKeyword;
+    delete payload.scheduledAt;
+    delete payload.isFeatured;
+  }
   if (entity === "posts") {
     delete payload.group;
     delete payload.location;
@@ -3719,7 +3734,7 @@ function canWriteEntity(entity: Entity, roles: string[]) {
   if (roles.includes("Super Admin")) return true;
   if (["projects", "project-categories", "project-filter-options", "architecture-designs", "interior-designs", "menus"].includes(entity)) return roles.includes("Admin");
   if (entity === "estimator") return roles.includes("Admin");
-  if (["posts", "post-categories"].includes(entity)) return roles.includes("Admin") || roles.includes("SEO Editor");
+  if (["posts", "post-categories", "pages"].includes(entity)) return roles.includes("Admin") || roles.includes("SEO Editor");
   if (entity === "leads") return roles.includes("Admin") || roles.includes("Sales");
   return false;
 }

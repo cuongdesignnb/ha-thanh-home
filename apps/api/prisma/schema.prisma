@@ -426,6 +426,7 @@ model MediaFile {
   postThumbnails    Post[]    @relation("PostThumbnail")
   architectureDesignThumbnails ArchitectureDesignTemplate[] @relation("ArchitectureDesignThumbnail")
   interiorDesignThumbnails InteriorDesignTemplate[] @relation("InteriorDesignThumbnail")
+  pageThumbnails    Page[]    @relation("PageThumbnail")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -558,4 +559,27 @@ model ActivityLog {
 
   @@index([createdAt])
   @@index([entityType, entityId])
+}
+
+model Page {
+  id              Int           @id @default(autoincrement())
+  title           String
+  slug            String        @unique
+  description     String?       @db.Text
+  contentHtml     String?       @db.LongText
+  thumbnailMediaId Int?
+  thumbnailMedia  MediaFile?    @relation("PageThumbnail", fields: [thumbnailMediaId], references: [id], onDelete: SetNull)
+  status          ContentStatus @default(draft)
+  sortOrder       Int           @default(0)
+  metaTitle       String?
+  metaDescription String?       @db.Text
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?       @db.Text
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status])
+  @@index([sortOrder])
 }

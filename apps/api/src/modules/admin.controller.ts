@@ -361,6 +361,59 @@ class ServiceDto {
   sortOrder?: number;
 }
 
+class PageDto {
+  @IsString()
+  @MinLength(2)
+  title!: string;
+
+  @IsOptional()
+  @IsString()
+  slug?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  contentHtml?: string;
+
+  @IsOptional()
+  @IsString()
+  metaTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  metaDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  canonicalUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  ogTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  ogDescription?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  thumbnailMediaId?: number;
+
+  @IsOptional()
+  @IsEnum(ContentStatus)
+  status?: ContentStatus;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  sortOrder?: number;
+}
+
 class PostDto {
   @IsString()
   @MinLength(2)
@@ -1571,6 +1624,64 @@ export class AdminController {
   @Roles("Super Admin")
   roles() {
     return this.prisma.role.findMany({ orderBy: { name: "asc" } });
+  }
+
+  @Get("pages")
+  @Roles("Admin", "Viewer")
+  async listPages(@Query() query: Record<string, string>) {
+    const { page, limit, skip } = parsePagination(query);
+    const where: Prisma.PageWhereInput = {
+      ...(query.status ? { status: query.status as ContentStatus } : {}),
+      ...(query.search ? { OR: [{ title: { contains: query.search } }, { slug: { contains: query.search } }] } : {}),
+    };
+    const [data, total] = await Promise.all([
+      this.prisma.page.findMany({ where, skip, take: limit, include: { thumbnailMedia: true }, orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
+      this.prisma.page.count({ where }),
+    ]);
+    return { data, meta: listMeta(total, page, limit) };
+  }
+
+  @Post("pages")
+  @Roles("Admin")
+  async createPage(@Body() dto: PageDto) {
+    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+      this.prisma.page.findUnique({ where: { slug: candidate } }).then(Boolean),
+    );
+    return this.prisma.page.create({
+      data: {
+        ...dto,
+        slug,
+        contentHtml: cleanHtml(dto.contentHtml),
+        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+      },
+    });
+  }
+
+  @Patch("pages/:id")
+  @Roles("Admin")
+  async updatePage(@Param("id") id: string, @Body() dto: PageDto) {
+    const currentId = Number(id);
+    const slug = dto.slug
+      ? await uniqueSlug(dto.title || "", dto.slug, async (candidate) => {
+          const match = await this.prisma.page.findUnique({ where: { slug: candidate } });
+          return Boolean(match && match.id !== currentId);
+        })
+      : undefined;
+    return this.prisma.page.update({
+      where: { id: currentId },
+      data: {
+        ...dto,
+        ...(slug ? { slug } : {}),
+        contentHtml: cleanHtml(dto.contentHtml),
+        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+      },
+    });
+  }
+
+  @Delete("pages/:id")
+  @Roles("Admin")
+  deletePage(@Param("id") id: string) {
+    return this.prisma.page.delete({ where: { id: Number(id) } });
   }
 
   private async assertMenuDepth(menuId: number, parentId: number | null) {

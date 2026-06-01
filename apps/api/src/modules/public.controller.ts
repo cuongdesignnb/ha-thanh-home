@@ -283,6 +283,18 @@ export class PublicController {
       }, {}),
     });
   }
+
+  @Get("pages/:slug")
+  async getPageBySlug(@Param("slug") slug: string) {
+    const page = await this.prisma.page.findUnique({
+      where: { slug, status: ContentStatus.published },
+      include: { thumbnailMedia: true },
+    });
+    if (!page) {
+      throw new NotFoundException("Trang không tồn tại");
+    }
+    return repairPublicText(page);
+  }
 }
 
 function publicDesignOrder(sort?: string, type: "architecture" | "interior" = "architecture") {

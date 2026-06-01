@@ -341,6 +341,23 @@ export type Post = {
   publishedAt?: string | null;
 };
 
+export type CustomPage = {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  contentHtml?: string | null;
+  thumbnailMedia?: MediaFile | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  canonicalUrl?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PostCategory = {
   id: number;
   name: string;
