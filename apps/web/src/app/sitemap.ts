@@ -38,11 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 
   // Dynamic routes from API
-  const [projects, archDesigns, intDesigns, posts] = await Promise.all([
+  const [projects, archDesigns, intDesigns, posts, customPages] = await Promise.all([
     fetchSlugs("/projects?limit=500&status=published"),
     fetchSlugs("/architecture-designs?limit=500&status=published"),
     fetchSlugs("/interior-designs?limit=500&status=published"),
     fetchSlugs("/posts?limit=500&status=published"),
+    fetchSlugs("/pages"),
   ]);
 
   const dynamicRoutes: MetadataRoute.Sitemap = [
@@ -69,6 +70,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: p.updatedAt || p.publishedAt ? new Date(p.updatedAt || p.publishedAt!) : undefined,
       changeFrequency: "weekly" as const,
       priority: 0.6,
+    })),
+    ...customPages.map((p) => ({
+      url: `${base}/${p.slug}`,
+      lastModified: p.updatedAt || p.publishedAt ? new Date(p.updatedAt || p.publishedAt!) : undefined,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
     })),
   ];
 

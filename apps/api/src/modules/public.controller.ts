@@ -284,6 +284,16 @@ export class PublicController {
     });
   }
 
+  @Get("pages")
+  async listPublicPages() {
+    const data = await this.prisma.page.findMany({
+      where: { status: ContentStatus.published },
+      select: { slug: true, updatedAt: true, publishedAt: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    return data;
+  }
+
   @Get("pages/:slug")
   async getPageBySlug(@Param("slug") slug: string) {
     const page = await this.prisma.page.findUnique({
