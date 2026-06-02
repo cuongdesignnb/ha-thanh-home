@@ -45,7 +45,7 @@ type EstimateResult = {
 
 const apiBase = "/api";
 
-export function ConstructionEstimatorWidget() {
+export function ConstructionEstimatorWidget({ initialHotline }: { initialHotline?: string }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [config, setConfig] = useState<EstimatorConfig | null>(null);
@@ -53,6 +53,7 @@ export function ConstructionEstimatorWidget() {
   const [result, setResult] = useState<EstimateResult | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [hotline, setHotline] = useState(initialHotline || "0898 502 333");
   const fields = config?.inputSchema || [];
   const firstStepFields = fields.slice(0, 5);
   const secondStepFields = fields.slice(5);
@@ -64,6 +65,15 @@ export function ConstructionEstimatorWidget() {
         if (!payload) return;
         setConfig(payload);
         setInput(sampleInput(payload.inputSchema || []));
+      })
+      .catch(() => undefined);
+
+    fetch("/api/site-settings")
+      .then((r) => r.ok ? r.json() : null)
+      .then((settings) => {
+        if (settings?.["site.identity"]?.hotline) {
+          setHotline(settings["site.identity"].hotline);
+        }
       })
       .catch(() => undefined);
   }, []);
@@ -134,7 +144,7 @@ export function ConstructionEstimatorWidget() {
       event.currentTarget.reset();
     } catch {
       setStatus("error");
-      setMessage("Chưa gửi được thông tin. Anh/chị vui lòng gọi hotline 0966 123 456 hoặc thử lại.");
+      setMessage(`Chưa gửi được thông tin. Anh/chị vui lòng gọi hotline ${hotline} hoặc thử lại.`);
     }
   }
 
@@ -145,7 +155,7 @@ export function ConstructionEstimatorWidget() {
 
   return (
     <>
-      <MobileBottomCta onOpenEstimator={() => setOpen(true)} />
+      <MobileBottomCta onOpenEstimator={() => setOpen(true)} hotline={hotline} />
       {open ? (
         <div className="estimator-modal" role="dialog" aria-modal="true" aria-label="Dự toán chi phí xây dựng">
           <div className="estimator-backdrop" onClick={close} />
@@ -233,14 +243,15 @@ function EstimateResultView({ message, result, status, submitLead }: { message: 
   );
 }
 
-function MobileBottomCta({ onOpenEstimator }: { onOpenEstimator: () => void }) {
+function MobileBottomCta({ onOpenEstimator, hotline }: { onOpenEstimator: () => void; hotline: string }) {
   const [path, setPath] = useState("/");
   useEffect(() => setPath(window.location.pathname), []);
+  const hotlineClean = hotline.replace(/\s/g, "");
   return (
     <nav className="mobile-bottom-cta" aria-label="Tác vụ nhanh">
       <a className={path === "/" ? "active" : ""} href="/"><Home size={21} /><span>Trang chủ</span></a>
       <button type="button" onClick={onOpenEstimator}><Calculator size={21} /><span>Dự toán</span></button>
-      <a href="tel:0966123456"><Phone size={21} /><span>Gọi ngay</span></a>
+      <a href={`tel:${hotlineClean}`}><Phone size={21} /><span>Gọi ngay</span></a>
       <a className={path.startsWith("/lien-he") ? "active" : ""} href="/lien-he"><MessageCircle size={21} /><span>Tư vấn</span></a>
     </nav>
   );

@@ -4,6 +4,7 @@ import { LeadForm } from "@/components/lead-form";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { buildBreadcrumbSchema, buildContactPageSchema, buildLocalBusinessSchema } from "@/lib/seo/jsonld";
+import { getSiteSettings } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Liên hệ tư vấn",
@@ -13,6 +14,11 @@ export const metadata: Metadata = {
 
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ mau?: string; loai?: string }> }) {
   const params = await searchParams;
+  const settings = await getSiteSettings();
+  const identity = settings["site.identity"] || {};
+  const hotline = identity.hotline || "0898 502 333";
+  const email = identity.email || "info@hathanhhome.vn";
+  const address = identity.address || "Hà Nội, Việt Nam";
 
   const schemas = [
     buildBreadcrumbSchema([
@@ -35,12 +41,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
               <h1>Đặt lịch tư vấn thiết kế và thi công theo nhu cầu thực tế</h1>
               <p>Gửi thông tin mẫu thiết kế, diện tích, vị trí và ngân sách dự kiến. Đội ngũ Hà Thành Home sẽ tư vấn phương án phù hợp trước khi triển khai hồ sơ chi tiết.</p>
               <div className="contact-points">
-                <span><Phone size={18} /> 0966 123 456</span>
-                <span><Mail size={18} /> info@hathanhhome.vn</span>
-                <span><MapPin size={18} /> Hà Nội, Ninh Bình và khu vực miền Bắc</span>
+                <span><Phone size={18} /> {hotline}</span>
+                <span><Mail size={18} /> {email}</span>
+                <span><MapPin size={16} /> {address}</span>
               </div>
             </div>
-            <LeadForm templateSlug={params.mau} templateType={params.loai} />
+            <LeadForm templateSlug={params.mau} templateType={params.loai} initialHotline={hotline} />
           </div>
         </section>
       </main>

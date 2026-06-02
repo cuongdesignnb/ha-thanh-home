@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 
 type LeadFormProps = {
   templateSlug?: string;
   templateType?: string;
+  initialHotline?: string;
 };
 
-export function LeadForm({ templateSlug, templateType }: LeadFormProps) {
+export function LeadForm({ templateSlug, templateType, initialHotline }: LeadFormProps) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [hotline, setHotline] = useState(initialHotline || "0898 502 333");
+
+  useEffect(() => {
+    fetch("/api/site-settings")
+      .then((r) => r.ok ? r.json() : null)
+      .then((settings) => {
+        if (settings?.["site.identity"]?.hotline) {
+          setHotline(settings["site.identity"].hotline);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +55,7 @@ export function LeadForm({ templateSlug, templateType }: LeadFormProps) {
       form.reset();
     } catch {
       setStatus("error");
-      setMessage("Chưa gửi được yêu cầu. Anh/chị vui lòng gọi hotline 0966 123 456 hoặc thử lại sau.");
+      setMessage(`Chưa gửi được yêu cầu. Anh/chị vui lòng gọi hotline ${hotline} hoặc thử lại sau.`);
     }
   }
 

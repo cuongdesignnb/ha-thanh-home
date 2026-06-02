@@ -5,7 +5,7 @@ import { getMenu, getSiteSettings, type MenuItem } from "@/lib/api";
 const defaultIdentity = {
   name: "Hà Thành Home",
   tagline: "Thiết kế - Thi công - Nội thất",
-  hotline: "0966 123 456",
+  hotline: "0898 502 333",
   email: "info@hathanhhome.vn",
   address: "Hà Nội, Việt Nam",
   facebook: "",

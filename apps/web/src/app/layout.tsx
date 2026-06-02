@@ -130,7 +130,7 @@ export default async function RootLayout({
           buildWebSiteSchema(),
         ]} />
         {children}
-        <ConstructionEstimatorWidget />
+        <ConstructionEstimatorWidget initialHotline={settings["site.identity"]?.hotline || "0898 502 333"} />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildItemListSchema } from "@/lib/seo/jsonld";
 import { ArrowRight, Compass, Layers, Sparkles, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { getSiteSettings } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Dịch vụ Thiết kế & Thi công trọn gói - Hà Thành Home",
@@ -65,6 +66,10 @@ const whyChooseUs = [
 ];
 
 export default async function ServicesPage() {
+  const settings = await getSiteSettings();
+  const hotline = settings["site.identity"]?.hotline || "0898 502 333";
+  const hotlineClean = hotline.replace(/\s/g, "");
+
   const schemas = [
     buildBreadcrumbSchema([
       { name: "Trang chủ", url: "/" },
@@ -173,7 +178,7 @@ export default async function ServicesPage() {
               </p>
               <div className="cta-banner-actions">
                 <a className="cta" href="/lien-he">Yêu cầu báo giá & Tư vấn</a>
-                <a className="cta secondary" href="tel:0966123456">Hotline: 0966 123 456</a>
+                <a className="cta secondary" href={`tel:${hotlineClean}`}>Hotline: {hotline}</a>
               </div>
             </div>
           </div>
