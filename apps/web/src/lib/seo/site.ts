@@ -19,7 +19,7 @@ export const siteConfig = {
   defaultOgImage: `${siteUrl}/og-default.jpg`,
   locale: "vi_VN",
   language: "vi",
-  phone: "0966 123 456",
+  phone: "0898 502 333",
   email: "info@hathanhhome.vn",
   address: {
     streetAddress: "Hà Nội",

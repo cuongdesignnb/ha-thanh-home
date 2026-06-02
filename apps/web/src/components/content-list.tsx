@@ -1,6 +1,6 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service } from "@/lib/api";
+import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings } from "@/lib/api";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -106,7 +106,10 @@ function ProjectCard({ index, project }: { index: number; project: Project }) {
   );
 }
 
-export function ProjectDetail({ project }: { project: Project }) {
+export async function ProjectDetail({ project }: { project: Project }) {
+  const settings = await getSiteSettings();
+  const hotline = settings["site.identity"]?.hotline || "0898 502 333";
+  const hotlineClean = hotline.replace(/\s/g, "");
   const image = thumbnailUrl(project, project.group === "interior" ? interiorImages[0] : projectImages[0]);
   const albumImages = buildProjectAlbum(project);
   const specs = [
@@ -130,7 +133,7 @@ export function ProjectDetail({ project }: { project: Project }) {
           <p>{project.description}</p>
           <div className="template-detail-actions">
             <a className="cta" href={`/lien-he?du-an=${project.slug}`}>Tư vấn dự án tương tự</a>
-            <a className="cta secondary" href="tel:0966123456">Gọi 0966 123 456</a>
+            <a className="cta secondary" href={`tel:${hotlineClean}`}>Gọi {hotline}</a>
           </div>
         </div>
       </section>
@@ -152,7 +155,7 @@ export function ProjectDetail({ project }: { project: Project }) {
             </article>
             <section className="template-lead-box">
               <div><span>Tư vấn dự án tương tự</span><h2>Cần triển khai công trình hoặc nội thất theo phong cách tương tự?</h2><p>Hà Thành Home sẽ tư vấn lại theo diện tích, vị trí, ngân sách và yêu cầu vận hành thực tế của anh/chị.</p></div>
-              <div className="template-lead-actions"><a className="cta" href={`/lien-he?du-an=${project.slug}`}>Đặt lịch tư vấn</a><a className="outline-cta" href="tel:0966123456">Gọi ngay</a></div>
+              <div className="template-lead-actions"><a className="cta" href={`/lien-he?du-an=${project.slug}`}>Đặt lịch tư vấn</a><a className="outline-cta" href={`tel:${hotlineClean}`}>Gọi ngay</a></div>
             </section>
           </div>
         </div>
@@ -161,7 +164,10 @@ export function ProjectDetail({ project }: { project: Project }) {
   );
 }
 
-export function ServiceDetail({ service }: { service: Service }) {
+export async function ServiceDetail({ service }: { service: Service }) {
+  const settings = await getSiteSettings();
+  const hotline = settings["site.identity"]?.hotline || "0898 502 333";
+  const hotlineClean = hotline.replace(/\s/g, "");
   const fallback = service.group === "interior" ? interiorImages[0] : projectImages[0];
   const image = thumbnailUrl(service, fallback);
   const albumImages = buildServiceAlbum(service);
@@ -183,7 +189,7 @@ export function ServiceDetail({ service }: { service: Service }) {
           {service.description ? <p>{service.description}</p> : null}
           <div className="template-detail-actions">
             <a className="cta" href={`/lien-he?dich-vu=${service.slug}`}>Đặt lịch tư vấn miễn phí</a>
-            <a className="cta secondary" href="tel:0966123456">Gọi 0966 123 456</a>
+            <a className="cta secondary" href={`tel:${hotlineClean}`}>Gọi {hotline}</a>
           </div>
         </div>
       </section>
@@ -211,7 +217,7 @@ export function ServiceDetail({ service }: { service: Service }) {
 
             <section className="template-lead-box">
               <div><span>Tư vấn dịch vụ này</span><h2>Cần triển khai dịch vụ tương tự?</h2><p>Hà Thành Home tư vấn miễn phí theo diện tích, vị trí, ngân sách và yêu cầu thực tế của anh/chị.</p></div>
-              <div className="template-lead-actions"><a className="cta" href={`/lien-he?dich-vu=${service.slug}`}>Đặt lịch tư vấn</a><a className="outline-cta" href="tel:0966123456">Gọi ngay</a></div>
+              <div className="template-lead-actions"><a className="cta" href={`/lien-he?dich-vu=${service.slug}`}>Đặt lịch tư vấn</a><a className="outline-cta" href={`tel:${hotlineClean}`}>Gọi ngay</a></div>
             </section>
           </div>
         </div>

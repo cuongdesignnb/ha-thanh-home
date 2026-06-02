@@ -2,7 +2,7 @@ import { ArrowRight, Banknote, CheckCircle2, Clock, Filter, Home, Images, Layout
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign } from "@/lib/api";
+import { interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -148,7 +148,10 @@ function Meta({ icon: Icon, label, value }: { icon: LucideIcon; label: string; v
   return <span><Icon size={16} /><small>{label}</small><strong>{value}</strong></span>;
 }
 
-export function TemplateDetail({ item, kind }: { item: ArchitectureDesign | InteriorDesign; kind: "architecture" | "interior" }) {
+export async function TemplateDetail({ item, kind }: { item: ArchitectureDesign | InteriorDesign; kind: "architecture" | "interior" }) {
+  const settings = await getSiteSettings();
+  const hotline = settings["site.identity"]?.hotline || "0898 502 333";
+  const hotlineClean = hotline.replace(/\s/g, "");
   const isArchitecture = kind === "architecture";
   const image = thumbnailUrl(item, isArchitecture ? projectImages[0] : interiorImages[0]);
   const architecture = item as ArchitectureDesign;
@@ -167,7 +170,7 @@ export function TemplateDetail({ item, kind }: { item: ArchitectureDesign | Inte
           <p>{item.description}</p>
           <div className="template-detail-actions">
             <a className="cta" href="#lead"><MessageCircle size={18} /> Đặt tư vấn mẫu này</a>
-            <a className="cta secondary" href="tel:0966123456"><Phone size={18} /> Gọi 0966 123 456</a>
+            <a className="cta secondary" href={`tel:${hotlineClean}`}><Phone size={18} /> Gọi {hotline}</a>
           </div>
         </div>
       </section>
@@ -210,7 +213,7 @@ export function TemplateDetail({ item, kind }: { item: ArchitectureDesign | Inte
               </div>
               <div className="template-lead-actions">
                 <a className="cta" href={`/lien-he?mau=${item.slug}&loai=${kind}`}>Đặt lịch tư vấn</a>
-                <a className="outline-cta" href="tel:0966123456"><Phone size={18} /> Gọi ngay</a>
+                <a className="outline-cta" href={`tel:${hotlineClean}`}><Phone size={18} /> Gọi ngay</a>
               </div>
             </section>
           </div>
