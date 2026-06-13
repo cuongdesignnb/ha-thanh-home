@@ -30,8 +30,8 @@ class AiContentDto {
   secondaryKeywords?: string;
 
   @IsOptional()
-  @IsIn(["construction", "interior"])
-  group?: "construction" | "interior";
+  @IsIn(["construction", "interior", "xay_nha_tron_goi"])
+  group?: "construction" | "interior" | "xay_nha_tron_goi";
 
   @IsOptional()
   @IsString()
@@ -496,7 +496,7 @@ function buildPrompt(task: "outline" | "meta" | "article", dto: AiContentDto) {
     `Chủ đề: ${dto.topic}`,
     `Từ khóa chính: ${dto.focusKeyword}`,
     `Từ khóa phụ: ${dto.secondaryKeywords || "Không có"}`,
-    `Nhóm nội dung: ${dto.group === "interior" ? "Nội thất" : "Công trình"}`,
+    `Nhóm nội dung: ${dto.group === "interior" ? "Nội thất" : dto.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình"}`,
     `Đối tượng khách hàng: ${dto.audience || "Chủ nhà, chủ đầu tư, doanh nghiệp"}`,
     `Giọng văn: ${dto.tone || "Chuyên gia, sang trọng, tư vấn bán hàng"}`,
     `Loại bài: ${dto.articleType || "Cẩm nang"}`,
