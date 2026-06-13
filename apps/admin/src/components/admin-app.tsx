@@ -901,7 +901,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "generating_image" } : item));
 
         try {
-          const imagePrompt = `Ảnh hero thực tế phong cách premium architecture & interior, biệt thự hiện đại với phòng khách sang trọng, ánh sáng tự nhiên, vật liệu gỗ đá cao cấp, không chữ, không logo cho chủ đề: ${keyword}`;
+          const imagePrompt = getDynamicImagePrompt(keyword, form.group);
           const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -2868,7 +2868,7 @@ function PostAiGenerator({ form }: { form: ReturnType<typeof useForm<Record<stri
       if (withImage) {
         notify({ tone: "info", title: "AI đang sinh ảnh", description: "Đang tạo ảnh minh họa phong cách chuyên nghiệp và lưu vào Media Library..." });
         
-        const imagePrompt = `Ảnh hero thực tế phong cách premium architecture & interior, biệt thự hiện đại với phòng khách sang trọng, ánh sáng tự nhiên, vật liệu gỗ đá cao cấp, không chữ, không logo cho chủ đề: ${title}`;
+        const imagePrompt = getDynamicImagePrompt(title);
         
         const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
           method: "POST",
@@ -4050,6 +4050,33 @@ function canWriteEntity(entity: Entity, roles: string[]) {
   if (["posts", "post-categories", "pages"].includes(entity)) return roles.includes("Admin") || roles.includes("SEO Editor");
   if (entity === "leads") return roles.includes("Admin") || roles.includes("Sales");
   return false;
+}
+
+function getDynamicImagePrompt(title: string, group?: string): string {
+  const lowercaseTitle = title.toLowerCase();
+  
+  let subject = "";
+  if (lowercaseTitle.includes("nhà xưởng") || lowercaseTitle.includes("nha xuong") || lowercaseTitle.includes("nhà kho") || lowercaseTitle.includes("nha kho")) {
+    subject = "Ảnh chụp thực tế công trình nhà xưởng công nghiệp hiện đại, nhà thép tiền chế, kết cấu vững chắc, phối cảnh ngoại thất góc rộng, ánh sáng ban ngày rõ nét";
+  } else if (lowercaseTitle.includes("văn phòng") || lowercaseTitle.includes("van phong") || lowercaseTitle.includes("office") || lowercaseTitle.includes("phong lam viec") || lowercaseTitle.includes("phòng làm việc")) {
+    subject = "Ảnh chụp phối cảnh thực tế thiết kế nội thất văn phòng làm việc hiện đại, không gian làm việc chuyên nghiệp, co-working space cao cấp, ánh sáng tự nhiên";
+  } else if (
+    lowercaseTitle.includes("nội thất") || lowercaseTitle.includes("noi that") || 
+    lowercaseTitle.includes("phòng khách") || lowercaseTitle.includes("phong khach") || 
+    lowercaseTitle.includes("phòng ngủ") || lowercaseTitle.includes("phong ngu") || 
+    lowercaseTitle.includes("phòng bếp") || lowercaseTitle.includes("phong bep") || 
+    lowercaseTitle.includes("nhà bếp") || lowercaseTitle.includes("nha bep") || 
+    lowercaseTitle.includes("chung cư") || lowercaseTitle.includes("chung cu") || 
+    lowercaseTitle.includes("căn hộ") || lowercaseTitle.includes("can ho") ||
+    group === "interior"
+  ) {
+    subject = "Ảnh chụp phối cảnh nội thất căn hộ biệt thự hiện đại, phòng khách hoặc phòng ngủ sang trọng, tinh tế, sử dụng vật liệu gỗ đá tự nhiên cao cấp, ánh sáng dịu nhẹ ấm cúng";
+  } else {
+    // construction, xay_nha_tron_goi, or default exterior
+    subject = "Ảnh chụp thực tế phối cảnh ngoại thất mặt tiền (facade architecture) của biệt thự hiện đại hoặc nhà lô phố sang trọng, thiết kế cao cấp, ánh sáng ban ngày tự nhiên đẹp";
+  }
+
+  return `${subject}, phong cách premium brand Hà Thành Home, ảnh chụp sắc nét, chân thực, góc nhìn chuyên nghiệp, không chữ, không hình vẽ watermark cho chủ đề: ${title}`;
 }
 
 
