@@ -271,20 +271,26 @@ export class AiController {
           throw new BadRequestException("OPENAI_API_KEY is not configured");
         }
 
-        // Validate and map parameters for OpenAI ChatGPT Image
+        // Validate and map parameters for OpenAI ChatGPT Image / DALL-E
         const openaiModel = model || "gpt-image-2";
         let size = input.size;
-        if (openaiModel.includes("dall-e-3") || openaiModel === "gpt-image-2") {
+        let quality: string | undefined = input.quality;
+
+        if (openaiModel.includes("dall-e-3")) {
+          // Standard OpenAI DALL-E 3 mappings
           if (size === "1536x1024") size = "1792x1024";
           else if (size === "1024x1536") size = "1024x1792";
           else if (size !== "1024x1024" && size !== "1792x1024" && size !== "1024x1792") {
             size = "1024x1024";
           }
-        } else {
-          // dall-e-2 or other models
+          quality = input.quality === "high" || input.quality === "hd" ? "hd" : "standard";
+        } else if (openaiModel.includes("dall-e-2")) {
           size = "1024x1024";
+          quality = undefined; // dall-e-2 doesn't support quality parameter
+        } else {
+          // Keep original params for gpt-image-2 or other proxy models
+          // (which support size like 1536x1024 and quality like low, medium, high, auto)
         }
-        const quality = input.quality === "hd" ? "hd" : "standard";
 
         const response = await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
