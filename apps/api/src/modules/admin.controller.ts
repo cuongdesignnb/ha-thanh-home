@@ -1141,6 +1141,8 @@ export class AdminController {
     return this.prisma.project.create({
       data: {
         ...dto,
+        categoryId: dto.categoryId || null,
+        thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1165,6 +1167,8 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        categoryId: dto.categoryId || null,
+        thumbnailMediaId: dto.thumbnailMediaId || null,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1403,10 +1407,11 @@ export class AdminController {
       data: {
         ...dto,
         categoryId: dto.categoryId || null,
+        thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         status: dto.status || ContentStatus.draft,
-        scheduledAt,
+        scheduledAt: scheduledAt || null,
         publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
       },
     });
@@ -1431,6 +1436,7 @@ export class AdminController {
       data: {
         ...dto,
         categoryId: dto.categoryId || null,
+        thumbnailMediaId: dto.thumbnailMediaId || null,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         scheduledAt: scheduledAt || null,

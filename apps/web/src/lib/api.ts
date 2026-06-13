@@ -1153,14 +1153,16 @@ export function contentMetadata(
     thumbnailMedia?: MediaFile | null;
   } | null,
   fallbackTitle: string,
+  canonicalPath?: string,
 ) {
   if (!item) return { title: fallbackTitle };
   const description = item.metaDescription || item.description || item.excerpt || undefined;
   const image = thumbnailUrl(item, "");
+  const path = canonicalPath ? (canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`) : undefined;
   return {
     title: item.metaTitle || `${item.title} | Hà Thành Home`,
     description,
-    alternates: item.canonicalUrl ? { canonical: item.canonicalUrl } : undefined,
+    alternates: (item.canonicalUrl || path) ? { canonical: item.canonicalUrl || path } : undefined,
     openGraph: {
       title: item.ogTitle || item.metaTitle || item.title,
       description: item.ogDescription || description,

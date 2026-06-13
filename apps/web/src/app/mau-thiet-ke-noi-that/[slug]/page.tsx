@@ -8,7 +8,7 @@ import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } fro
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
-  return contentMetadata(item, "Mẫu thiết kế nội thất | Hà Thành Home");
+  return contentMetadata(item, "Mẫu thiết kế nội thất | Hà Thành Home", `/mau-thiet-ke-noi-that/${slug}`);
 }
 
 export default async function InteriorDesignDetailPage({ params }: { params: Promise<{ slug: string }> }) {

@@ -10,7 +10,7 @@ import { absoluteImageUrl } from "@/lib/seo/site";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const project = await getDetail<Project>(`/projects/${slug}`);
-  return contentMetadata(project, "Dự án | Hà Thành Home");
+  return contentMetadata(project, "Dự án | Hà Thành Home", `/du-an/${slug}`);
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {

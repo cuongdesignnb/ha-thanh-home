@@ -735,6 +735,24 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
   const [output, setOutput] = useState<AiOutput>(null);
   const [history, setHistory] = useState<CmsItem[]>([]);
 
+  // Bulk Generator states
+  const [tab, setTab] = useState<"single" | "bulk">("single");
+  const [keywordsText, setKeywordsText] = useState("");
+  const [bulkStartTime, setBulkStartTime] = useState(() => {
+    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
+    tomorrow.setMinutes(0);
+    tomorrow.setSeconds(0);
+    tomorrow.setMilliseconds(0);
+    // Convert to local time string format YYYY-MM-DDTHH:mm
+    const tzOffset = tomorrow.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(tomorrow.getTime() - tzOffset).toISOString().slice(0, 16);
+    return localISOTime;
+  });
+  const [bulkInterval, setBulkInterval] = useState(24); // hours
+  const [bulkWithImage, setBulkWithImage] = useState(true);
+  const [bulkProgress, setBulkProgress] = useState<Array<{ keyword: string; status: string; error?: string; scheduledAt?: string; postId?: number }>>([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
+
   async function loadHistory() {
     try {
       const response = await apiFetch("/api/cms/ai/generations");
@@ -817,29 +835,324 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
     notify({ tone: "success", title: "Đã tạo ảnh và lưu vào Media Library" });
   }
 
+  async function runBulkGeneration() {
+    const lines = keywordsText.split("\n").map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      notify({ tone: "error", title: "Thiếu từ khóa", description: "Vui lòng nhập ít nhất một từ khóa." });
+      return;
+    }
+
+    const start = new Date(bulkStartTime);
+    if (Number.isNaN(start.getTime())) {
+      notify({ tone: "error", title: "Lịch đăng không hợp lệ", description: "Vui lòng chọn thời gian bắt đầu hợp lệ." });
+      return;
+    }
+
+    setBulkLoading(true);
+    const initialProgress = lines.map(kw => ({ keyword: kw, status: "pending" }));
+    setBulkProgress(initialProgress);
+
+    for (let i = 0; i < lines.length; i++) {
+      const keyword = lines[i];
+      
+      // Update status to writing_article
+      setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "writing_article" } : item));
+
+      // Calculate scheduledAt for this keyword
+      const scheduledTime = new Date(start.getTime() + i * bulkInterval * 3600 * 1000);
+      const scheduledAtStr = scheduledTime.toISOString();
+      const localTimeString = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" }).format(scheduledTime);
+
+      setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, scheduledAt: localTimeString } : item));
+
+      let articlePayload: any;
+      try {
+        // 1. Sinh bài viết (createDraft: false để chúng ta tự gán ảnh cover)
+        const response = await apiFetch("/api/cms/ai/generate-article", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: keyword,
+            focusKeyword: keyword,
+            secondaryKeywords: form.secondaryKeywords,
+            group: form.group,
+            audience: form.audience,
+            tone: form.tone,
+            articleType: form.articleType,
+            length: form.length,
+            createDraft: false,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(await readApiError(response, "Lỗi sinh bài viết."));
+        }
+        articlePayload = await response.json();
+      } catch (err: any) {
+        setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "failed", error: err.message } : item));
+        continue;
+      }
+
+      let thumbnailMediaId: number | null = null;
+      let finalContentHtml = articlePayload.contentHtml || "";
+
+      // 2. Sinh ảnh đại diện bằng AI
+      if (bulkWithImage) {
+        setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "generating_image" } : item));
+
+        try {
+          const imagePrompt = `Ảnh hero thực tế phong cách premium architecture & interior, biệt thự hiện đại với phòng khách sang trọng, ánh sáng tự nhiên, vật liệu gỗ đá cao cấp, không chữ, không logo cho chủ đề: ${keyword}`;
+          const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: imagePrompt,
+              topic: keyword,
+              type: "blog",
+              size: "1536x1024",
+              quality: "medium",
+              altText: keyword,
+            }),
+          });
+
+          if (!imageResponse.ok) {
+            throw new Error(await readApiError(imageResponse, "Lỗi sinh ảnh."));
+          }
+
+          const imagePayload = await imageResponse.json();
+          const media = imagePayload.media;
+          if (media) {
+            thumbnailMediaId = media.id;
+            const mediaUrl = media.largeUrl || media.webpUrl || media.mediumUrl;
+            const imageHtml = `<p><img src="${mediaUrl}" alt="${keyword}" style="width:100%; max-width:800px; height:auto; border-radius:8px; display:block; margin: 0 auto 20px;" /></p>`;
+            finalContentHtml = imageHtml + finalContentHtml;
+          }
+        } catch (err: any) {
+          console.warn("Failed to generate image for keyword:", keyword, err);
+        }
+      }
+
+      // 3. Tạo bài viết với trạng thái scheduled
+      setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "saving" } : item));
+
+      try {
+        const postResponse = await apiFetch("/api/cms/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: articlePayload.title || keyword,
+            slug: articlePayload.slug || "",
+            contentHtml: finalContentHtml,
+            excerpt: articlePayload.excerpt || "",
+            focusKeyword: articlePayload.focusKeyword || keyword,
+            metaTitle: articlePayload.metaTitle || articlePayload.title || keyword,
+            metaDescription: articlePayload.metaDescription || "",
+            thumbnailMediaId,
+            status: "scheduled",
+            scheduledAt: scheduledAtStr,
+            isFeatured: false,
+          }),
+        });
+
+        if (!postResponse.ok) {
+          throw new Error(await readApiError(postResponse, "Lỗi lưu bài viết."));
+        }
+
+        const savedPost = await postResponse.json();
+        setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "completed", postId: savedPost.id } : item));
+      } catch (err: any) {
+        setBulkProgress(prev => prev.map((item, idx) => idx === i ? { ...item, status: "failed", error: err.message } : item));
+      }
+    }
+
+    setBulkLoading(false);
+    notify({ tone: "success", title: "Sinh bài viết hàng loạt hoàn tất" });
+    await loadHistory();
+  }
+
   return (
     <section className="ai-layout">
       <article className="panel ai-studio-card">
-        <div className="panel-heading">
-          <div><h2>Tạo nội dung SEO</h2><p>AI chỉ tạo draft, không tự xuất bản. Model và API key lấy từ cấu hình môi trường.</p></div>
+        <div className="panel-heading" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+          <div>
+            <h2>Tạo nội dung SEO</h2>
+            <p>AI chỉ tạo draft, không tự xuất bản. Model và API key lấy từ cấu hình môi trường.</p>
+          </div>
+          <div style={{ display: "flex", gap: "4px", background: "#f0ece4", padding: "4px", borderRadius: "6px" }}>
+            <button
+              type="button"
+              onClick={() => setTab("single")}
+              style={{
+                border: "none",
+                background: tab === "single" ? "#fff" : "transparent",
+                color: tab === "single" ? "var(--admin-forest-green, #1b4332)" : "#666",
+                fontWeight: tab === "single" ? "600" : "normal",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "13px",
+                transition: "all 0.2s"
+              }}
+            >
+              Tạo một bài
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("bulk")}
+              style={{
+                border: "none",
+                background: tab === "bulk" ? "#fff" : "transparent",
+                color: tab === "bulk" ? "var(--admin-forest-green, #1b4332)" : "#666",
+                fontWeight: tab === "bulk" ? "600" : "normal",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "13px",
+                transition: "all 0.2s"
+              }}
+            >
+              Tạo hàng loạt
+            </button>
+          </div>
         </div>
-        <div className="cms-form two-columns">
-          <label className="wide">Chủ đề<input value={form.topic} onChange={(event) => setForm({ ...form, topic: event.target.value })} /></label>
-          <label>Từ khóa chính<input value={form.focusKeyword} onChange={(event) => setForm({ ...form, focusKeyword: event.target.value })} /></label>
-          <label>Từ khóa phụ<input value={form.secondaryKeywords} onChange={(event) => setForm({ ...form, secondaryKeywords: event.target.value })} /></label>
-          <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
-          <label>Loại bài<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })}><option>Cẩm nang</option><option>Dịch vụ</option><option>Dự án/case study</option><option>So sánh</option><option>Báo giá tham khảo</option></select></label>
-          <label>Giọng văn<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })}><option>Chuyên gia</option><option>Thân thiện</option><option>Sang trọng</option><option>Tư vấn bán hàng</option><option>Chuyên gia, sang trọng, tư vấn bán hàng</option></select></label>
-          <label>Độ dài<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })}><option>800 từ</option><option>1200 từ</option><option>1800 từ</option><option>2500 từ</option></select></label>
-          <label className="wide">Đối tượng khách hàng<input value={form.audience} onChange={(event) => setForm({ ...form, audience: event.target.value })} /></label>
-          <label className="wide">Prompt tạo ảnh bài viết<textarea value={form.imagePrompt} onChange={(event) => setForm({ ...form, imagePrompt: event.target.value })} rows={4} placeholder="Mô tả ảnh cover cần tạo, không cần thêm chữ/logo." /></label>
-        </div>
-        <div className="ai-actions">
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-outline")} type="button"><Sparkles size={16} /> {loading === "generate-outline" ? "Đang tạo..." : "Tạo outline"}</button>
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-meta")} type="button"><FileText size={16} /> {loading === "generate-meta" ? "Đang tạo..." : "Tạo meta SEO"}</button>
-          <button className="primary-button" disabled={Boolean(loading)} onClick={() => run("generate-article", true)} type="button"><Newspaper size={16} /> {loading === "generate-article-draft" ? "Đang tạo draft..." : "Tạo bài viết draft"}</button>
-          <button className="secondary-button" disabled={Boolean(loading)} onClick={generateImage} type="button"><ImagePlus size={16} /> {loading === "generate-image" ? "Đang tạo ảnh..." : "Tạo ảnh lưu Media"}</button>
-        </div>
+
+        {tab === "single" ? (
+          <>
+            <div className="cms-form two-columns">
+              <label className="wide">Chủ đề<input value={form.topic} onChange={(event) => setForm({ ...form, topic: event.target.value })} /></label>
+              <label>Từ khóa chính<input value={form.focusKeyword} onChange={(event) => setForm({ ...form, focusKeyword: event.target.value })} /></label>
+              <label>Từ khóa phụ<input value={form.secondaryKeywords} onChange={(event) => setForm({ ...form, secondaryKeywords: event.target.value })} /></label>
+              <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
+              <label>Loại bài<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })}><option>Cẩm nang</option><option>Dịch vụ</option><option>Dự án/case study</option><option>So sánh</option><option>Báo giá tham khảo</option></select></label>
+              <label>Giọng văn<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })}><option>Chuyên gia</option><option>Thân thiện</option><option>Sang trọng</option><option>Tư vấn bán hàng</option><option>Chuyên gia, sang trọng, tư vấn bán hàng</option></select></label>
+              <label>Độ dài<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })}><option>800 từ</option><option>1200 từ</option><option>1800 từ</option><option>2500 từ</option></select></label>
+              <label className="wide">Đối tượng khách hàng<input value={form.audience} onChange={(event) => setForm({ ...form, audience: event.target.value })} /></label>
+              <label className="wide">Prompt tạo ảnh bài viết<textarea value={form.imagePrompt} onChange={(event) => setForm({ ...form, imagePrompt: event.target.value })} rows={4} placeholder="Mô tả ảnh cover cần tạo, không cần thêm chữ/logo." /></label>
+            </div>
+            <div className="ai-actions">
+              <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-outline")} type="button"><Sparkles size={16} /> {loading === "generate-outline" ? "Đang tạo..." : "Tạo outline"}</button>
+              <button className="secondary-button" disabled={Boolean(loading)} onClick={() => run("generate-meta")} type="button"><FileText size={16} /> {loading === "generate-meta" ? "Đang tạo..." : "Tạo meta SEO"}</button>
+              <button className="primary-button" disabled={Boolean(loading)} onClick={() => run("generate-article", true)} type="button"><Newspaper size={16} /> {loading === "generate-article-draft" ? "Đang tạo draft..." : "Tạo bài viết draft"}</button>
+              <button className="secondary-button" disabled={Boolean(loading)} onClick={generateImage} type="button"><ImagePlus size={16} /> {loading === "generate-image" ? "Đang tạo ảnh..." : "Tạo ảnh lưu Media"}</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="cms-form two-columns">
+              <label className="wide">
+                Danh sách từ khóa (mỗi từ khóa một dòng)
+                <textarea
+                  value={keywordsText}
+                  onChange={(event) => setKeywordsText(event.target.value)}
+                  rows={6}
+                  placeholder="Ví dụ:&#10;Thiết kế phòng khách biệt thự hiện đại&#10;Xu hướng thiết kế phòng ngủ 2026&#10;Cách dự toán chi phí xây nhà trọn gói"
+                  disabled={bulkLoading}
+                />
+              </label>
+              <label>
+                Lịch đăng bắt đầu
+                <input
+                  type="datetime-local"
+                  value={bulkStartTime}
+                  onChange={(event) => setBulkStartTime(event.target.value)}
+                  disabled={bulkLoading}
+                />
+              </label>
+              <label>
+                Khoảng cách đăng bài
+                <select
+                  value={bulkInterval}
+                  onChange={(event) => setBulkInterval(Number(event.target.value))}
+                  disabled={bulkLoading}
+                >
+                  <option value={4}>4 giờ/bài</option>
+                  <option value={6}>6 giờ/bài</option>
+                  <option value={8}>8 giờ/bài</option>
+                  <option value={12}>12 giờ/bài</option>
+                  <option value={24}>24 giờ/bài (1 ngày)</option>
+                  <option value={48}>48 giờ/bài (2 ngày)</option>
+                </select>
+              </label>
+              <label>Nhóm nội dung<select value={form.group} onChange={(event) => setForm({ ...form, group: event.target.value })} disabled={bulkLoading}><option value="construction">Công trình</option><option value="interior">Nội thất</option><option value="xay_nha_tron_goi">Xây nhà trọn gói</option></select></label>
+              <label>Loại bài<select value={form.articleType} onChange={(event) => setForm({ ...form, articleType: event.target.value })} disabled={bulkLoading}><option>Cẩm nang</option><option>Dịch vụ</option><option>Dự án/case study</option><option>So sánh</option><option>Báo giá tham khảo</option></select></label>
+              <label>Giọng văn<select value={form.tone} onChange={(event) => setForm({ ...form, tone: event.target.value })} disabled={bulkLoading}><option>Chuyên gia</option><option>Thân thiện</option><option>Sang trọng</option><option>Tư vấn bán hàng</option><option>Chuyên gia, sang trọng, tư vấn bán hàng</option></select></label>
+              <label>Độ dài<select value={form.length} onChange={(event) => setForm({ ...form, length: event.target.value })} disabled={bulkLoading}><option>800 từ</option><option>1200 từ</option><option>1800 từ</option><option>2500 từ</option></select></label>
+              <label className="wide">Đối tượng khách hàng<input value={form.audience} onChange={(event) => setForm({ ...form, audience: event.target.value })} disabled={bulkLoading} /></label>
+              <label className="wide check-row">
+                <input
+                  type="checkbox"
+                  checked={bulkWithImage}
+                  onChange={(event) => setBulkWithImage(event.target.checked)}
+                  disabled={bulkLoading}
+                />
+                Tự động tạo ảnh đại diện (AI Cover Image)
+              </label>
+            </div>
+            
+            <div className="ai-actions">
+              <button
+                className="primary-button"
+                disabled={bulkLoading}
+                onClick={runBulkGeneration}
+                type="button"
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                <Sparkles size={16} />
+                {bulkLoading ? "Đang xử lý sinh bài viết hàng loạt..." : "Bắt đầu sinh bài viết hàng loạt"}
+              </button>
+            </div>
+
+            {bulkProgress.length > 0 ? (
+              <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                <strong style={{ fontSize: "14px" }}>Tiến độ sinh bài viết:</strong>
+                <div style={{
+                  maxHeight: "250px",
+                  overflowY: "auto",
+                  border: "1px solid #ddd",
+                  borderRadius: "6px",
+                  padding: "10px",
+                  background: "#fff",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px"
+                }}>
+                  {bulkProgress.map((item, index) => (
+                    <div key={index} style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      fontSize: "13px",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      background: item.status === "completed" ? "#e8f5e9" : item.status === "failed" ? "#ffebee" : item.status === "pending" ? "#f5f5f5" : "#e3f2fd"
+                    }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                        <span style={{ fontWeight: "500" }}>{item.keyword}</span>
+                        {item.scheduledAt ? <small style={{ color: "#666" }}>Lên lịch: {item.scheduledAt}</small> : null}
+                        {item.error ? <small style={{ color: "red" }}>Lỗi: {item.error}</small> : null}
+                      </div>
+                      <span style={{
+                        fontSize: "11px",
+                        fontWeight: "600",
+                        padding: "2px 6px",
+                        borderRadius: "10px",
+                        color: "#fff",
+                        background: item.status === "completed" ? "#2e7d32" : item.status === "failed" ? "#c62828" : item.status === "pending" ? "#757575" : "#1565c0"
+                      }}>
+                        {item.status === "pending" && "Chờ xử lý"}
+                        {item.status === "writing_article" && "Đang viết bài..."}
+                        {item.status === "generating_image" && "Đang tạo ảnh..."}
+                        {item.status === "saving" && "Đang lưu..."}
+                        {item.status === "completed" && "Thành công"}
+                        {item.status === "failed" && "Thất bại"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </>
+        )}
       </article>
 
       <article className="panel ai-output-card">
@@ -1937,7 +2250,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
                     setValues({ ...values, imageProvider: provider, openaiImageModel: defaultModel });
                   }}
                 >
-                  <option value="openai">OpenAI (ChatGPT / DALL-E)</option>
+                  <option value="openai">OpenAI (ChatGPT Image)</option>
                   <option value="gemini">Google Gemini</option>
                 </select>
               </label>

@@ -265,11 +265,26 @@ export class AiController {
           imageBuffer = Buffer.from(base64Image, "base64");
         }
       } else {
-        // OpenAI (ChatGPT / DALL-E)
+        // OpenAI (ChatGPT Image)
         const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) {
           throw new BadRequestException("OPENAI_API_KEY is not configured");
         }
+
+        // Validate and map parameters for OpenAI ChatGPT Image
+        const openaiModel = model || "gpt-image-2";
+        let size = input.size;
+        if (openaiModel.includes("dall-e-3") || openaiModel === "gpt-image-2") {
+          if (size === "1536x1024") size = "1792x1024";
+          else if (size === "1024x1536") size = "1024x1792";
+          else if (size !== "1024x1024" && size !== "1792x1024" && size !== "1024x1792") {
+            size = "1024x1024";
+          }
+        } else {
+          // dall-e-2 or other models
+          size = "1024x1024";
+        }
+        const quality = input.quality === "hd" ? "hd" : "standard";
 
         const response = await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
@@ -278,12 +293,11 @@ export class AiController {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model,
+            model: openaiModel,
             prompt,
-            size: input.size,
-            quality: input.quality,
+            size,
+            quality,
             n: 1,
-            output_format: "png",
           }),
         });
         const data = await response.json() as Record<string, unknown>;

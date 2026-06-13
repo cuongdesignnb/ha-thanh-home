@@ -9,7 +9,7 @@ import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getDetail<Post>(`/posts/${slug}`);
-  return contentMetadata(post, "Tin tức | Hà Thành Home");
+  return contentMetadata(post, "Tin tức | Hà Thành Home", `/tin-tuc/${slug}`);
 }
 
 export default async function PostDetailPage({ params }: { params: Promise<{ slug: string }> }) {
