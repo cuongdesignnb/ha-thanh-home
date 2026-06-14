@@ -861,7 +861,7 @@ export class AdminController {
     const slug = await uniqueSlug(dto.name, dto.slug, (candidate) =>
       this.prisma.projectCategory.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
-    return this.prisma.projectCategory.create({ data: { ...dto, slug, sortOrder: dto.sortOrder || 0, isActive: dto.isActive ?? true } });
+    return this.prisma.projectCategory.create({ data: { ...dto, slug, sortOrder: dto.sortOrder || 0, isActive: dto.isActive === null ? true : (dto.isActive ?? true) } });
   }
 
   @Patch("project-categories/:id")
@@ -874,7 +874,7 @@ export class AdminController {
           return Boolean(match && match.id !== currentId);
         })
       : undefined;
-    return this.prisma.projectCategory.update({ where: { id: currentId }, data: { ...dto, ...(slug ? { slug } : {}) } });
+    return this.prisma.projectCategory.update({ where: { id: currentId }, data: { ...dto, isActive: dto.isActive === null ? true : dto.isActive, ...(slug ? { slug } : {}) } });
   }
 
   @Delete("project-categories/:id")
@@ -979,7 +979,7 @@ export class AdminController {
     const slug = await uniqueSlug(dto.name, dto.slug, (candidate) =>
       this.prisma.postCategory.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
-    return this.prisma.postCategory.create({ data: { ...dto, slug } });
+    return this.prisma.postCategory.create({ data: { ...dto, slug, isActive: dto.isActive === null ? true : (dto.isActive ?? true) } });
   }
 
   @Patch("post-categories/:id")
@@ -992,7 +992,7 @@ export class AdminController {
           return Boolean(match && match.id !== currentId);
         })
       : undefined;
-    return this.prisma.postCategory.update({ where: { id: currentId }, data: { ...dto, ...(slug ? { slug } : {}) } });
+    return this.prisma.postCategory.update({ where: { id: currentId }, data: { ...dto, isActive: dto.isActive === null ? true : dto.isActive, ...(slug ? { slug } : {}) } });
   }
 
   @Delete("post-categories/:id")
@@ -1141,6 +1141,7 @@ export class AdminController {
     return this.prisma.project.create({
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
@@ -1167,6 +1168,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         ...(slug ? { slug } : {}),
@@ -1211,6 +1213,7 @@ export class AdminController {
     return this.prisma.architectureDesignTemplate.create({
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1235,6 +1238,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1277,6 +1281,7 @@ export class AdminController {
     return this.prisma.interiorDesignTemplate.create({
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1301,6 +1306,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
@@ -1341,6 +1347,7 @@ export class AdminController {
     return this.prisma.service.create({
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         status: dto.status || ContentStatus.draft,
@@ -1363,6 +1370,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
@@ -1406,6 +1414,7 @@ export class AdminController {
     return this.prisma.post.create({
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
@@ -1435,6 +1444,7 @@ export class AdminController {
       where: { id: currentId },
       data: {
         ...dto,
+        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         ...(slug ? { slug } : {}),
