@@ -25,7 +25,7 @@ import {
   MinLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { cleanHtml, listMeta, parsePagination, uniqueSlug } from "./cms-utils";
+import { cleanHtml, listMeta, parsePagination, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { Roles } from "./roles.decorator";
@@ -1418,6 +1418,11 @@ export class AdminController {
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
+        title: safeString(dto.title, 191)!,
+        focusKeyword: safeString(dto.focusKeyword, 191),
+        metaTitle: safeString(dto.metaTitle, 191),
+        canonicalUrl: safeString(dto.canonicalUrl, 191),
+        ogTitle: safeString(dto.ogTitle, 191),
         contentHtml: cleanHtml(dto.contentHtml),
         status: dto.status || ContentStatus.draft,
         scheduledAt: scheduledAt || null,
@@ -1448,6 +1453,11 @@ export class AdminController {
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         ...(slug ? { slug } : {}),
+        title: dto.title !== undefined ? safeString(dto.title, 191)! : undefined,
+        focusKeyword: dto.focusKeyword !== undefined ? safeString(dto.focusKeyword, 191) : undefined,
+        metaTitle: dto.metaTitle !== undefined ? safeString(dto.metaTitle, 191) : undefined,
+        canonicalUrl: dto.canonicalUrl !== undefined ? safeString(dto.canonicalUrl, 191) : undefined,
+        ogTitle: dto.ogTitle !== undefined ? safeString(dto.ogTitle, 191) : undefined,
         contentHtml: cleanHtml(dto.contentHtml),
         scheduledAt: scheduledAt || null,
         publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,

@@ -118,3 +118,9 @@ export function repairPublicText<T>(value: T): T {
     Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, repairPublicText(item)]),
   ) as T;
 }
+
+export function safeString(value?: string | null, length = 191): string | null {
+  if (value === undefined || value === null) return null;
+  return value.substring(0, length);
+}
+

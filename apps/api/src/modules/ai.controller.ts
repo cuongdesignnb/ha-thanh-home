@@ -6,7 +6,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
-import { cleanHtml, uniqueSlug } from "./cms-utils";
+import { cleanHtml, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { Roles } from "./roles.decorator";
@@ -155,13 +155,13 @@ export class AiController {
     );
     const post = await this.prisma.post.create({
       data: {
-        title,
+        title: safeString(title, 191)!,
         slug,
         excerpt: article.excerpt,
         contentHtml: cleanHtml(article.contentHtml),
-        metaTitle: article.metaTitle,
+        metaTitle: safeString(article.metaTitle, 191),
         metaDescription: article.metaDescription,
-        focusKeyword: article.focusKeyword || dto.focusKeyword,
+        focusKeyword: safeString(article.focusKeyword || dto.focusKeyword, 191),
         status: ContentStatus.draft,
         isFeatured: false,
         createdAt: new Date(),
