@@ -16,6 +16,7 @@ import { PrismaService } from "./prisma.service";
 import { PublicController } from "./public.controller";
 import { RolesGuard } from "./roles.guard";
 import { ScheduleService } from "./schedule.service";
+import { MailService } from "./mail.service";
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { ScheduleService } from "./schedule.service";
     }),
   ],
   controllers: [AppController, AuthController, AuthCompatController, AdminController, PublicController, MediaController, AiController, ConstructionEstimatorPublicController, ConstructionEstimatorAdminController],
-  providers: [AppService, AuthService, ConstructionEstimatorService, JwtGuard, RolesGuard, PrismaService, ScheduleService],
+  providers: [AppService, AuthService, ConstructionEstimatorService, JwtGuard, RolesGuard, PrismaService, ScheduleService, MailService],
 })
 export class AppModule {}

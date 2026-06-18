@@ -1975,6 +1975,15 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     phoneIconUrl: "",
     zaloLabel: "",
     phoneLabel: "",
+    smtpHost: "",
+    smtpPort: "587",
+    smtpSecure: "false",
+    smtpUser: "",
+    smtpPass: "",
+    smtpFromName: "Hà Thành Home",
+    smtpFromEmail: "",
+    smtpToEmail: "",
+    smtpEnabled: "false",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -1990,6 +1999,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
         const theme = typeof payload["site.theme"] === "object" && payload["site.theme"] ? payload["site.theme"] as Record<string, unknown> : {};
         const homepage = typeof payload["site.homepage"] === "object" && payload["site.homepage"] ? payload["site.homepage"] as Record<string, unknown> : {};
         const ai = typeof payload["site.ai"] === "object" && payload["site.ai"] ? payload["site.ai"] as Record<string, unknown> : {};
+        const smtp = typeof payload["site.smtp"] === "object" && payload["site.smtp"] ? payload["site.smtp"] as Record<string, unknown> : {};
         const heroSlides = Array.isArray(homepage.heroSlides) ? homepage.heroSlides as Array<Record<string, unknown>> : [];
         const hero = heroSlides[0] || {};
         setValues((current) => ({
@@ -2044,6 +2054,15 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           openaiImageModel: String(ai.openaiImageModel || "gpt-image-2"),
           imageProvider: String(ai.imageProvider || "openai"),
           geminiApiKey: String(ai.geminiApiKey || ""),
+          smtpHost: String(smtp.smtpHost || ""),
+          smtpPort: String(smtp.smtpPort || "587"),
+          smtpSecure: String(smtp.smtpSecure === true || smtp.smtpSecure === "true" ? "true" : "false"),
+          smtpUser: String(smtp.smtpUser || ""),
+          smtpPass: String(smtp.smtpPass || ""),
+          smtpFromName: String(smtp.smtpFromName || "Hà Thành Home"),
+          smtpFromEmail: String(smtp.smtpFromEmail || ""),
+          smtpToEmail: String(smtp.smtpToEmail || ""),
+          smtpEnabled: String(smtp.smtpEnabled === true || smtp.smtpEnabled === "true" ? "true" : "false"),
         }));
       })
       .catch((error) => notify({ tone: "error", title: "Không tải được cấu hình", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") }));
@@ -2129,6 +2148,17 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       openaiImageModel: values.openaiImageModel,
       imageProvider: values.imageProvider,
     };
+    const smtp = {
+      smtpHost: values.smtpHost,
+      smtpPort: Number(values.smtpPort) || 587,
+      smtpSecure: values.smtpSecure === "true",
+      smtpUser: values.smtpUser,
+      smtpPass: values.smtpPass,
+      smtpFromName: values.smtpFromName,
+      smtpFromEmail: values.smtpFromEmail,
+      smtpToEmail: values.smtpToEmail,
+      smtpEnabled: values.smtpEnabled === "true",
+    };
     try {
       const responses = await Promise.all([
         apiFetch("/api/cms/settings", {
@@ -2150,6 +2180,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: "site.ai", value: ai }),
+        }),
+        apiFetch("/api/cms/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "site.smtp", value: smtp }),
         }),
       ]);
       const failed = responses.find((response) => !response.ok);
@@ -2189,6 +2224,57 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           <LogoPickerField label="Icon Zalo tùy chỉnh (bỏ trống để dùng mặc định)" value={values.zaloIconUrl || ""} onChange={(url) => setValues({ ...values, zaloIconUrl: url })} />
           <LogoPickerField label="Icon Gọi Điện tùy chỉnh (bỏ trống để dùng mặc định)" value={values.phoneIconUrl || ""} onChange={(url) => setValues({ ...values, phoneIconUrl: url })} />
           <label className="wide">Giờ làm việc<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Thứ 2 - Thứ 7" /></label>
+
+          <div className="form-section wide theme-settings-section">
+            <div className="form-section-title">
+              <span>SMTP Email</span>
+              <div>
+                <h3>Cấu hình Email thông báo</h3>
+                <p>Cài đặt tài khoản SMTP để tự động gửi thông báo qua Email khi có khách hàng đăng ký tư vấn hoặc dự toán.</p>
+              </div>
+            </div>
+            <div className="form-grid">
+              <label>Kích hoạt thông báo Email
+                <select value={values.smtpEnabled} onChange={(event) => setValues({ ...values, smtpEnabled: event.target.value })}>
+                  <option value="false">Tắt thông báo</option>
+                  <option value="true">Bật thông báo</option>
+                </select>
+              </label>
+              <label>SMTP Host<input value={values.smtpHost} onChange={(event) => setValues({ ...values, smtpHost: event.target.value })} placeholder="Ví dụ: smtp.gmail.com" /></label>
+              <label>SMTP Port<input value={values.smtpPort} onChange={(event) => setValues({ ...values, smtpPort: event.target.value })} placeholder="Ví dụ: 465 (SSL) hoặc 587 (TLS)" /></label>
+              <label>Phương thức bảo mật
+                <select value={values.smtpSecure} onChange={(event) => setValues({ ...values, smtpSecure: event.target.value })}>
+                  <option value="false">STARTTLS (Thường dùng cổng 587)</option>
+                  <option value="true">SSL/TLS (Thường dùng cổng 465)</option>
+                </select>
+              </label>
+              <label>Tài khoản SMTP (Email gửi)<input value={values.smtpUser} onChange={(event) => setValues({ ...values, smtpUser: event.target.value })} placeholder="Ví dụ: user@gmail.com" /></label>
+              <label>Mật khẩu SMTP (Mật khẩu ứng dụng)<input type="password" value={values.smtpPass} onChange={(event) => setValues({ ...values, smtpPass: event.target.value })} placeholder="••••••••••••••••" /></label>
+              <label>Tên người gửi hiển thị<input value={values.smtpFromName} onChange={(event) => setValues({ ...values, smtpFromName: event.target.value })} placeholder="Ví dụ: Hà Thành Home" /></label>
+              <label>Email người gửi (Thường trùng SMTP)<input value={values.smtpFromEmail} onChange={(event) => setValues({ ...values, smtpFromEmail: event.target.value })} placeholder="Ví dụ: noreply@hathanhhome.vn" /></label>
+              <label className="wide">Email nhận thông báo (Nhận lead mới)<input value={values.smtpToEmail} onChange={(event) => setValues({ ...values, smtpToEmail: event.target.value })} placeholder="Nhập địa chỉ email sẽ nhận thông tin khách hàng đăng ký" /></label>
+              
+              <div className="smtp-guide-box wide" style={{ backgroundColor: "#f9f6f0", borderLeft: "4px solid #c99a4a", padding: "16px", borderRadius: "8px", marginTop: "12px", fontSize: "13px", lineHeight: "1.6", color: "#555" }}>
+                <h4 style={{ margin: "0 0 8px 0", color: "#183b2d", fontWeight: "bold", fontSize: "14px" }}>💡 Hướng dẫn cấu hình Email SMTP nhanh:</h4>
+                <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                  <li><strong>Nếu sử dụng Gmail:</strong>
+                    <ul style={{ margin: "4px 0", paddingLeft: "15px" }}>
+                      <li><strong>SMTP Host:</strong> <code>smtp.gmail.com</code> | <strong>Port:</strong> <code>465</code> (chọn SSL/TLS) hoặc <code>587</code> (chọn STARTTLS).</li>
+                      <li><strong>Tài khoản:</strong> Nhập địa chỉ Gmail của bạn.</li>
+                      <li><strong>Mật khẩu:</strong> Bạn <u>không dùng</u> mật khẩu Gmail chính. Bạn phải kích hoạt <b>Bảo mật 2 lớp</b> cho tài khoản Google, sau đó truy cập vào trang quản lý tài khoản để tạo <b>Mật khẩu ứng dụng (App Password)</b> gồm 16 ký tự và dán vào đây.</li>
+                    </ul>
+                  </li>
+                  <li style={{ marginTop: "6px" }}><strong>Nếu sử dụng Email theo tên miền (Webmail cPanel/DirectAdmin):</strong>
+                    <ul style={{ margin: "4px 0", paddingLeft: "15px" }}>
+                      <li><strong>SMTP Host:</strong> Thường là <code>mail.domain.com</code>.</li>
+                      <li><strong>Port:</strong> <code>465</code> (SSL) hoặc <code>587</code> (TLS/STARTTLS).</li>
+                      <li><strong>Mật khẩu:</strong> Sử dụng mật khẩu của hòm thư email theo tên miền đó.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">

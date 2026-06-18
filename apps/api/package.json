@@ -25,6 +25,7 @@
     "class-validator": "^0.14.3",
     "expr-eval": "^2.0.2",
     "mysql2": "^3.22.3",
+    "nodemailer": "^9.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "sharp": "^0.34.5"
@@ -33,6 +34,7 @@
     "@types/express": "^5.0.5",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.10.1",
+    "@types/nodemailer": "^8.0.1",
     "prisma": "6.19.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

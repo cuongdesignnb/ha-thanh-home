@@ -2,10 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { ContentStatus } from "@prisma/client";
 import { repairPublicText } from "./cms-utils";
 import { PrismaService } from "./prisma.service";
+import { MailService } from "./mail.service";
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async getHome() {
     const [constructionProjects, interiorProjects, posts, architectureDesigns, interiorDesigns] = await Promise.all([
@@ -107,7 +111,7 @@ export class AppService {
     message?: string;
     sourceUrl?: string;
   }) {
-    return this.prisma.lead.create({
+    const lead = await this.prisma.lead.create({
       data: {
         fullName: dto.fullName,
         phone: dto.phone,
@@ -122,5 +126,8 @@ export class AppService {
         sourceType: "website",
       },
     });
+
+    this.mailService.sendLeadNotification(lead).catch(() => undefined);
+    return lead;
   }
 }

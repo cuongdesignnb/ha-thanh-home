@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { Parser } from "expr-eval";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "./prisma.service";
+import { MailService } from "./mail.service";
 
 type EstimatorOption = {
   label: string;
@@ -193,7 +194,10 @@ export class ConstructionEstimatorService {
     },
   });
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async getAdminConfig() {
     const config = await this.prisma.constructionEstimatorConfig.findFirst({ orderBy: [{ isActive: "desc" }, { updatedAt: "desc" }] });
@@ -283,6 +287,7 @@ export class ConstructionEstimatorService {
     if (estimate) {
       await this.prisma.constructionEstimate.update({ where: { id: estimate.id }, data: { leadId: lead.id } });
     }
+    this.mailService.sendLeadNotification(lead).catch(() => undefined);
     return { lead, estimateId: estimate?.id || null };
   }
 
