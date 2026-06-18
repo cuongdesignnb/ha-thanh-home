@@ -155,7 +155,6 @@ export function ConstructionEstimatorWidget({ initialHotline }: { initialHotline
 
   return (
     <>
-      <MobileBottomCta onOpenEstimator={() => setOpen(true)} hotline={hotline} />
       {open ? (
         <div className="estimator-modal" role="dialog" aria-modal="true" aria-label="Dự toán chi phí xây dựng">
           <div className="estimator-backdrop" onClick={close} />
@@ -243,19 +242,7 @@ function EstimateResultView({ message, result, status, submitLead }: { message: 
   );
 }
 
-function MobileBottomCta({ onOpenEstimator, hotline }: { onOpenEstimator: () => void; hotline: string }) {
-  const [path, setPath] = useState("/");
-  useEffect(() => setPath(window.location.pathname), []);
-  const hotlineClean = hotline.replace(/\s/g, "");
-  return (
-    <nav className="mobile-bottom-cta" aria-label="Tác vụ nhanh">
-      <a className={path === "/" ? "active" : ""} href="/"><Home size={21} /><span>Trang chủ</span></a>
-      <button type="button" onClick={onOpenEstimator}><Calculator size={21} /><span>Dự toán</span></button>
-      <a href={`tel:${hotlineClean}`}><Phone size={21} /><span>Gọi ngay</span></a>
-      <a className={path.startsWith("/lien-he") ? "active" : ""} href="/lien-he"><MessageCircle size={21} /><span>Tư vấn</span></a>
-    </nav>
-  );
-}
+
 
 function sampleInput(fields: EstimatorField[]) {
   return Object.fromEntries(fields.map((field) => [field.name, field.defaultValue ?? (field.type === "number" ? field.min || 0 : field.options?.[0]?.value || "")]));

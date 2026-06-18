@@ -4239,3 +4239,130 @@ h3 {
   }
 }
 
+/* PC Floating Contact Buttons */
+.pc-contact-float {
+  position: fixed;
+  right: 24px;
+  bottom: 80px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.pc-float-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.pc-float-btn:hover {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+}
+
+.pc-float-btn .btn-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.pc-float-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.zalo-fallback-circle,
+.phone-fallback-circle {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+/* Tooltip Labels */
+.float-btn-label {
+  position: absolute;
+  right: 72px;
+  background: #23312b;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(10px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.pc-float-btn:hover .float-btn-label {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Glowing Pulsing Rings */
+.pulse-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: pulse-animation 2s infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pulse-ring.blue {
+  background: rgba(0, 104, 255, 0.4);
+}
+
+.pulse-ring.green {
+  background: rgba(76, 175, 80, 0.4);
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Hide PC floating widget on mobile screens */
+@media (max-width: 768px) {
+  .pc-contact-float {
+    display: none !important;
+  }
+  .mobile-bottom-cta img {
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+    border-radius: 50%;
+  }
+}
+

@@ -1971,6 +1971,10 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     geminiApiKey: "",
     logoUrl: "",
     faviconUrl: "",
+    zaloIconUrl: "",
+    phoneIconUrl: "",
+    zaloLabel: "",
+    phoneLabel: "",
   });
   const [saving, setSaving] = useState(false);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
@@ -2000,6 +2004,10 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           workingHours: String(identity.workingHours || ""),
           logoUrl: String(identity.logoUrl || ""),
           faviconUrl: String(identity.faviconUrl || ""),
+          zaloIconUrl: String(identity.zaloIconUrl || ""),
+          phoneIconUrl: String(identity.phoneIconUrl || ""),
+          zaloLabel: String(identity.zaloLabel || ""),
+          phoneLabel: String(identity.phoneLabel || ""),
           forestGreen: String(theme.forestGreen || current.forestGreen),
           gold: String(theme.gold || current.gold),
           cream: String(theme.cream || current.cream),
@@ -2056,6 +2064,10 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       facebook: values.facebook,
       zalo: values.zalo,
       workingHours: values.workingHours,
+      zaloIconUrl: values.zaloIconUrl,
+      phoneIconUrl: values.phoneIconUrl,
+      zaloLabel: values.zaloLabel,
+      phoneLabel: values.phoneLabel,
     };
     const theme = {
       forestGreen: values.forestGreen,
@@ -2171,7 +2183,11 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           <label>Email<input value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} placeholder="info@hathanhhome.vn" /></label>
           <label className="wide">Địa chỉ<textarea value={values.address} onChange={(event) => setValues({ ...values, address: event.target.value })} rows={3} placeholder="Số 123 Nguyễn Trãi, Hà Nội" /></label>
           <label>Facebook<input value={values.facebook} onChange={(event) => setValues({ ...values, facebook: event.target.value })} placeholder="https://facebook.com/..." /></label>
-          <label>Zalo<input value={values.zalo} onChange={(event) => setValues({ ...values, zalo: event.target.value })} placeholder="https://zalo.me/..." /></label>
+          <label>Số điện thoại Zalo hoặc link Zalo chat<input value={values.zalo} onChange={(event) => setValues({ ...values, zalo: event.target.value })} placeholder="Ví dụ: 0966123456 hoặc https://zalo.me/..." /></label>
+          <label>Nhãn nút Zalo (PC/Mobile)<input value={values.zaloLabel} onChange={(event) => setValues({ ...values, zaloLabel: event.target.value })} placeholder="Mặc định: Chat Zalo" /></label>
+          <label>Nhãn nút Gọi điện (PC/Mobile)<input value={values.phoneLabel} onChange={(event) => setValues({ ...values, phoneLabel: event.target.value })} placeholder="Mặc định: Gọi điện" /></label>
+          <LogoPickerField label="Icon Zalo tùy chỉnh (bỏ trống để dùng mặc định)" value={values.zaloIconUrl || ""} onChange={(url) => setValues({ ...values, zaloIconUrl: url })} />
+          <LogoPickerField label="Icon Gọi Điện tùy chỉnh (bỏ trống để dùng mặc định)" value={values.phoneIconUrl || ""} onChange={(url) => setValues({ ...values, phoneIconUrl: url })} />
           <label className="wide">Giờ làm việc<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Thứ 2 - Thứ 7" /></label>
 
           <div className="form-section wide theme-settings-section">

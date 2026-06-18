@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Cormorant_Garamond, Inter, Playfair_Display, Roboto } from "next/font/google";
 import { ConstructionEstimatorWidget } from "@/components/construction-estimator-widget";
+import { ContactWidget } from "@/components/contact-widget";
 import { JsonLd } from "@/components/seo/json-ld";
 import { ThemeRuntimeSync } from "@/components/theme-runtime-sync";
 import { getSiteSettings, type SiteTheme } from "@/lib/api";
@@ -131,6 +132,7 @@ export default async function RootLayout({
         ]} />
         {children}
         <ConstructionEstimatorWidget initialHotline={settings["site.identity"]?.hotline || "0898 502 333"} />
+        <ContactWidget identity={settings["site.identity"]} />
       </body>
     </html>
   );

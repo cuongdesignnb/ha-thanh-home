@@ -95,6 +95,10 @@ export type SiteIdentity = {
   address?: string;
   facebook?: string;
   zalo?: string;
+  zaloIconUrl?: string;
+  phoneIconUrl?: string;
+  zaloLabel?: string;
+  phoneLabel?: string;
   workingHours?: string;
   logoUrl?: string;
   faviconUrl?: string;
