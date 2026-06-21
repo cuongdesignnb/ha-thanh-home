@@ -1,6 +1,6 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings } from "@/lib/api";
+import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -90,7 +90,7 @@ function isReadableOption(value: string) {
 }
 
 function ProjectCard({ index, project }: { index: number; project: Project }) {
-  const image = thumbnailUrl(project, project.group === "interior" ? interiorImages[index % interiorImages.length] : projectImages[index % projectImages.length]);
+  const image = thumbnailUrl(project, PLACEHOLDER_IMAGE);
   const categoryName = project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình");
   return (
     <a className="project-catalog-card" href={`/du-an/${project.slug}`}>
@@ -110,7 +110,7 @@ export async function ProjectDetail({ project }: { project: Project }) {
   const settings = await getSiteSettings();
   const hotline = settings["site.identity"]?.hotline || "0898 502 333";
   const hotlineClean = hotline.replace(/\s/g, "");
-  const image = thumbnailUrl(project, project.group === "interior" ? interiorImages[0] : projectImages[0]);
+  const image = thumbnailUrl(project, "");
   const albumImages = buildProjectAlbum(project);
   const specs = [
     ["Nhóm", project.group === "interior" ? "Nội thất" : "Công trình"],
@@ -126,7 +126,7 @@ export async function ProjectDetail({ project }: { project: Project }) {
   ];
   return (
     <main>
-      <section className="template-detail-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,61,46,.84), rgba(15,61,46,.2)), url(${image})` }}>
+      <section className="template-detail-hero" style={image ? { backgroundImage: `linear-gradient(90deg, rgba(15,61,46,.84), rgba(15,61,46,.2)), url(${image})` } : undefined}>
         <div className="container template-detail-hero-content">
           <span>Dự án đã thực hiện</span>
           <h1>{project.title}</h1>
@@ -277,9 +277,8 @@ function buildProjectAlbum(project: Project) {
   const mediaImages = (project.galleryMedia || [])
     .map((media) => media.largeUrl || media.mediumUrl || media.webpUrl || media.thumbUrl)
     .filter(Boolean) as string[];
-  const fallback = project.group === "interior" ? interiorImages : projectImages;
   const thumbnail = thumbnailUrl(project, "");
-  return Array.from(new Set([thumbnail, ...mediaImages, ...fallback].filter(Boolean))).slice(0, 6);
+  return Array.from(new Set([thumbnail, ...mediaImages].filter(Boolean)));
 }
 
 function defaultProjectArticle(project: Project) {

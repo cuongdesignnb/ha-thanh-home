@@ -736,12 +736,12 @@ export async function fetchLandingProjects(
 
   if (entity === "project") {
     const payload = await getListPayload<Project>(`${url}?${params}`);
-    return payload.data.map((p, index) => ({
+    return payload.data.map((p) => ({
       id: p.id,
       title: p.title,
       slug: p.slug,
       href: `/du-an/${p.slug}`,
-      thumbnailUrl: thumbnailUrl(p, fallbackImages[index % fallbackImages.length]),
+      thumbnailUrl: thumbnailUrl(p, PLACEHOLDER_IMAGE),
       categoryLabel: p.categoryRef?.name || p.category || (p.group === "interior" ? "Nội thất" : "Công trình"),
       location: p.location || undefined,
       meta: p.area || p.scale || undefined,
@@ -788,6 +788,8 @@ export const interiorImages = [
   "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=85",
   "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=85",
 ];
+
+export const PLACEHOLDER_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='560' viewBox='0 0 800 560'><rect width='100%' height='100%' fill='%23f4f6f5'/><circle cx='400' cy='240' r='48' fill='%23e2e8f0'/><path d='M376 224h48v32h-48z' fill='%2394a3b8'/><text x='50%' y='360' font-family='system-ui, sans-serif' font-size='20' font-weight='500' fill='%2364748b' text-anchor='middle'>Hà Thành Home</text></svg>";
 
 export function thumbnailUrl(item: { thumbnailMedia?: MediaFile | null } | null | undefined, fallback: string) {
   const media = item?.thumbnailMedia;

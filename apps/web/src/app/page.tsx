@@ -31,6 +31,7 @@ import {
   type Project,
   type Service,
   type SiteHomepage,
+  PLACEHOLDER_IMAGE,
 } from "@/lib/api";
 
 export default async function HomePage() {
@@ -44,8 +45,8 @@ export default async function HomePage() {
         <HeroSection slide={homepage.heroSlides?.[0] || defaultHomepage.heroSlides[0]} />
         <AboutSection homepage={homepage} />
         <ExpertiseSection homepage={homepage} />
-        <ProjectsSection id="projects" title="Dự án công trình tiêu biểu" projects={data.constructionProjects} images={projectImages} />
-        <ProjectsSection title="Dự án nội thất nổi bật" projects={data.interiorProjects} images={interiorImages} cream />
+        <ProjectsSection id="projects" title="Dự án công trình tiêu biểu" projects={data.constructionProjects} />
+        <ProjectsSection title="Dự án nội thất nổi bật" projects={data.interiorProjects} cream />
         <ArchitectureTemplatesSection homepage={homepage} designs={data.architectureDesigns || []} />
         <InteriorTemplatesSection homepage={homepage} designs={data.interiorDesigns || []} />
         <ServicesSection homepage={homepage} services={data.services} />
@@ -141,15 +142,15 @@ function ExpertiseSection({ homepage }: { homepage: SiteHomepage }) {
   );
 }
 
-function ProjectsSection({ id, title, projects, images, cream }: { id?: string; title: string; projects: Project[]; images: string[]; cream?: boolean }) {
+function ProjectsSection({ id, title, projects, cream }: { id?: string; title: string; projects: Project[]; cream?: boolean }) {
   return (
     <section className={`section ${cream ? "cream" : ""}`} id={id}>
       <div className="container">
         <div className="section-title"><h2>{title}</h2></div>
         <HorizontalSliderWrapper className="project-grid home-slider-grid">
-          {projects.slice(0, 6).map((project, index) => (
+          {projects.slice(0, 6).map((project) => (
             <a className="card" key={project.id} href={`/du-an/${project.slug}`}>
-              <div className="project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, images[index % images.length])})` }} />
+              <div className="project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, PLACEHOLDER_IMAGE)})` }} />
               <div className="card-body">
                 <h3>{project.title}</h3>
                 <span className="meta"><MapPin size={15} /> {project.location || "Hà Nội"}</span>
