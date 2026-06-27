@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -486,6 +487,10 @@ class PostDto {
   @IsOptional()
   @IsString()
   scheduledAt?: string;
+
+  @IsOptional()
+  @IsString()
+  publishedAt?: string;
 }
 
 class ArchitectureDesignDto {
@@ -1408,6 +1413,10 @@ export class AdminController {
     if (dto.status === ContentStatus.scheduled && !scheduledAt) {
       throw new BadRequestException("scheduledAt is required when status is scheduled");
     }
+    const publishedAt = dto.publishedAt ? new Date(dto.publishedAt) : undefined;
+    if (publishedAt && Number.isNaN(publishedAt.getTime())) {
+      throw new BadRequestException("Invalid publishedAt date");
+    }
     const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.post.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
@@ -1426,7 +1435,7 @@ export class AdminController {
         contentHtml: cleanHtml(dto.contentHtml),
         status: dto.status || ContentStatus.draft,
         scheduledAt: scheduledAt || null,
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt: dto.status === ContentStatus.published ? (publishedAt || new Date()) : null,
       },
     });
   }
@@ -1439,6 +1448,24 @@ export class AdminController {
     if (dto.status === ContentStatus.scheduled && !scheduledAt) {
       throw new BadRequestException("scheduledAt is required when status is scheduled");
     }
+    const publishedAt = dto.publishedAt ? new Date(dto.publishedAt) : undefined;
+    if (publishedAt && Number.isNaN(publishedAt.getTime())) {
+      throw new BadRequestException("Invalid publishedAt date");
+    }
+    const currentPost = await this.prisma.post.findUnique({ where: { id: currentId } });
+    if (!currentPost) throw new NotFoundException("Post not found");
+
+    let finalPublishedAt: Date | null | undefined = undefined;
+    if (dto.status === ContentStatus.published) {
+      if (publishedAt) {
+        finalPublishedAt = publishedAt;
+      } else if (currentPost.status !== ContentStatus.published) {
+        finalPublishedAt = new Date();
+      }
+    } else {
+      finalPublishedAt = null;
+    }
+
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
           const match = await this.prisma.post.findUnique({ where: { slug: candidate } });
@@ -1460,7 +1487,7 @@ export class AdminController {
         ogTitle: dto.ogTitle !== undefined ? safeString(dto.ogTitle, 191) : undefined,
         contentHtml: cleanHtml(dto.contentHtml),
         scheduledAt: scheduledAt || null,
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt: finalPublishedAt,
       },
     });
   }

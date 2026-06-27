@@ -238,8 +238,39 @@ function Testimonials({ homepage }: { homepage: SiteHomepage }) {
   );
 }
 
+function formatPostDate(dateStr?: string | null) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month}`;
+}
+
 function NewsSection({ posts, homepage }: { posts: Post[]; homepage: SiteHomepage }) {
+  if (!posts.length) return null;
   return (
-    <section className="section cream"><div className="container"><div className="section-title"><h2>{homepage.newsTitle || defaultHomepage.newsTitle}</h2></div><div className="news-grid">{posts.slice(0, 4).map((post, index) => <a className="news-card" key={post.id} href={`/tin-tuc/${post.slug}`}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><span className="date-badge"><CalendarDays size={14} /> 13.05</span><div className="card-body"><h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div></div></section>
+    <section className="section cream">
+      <div className="container">
+        <div className="section-title"><h2>{homepage.newsTitle || defaultHomepage.newsTitle}</h2></div>
+        <div className="news-grid">
+          {posts.slice(0, 4).map((post, index) => (
+            <a className="news-card" key={post.id} href={`/tin-tuc/${post.slug}`}>
+              <div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} />
+              {post.publishedAt ? (
+                <span className="date-badge">
+                  <CalendarDays size={14} /> {formatPostDate(post.publishedAt)}
+                </span>
+              ) : null}
+              <div className="card-body">
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+                <span>Đọc thêm <ArrowRight size={14} /></span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

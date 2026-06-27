@@ -201,6 +201,7 @@ const contentSchema = z.object({
   contentHtml: z.string().nullish(),
   slug: z.string().nullish(),
   scheduledAt: z.string().nullish(),
+  publishedAt: z.string().nullish(),
   code: z.string().nullish(),
   houseType: z.string().nullish(),
   interiorStyle: z.string().nullish(),
@@ -2678,7 +2679,13 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
 
   function startEdit(row: CmsItem) {
     setEditing(row);
-    form.reset({ ...defaultValues(entity), ...row, scheduledAt: toDateTimeLocal(row.scheduledAt), isFeatured: Boolean(row.isFeatured) });
+    form.reset({
+      ...defaultValues(entity),
+      ...row,
+      scheduledAt: toDateTimeLocal(row.scheduledAt),
+      publishedAt: toDateTimeLocal(row.publishedAt),
+      isFeatured: Boolean(row.isFeatured),
+    });
     setMode("form");
   }
 
@@ -3192,6 +3199,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
         <div className="form-grid">
           <label>Trạng thái<select {...form.register("status")}><option value="draft">Nháp</option><option value="pending_review">Chờ duyệt</option><option value="scheduled">Đặt lịch</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
           {entity === "posts" ? <label>Lịch đăng<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
+          {entity === "posts" ? <label>Ngày xuất bản<input type="datetime-local" {...form.register("publishedAt")} /></label> : null}
           {["projects", "pages"].includes(entity) ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
           {["projects", "posts"].includes(entity) ? (
             <div className="check-row-container wide">
@@ -4037,6 +4045,7 @@ function defaultValues(entity: Entity) {
     ogTitle: "",
     ogDescription: "",
     scheduledAt: "",
+    publishedAt: "",
     sortOrder: 0,
     isFeatured: false,
     isActive: true,
@@ -4058,6 +4067,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     delete payload.excerpt;
     delete payload.focusKeyword;
     delete payload.scheduledAt;
+    delete payload.publishedAt;
     delete payload.isFeatured;
   }
   if (entity === "posts") {
@@ -4073,6 +4083,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     delete payload.excerpt;
     delete payload.focusKeyword;
     delete payload.scheduledAt;
+    delete payload.publishedAt;
     delete payload.interiorStyle;
     delete payload.roomType;
     delete payload.layoutType;
@@ -4087,6 +4098,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     delete payload.excerpt;
     delete payload.focusKeyword;
     delete payload.scheduledAt;
+    delete payload.publishedAt;
     delete payload.style;
     delete payload.floors;
     delete payload.facadeWidth;
@@ -4101,6 +4113,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     delete payload.excerpt;
     delete payload.focusKeyword;
     delete payload.scheduledAt;
+    delete payload.publishedAt;
   }
   return payload;
 }
