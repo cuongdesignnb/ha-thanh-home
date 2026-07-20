@@ -96,8 +96,10 @@ function isReadableOption(value: string) {
 }
 
 function Select({ alignRight, label, labels, name, options, value }: { alignRight?: boolean; label: string; labels?: Record<string, string>; name: string; options: string[]; value?: string }) {
+  const className = [alignRight ? "push-right" : "", value ? "is-active" : ""].filter(Boolean).join(" ");
+
   return (
-    <label className={alignRight ? "push-right" : ""}>
+    <label className={className || undefined}>
       <span>{label}:</span>
       <select defaultValue={value || ""} name={name}>
         <option value="">Tất cả</option>

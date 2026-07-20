@@ -6,7 +6,7 @@ type Meta = { total: number; page: number; limit: number; totalPages: number };
 
 export function ProjectList({ title, projects }: { title: string; projects: Project[] }) {
   return (
-    <><PageHero title={title} description="Các dự án đã xuất bản từ hệ quản trị Hà Thành Home." /><section className="section"><div className="container project-grid">{projects.map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
   );
 }
 
@@ -61,8 +61,10 @@ function ProjectFilterBar({ filters, group, searchParams }: { filters: ProjectFi
 }
 
 function Select({ alignRight, label, labels, name, options, value }: { alignRight?: boolean; label: string; labels?: Record<string, string>; name: string; options: string[]; value?: string }) {
+  const className = [alignRight ? "push-right" : "", value ? "is-active" : ""].filter(Boolean).join(" ");
+
   return (
-    <label className={alignRight ? "push-right" : ""}>
+    <label className={className || undefined}>
       <span>{label}:</span>
       <select defaultValue={value || ""} name={name}>
         <option value="">Tất cả</option>
@@ -244,14 +246,14 @@ function extractContentImages(html: string): string[] {
 
 export function ServiceList({ title, services }: { title: string; services: Service[] }) {
   return (
-    <><PageHero title={title} description="Dịch vụ công trình và nội thất đang được xuất bản trên website." /><section className="section"><div className="container services">{services.map((service) => <a className="service-card" href={`/dich-vu/${service.slug}`} key={service.id}><h3>{service.title}</h3><p>{service.description}</p><span>Tìm hiểu thêm <ArrowRight size={14} /></span></a>)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container services">{services.map((service) => <a className="service-card" href={`/dich-vu/${service.slug}`} key={service.id}><h3>{service.title}</h3><p>{service.description}</p><span>Tìm hiểu thêm <ArrowRight size={14} /></span></a>)}</div></section></>
   );
 }
 
 export function PostList({ activeCategory, categories, posts }: { activeCategory?: string; categories?: PostCategory[]; posts: Post[] }) {
   return (
     <>
-      <PageHero title="Tin tức & cảm hứng" description="Bài viết SEO đã xuất bản từ hệ quản trị." />
+      <PageHero title="Tin tức & cảm hứng" />
       <section className="section">
         <div className="container">
           {categories?.length ? (

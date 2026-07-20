@@ -191,6 +191,8 @@ function ProcessTimeline({ landing }: { landing: ReturnType<typeof xayNhaLanding
 }
 
 function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]; landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
+  if (!projects.length) return null;
+
   return (
     <section className="section cream">
       <div className="container">
@@ -198,25 +200,21 @@ function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]
           <div><span className="eyebrow">{landing.projectsEyebrow}</span><h2>{landing.projectsTitle}</h2></div>
           <a className="section-link" href="/du-an/cong-trinh">Xem tất cả dự án <ArrowRight size={16} /></a>
         </div>
-        {projects.length ? (
-          <div className="xay-nha-project-grid">
-            {projects.map((project) => (
-              <article className="xay-nha-project-card" key={project.id}>
-                <div className="xay-nha-project-image" style={{ backgroundImage: `url(${project.thumbnailUrl})` }}><span>{project.categoryLabel || "Công trình"}</span></div>
-                <div className="xay-nha-project-body">
-                  <h3>{project.title}</h3>
-                  <div className="xay-nha-project-meta">
-                    <span><MapPin size={15} /> {project.location || "Đang cập nhật"}</span>
-                    <span><Ruler size={15} /> {project.meta || "Đang cập nhật"}</span>
-                  </div>
-                  <a href={project.href}>Xem chi tiết</a>
+        <div className="xay-nha-project-grid">
+          {projects.map((project) => (
+            <article className="xay-nha-project-card" key={project.id}>
+              <div className="xay-nha-project-image" style={{ backgroundImage: `url(${project.thumbnailUrl})` }}><span>{project.categoryLabel || "Công trình"}</span></div>
+              <div className="xay-nha-project-body">
+                <h3>{project.title}</h3>
+                <div className="xay-nha-project-meta">
+                  <span><MapPin size={15} /> {project.location || "Đang cập nhật"}</span>
+                  <span><Ruler size={15} /> {project.meta || "Đang cập nhật"}</span>
                 </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="xay-nha-empty">Chưa có dự án công trình đã xuất bản. Vui lòng thêm dự án trong admin để hiển thị tại đây.</div>
-        )}
+                <a href={project.href}>Xem chi tiết</a>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
