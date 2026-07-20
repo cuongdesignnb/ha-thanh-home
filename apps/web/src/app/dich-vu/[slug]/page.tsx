@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceDetail } from "@/components/content-list";
+import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, type Service } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema } from "@/lib/seo/jsonld";
+import { getRelatedServices } from "@/lib/related-content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -16,6 +18,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const service = await getDetail<Service>(`/services/${slug}`);
   if (!service) notFound();
+  const related = await getRelatedServices(service);
 
   const schemas = [
     buildBreadcrumbSchema([
@@ -36,6 +39,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       <SiteHeader />
       <JsonLd data={schemas} />
       <ServiceDetail service={service} />
+      <RelatedContent items={related} title="Dịch vụ liên quan" />
       <SiteFooter />
     </>
   );

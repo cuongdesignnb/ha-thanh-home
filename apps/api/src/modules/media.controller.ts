@@ -19,8 +19,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { memoryStorage } from "multer";
-import { IsEnum, IsOptional, IsString } from "class-validator";
-import { listMeta, parsePagination } from "./cms-utils";
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { listMeta, parsePagination, repairMojibakeText } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { Roles } from "./roles.decorator";
@@ -45,6 +45,12 @@ class MediaUpdateDto {
   @IsOptional()
   @IsEnum(MediaType)
   type?: MediaType;
+}
+
+class MediaUploadDto extends MediaUpdateDto {
+  @IsString()
+  @IsNotEmpty()
+  declare altText: string;
 }
 
 @Controller("api/admin/media")
@@ -75,7 +81,12 @@ export class MediaController {
         : {}),
     };
     const [data, total] = await Promise.all([
-      this.prisma.mediaFile.findMany({ where, skip, take: limit, orderBy: { createdAt: "desc" } }),
+      this.prisma.mediaFile.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ createdAt: query.sort === "oldest" ? "asc" : "desc" }, { id: query.sort === "oldest" ? "asc" : "desc" }],
+      }),
       this.prisma.mediaFile.count({ where }),
     ]);
     return { data, meta: listMeta(total, page, limit) };
@@ -97,15 +108,40 @@ export class MediaController {
       },
     }),
   )
-  async upload(@UploadedFile() file: Express.Multer.File, @Body() body: MediaUpdateDto) {
+  async upload(@UploadedFile() file: Express.Multer.File, @Body() body: MediaUploadDto) {
     if (!file?.buffer) {
       throw new BadRequestException("Missing image file");
     }
+    if (!body.altText?.trim()) {
+      throw new BadRequestException("Image alt text is required");
+    }
 
     const hash = crypto.createHash("sha256").update(file.buffer).digest("hex");
-    const existing = await this.prisma.mediaFile.findUnique({ where: { hash } });
+    const originalName = repairMojibakeText(file.originalname);
+    const existing = await this.prisma.mediaFile.findFirst({ where: { hash }, orderBy: { id: "asc" } });
     if (existing) {
-      return { media: existing, duplicated: true };
+      const media = await this.prisma.mediaFile.create({
+        data: {
+          originalName,
+          fileName: existing.fileName,
+          mimeType: existing.mimeType,
+          extension: existing.extension,
+          size: file.size,
+          width: existing.width,
+          height: existing.height,
+          hash,
+          originalUrl: existing.originalUrl,
+          webpUrl: existing.webpUrl,
+          thumbUrl: existing.thumbUrl,
+          mediumUrl: existing.mediumUrl,
+          largeUrl: existing.largeUrl,
+          altText: body.altText.trim(),
+          caption: body.caption?.trim() || null,
+          description: body.description?.trim() || null,
+          type: body.type || MediaType.general,
+        },
+      });
+      return { media, duplicated: true };
     }
 
     const uploadRoot = path.resolve(process.cwd(), "..", "..", process.env.UPLOAD_DIR || "storage/uploads");
@@ -114,8 +150,8 @@ export class MediaController {
     await fs.mkdir(targetDir, { recursive: true });
 
     const quality = Number(process.env.WEBP_QUALITY || 80);
-    const baseName = slugFileName(file.originalname.replace(/\.[^.]+$/, "")) || hash.slice(0, 10);
-    const originalPath = path.join(targetDir, `${baseName}${path.extname(file.originalname).toLowerCase()}`);
+    const baseName = slugFileName(originalName.replace(/\.[^.]+$/, "")) || hash.slice(0, 10);
+    const originalPath = path.join(targetDir, `${baseName}${path.extname(originalName).toLowerCase()}`);
     const webpPath = path.join(targetDir, `${baseName}.webp`);
     const thumbPath = path.join(targetDir, `${baseName}-thumb.webp`);
     const mediumPath = path.join(targetDir, `${baseName}-medium.webp`);
@@ -140,7 +176,7 @@ export class MediaController {
 
     const media = await this.prisma.mediaFile.create({
       data: {
-        originalName: file.originalname,
+        originalName,
         fileName: `${baseName}.webp`,
         mimeType: "image/webp",
         extension: "webp",
@@ -153,9 +189,9 @@ export class MediaController {
         thumbUrl: publicUrl(path.basename(thumbPath)),
         mediumUrl: publicUrl(path.basename(mediumPath)),
         largeUrl: publicUrl(path.basename(largePath)),
-        altText: body.altText,
-        caption: body.caption,
-        description: body.description,
+        altText: body.altText.trim(),
+        caption: body.caption?.trim() || null,
+        description: body.description?.trim() || null,
         type: body.type || MediaType.general,
       },
     });

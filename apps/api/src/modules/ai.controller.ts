@@ -18,6 +18,14 @@ type JwtUser = {
   roles?: string[];
 };
 
+type InternalLinkCandidate = {
+  title: string;
+  url: string;
+  kind: string;
+  text?: string | null;
+  group?: string | null;
+};
+
 class AiContentDto {
   @IsString()
   topic!: string;
@@ -134,7 +142,7 @@ export class AiController {
     const signature = `
 <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;" />
 <div style="padding: 20px; background-color: #f9f9f9; border-left: 4px solid #cc0000; margin-top: 30px; font-family: sans-serif;">
-  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; font-weight: bold;"><strong>CÔNG TY CỔ PHẦN THIẾT KẾ VÀ XÂY DỰNG HÀ THÀNH</strong></p>
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; font-weight: bold;"><strong>CÔNG TY CỔ PHẦN THIẾT KẾ VÀ X&Acirc;Y DỰNG HÀ THÀNH</strong></p>
   <p style="margin: 0 0 5px 0; font-size: 14px; color: #555;"><strong>Showroom:</strong> Số 42, Tổ 18 Khu Tập Thể Trường Cao Đẳng Du Lịch, P. Nghĩa Đô, TP. Hà Nội</p>
   <p style="margin: 0 0 5px 0; font-size: 14px; color: #555;"><strong>Tư vấn miễn phí:</strong> <a href="tel:0898502333" style="color: #cc0000; text-decoration: none; font-weight: bold;">0898 502 333</a></p>
   <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;"><strong>Website:</strong> <a href="https://hathanhhome.vn" target="_blank" rel="noopener" style="color: #0066cc; text-decoration: none;">hathanhhome.vn</a></p>
@@ -378,7 +386,8 @@ export class AiController {
       throw new BadRequestException("OPENAI_MODEL_WRITER or OPENAI_MODEL_FAST is not configured");
     }
 
-    const prompt = buildPrompt(options.task, options.dto);
+    const linkCandidates = options.task === "meta" ? [] : await this.buildInternalLinkCandidates(options.dto);
+    const prompt = buildPrompt(options.task, options.dto, linkCandidates);
     let status = "success";
     let output: unknown = null;
     try {
@@ -408,7 +417,12 @@ export class AiController {
         output = data;
         throw new BadRequestException(readOpenAiError(data));
       }
-      output = parseResponseJson(data);
+      const parsed = parseResponseJson(data);
+      output = options.task === "article"
+        ? enforceArticleInternalLinks(parsed, linkCandidates)
+        : options.task === "outline"
+          ? normalizeOutlineInternalLinks(parsed, linkCandidates)
+          : parsed;
       return output;
     } catch (error) {
       status = "error";
@@ -429,6 +443,55 @@ export class AiController {
     }
   }
 
+  private async buildInternalLinkCandidates(dto: AiContentDto): Promise<InternalLinkCandidate[]> {
+    const [projects, services, posts, architecture, interior] = await Promise.all([
+      this.prisma.project.findMany({
+        where: { status: ContentStatus.published },
+        select: { title: true, slug: true, description: true, group: true },
+        orderBy: { id: "desc" }, take: 24,
+      }),
+      this.prisma.service.findMany({
+        where: { status: ContentStatus.published },
+        select: { title: true, slug: true, description: true, group: true },
+        orderBy: { id: "desc" }, take: 16,
+      }),
+      this.prisma.post.findMany({
+        where: { status: ContentStatus.published },
+        select: { title: true, slug: true, excerpt: true },
+        orderBy: { id: "desc" }, take: 24,
+      }),
+      this.prisma.architectureDesignTemplate.findMany({
+        where: { status: ContentStatus.published },
+        select: { title: true, slug: true, description: true },
+        orderBy: { id: "desc" }, take: 16,
+      }),
+      this.prisma.interiorDesignTemplate.findMany({
+        where: { status: ContentStatus.published },
+        select: { title: true, slug: true, description: true },
+        orderBy: { id: "desc" }, take: 16,
+      }),
+    ]);
+
+    const candidates: InternalLinkCandidate[] = [
+      ...projects.map((item) => ({ title: item.title, url: `/du-an/${item.slug}`, kind: "Dự án", text: item.description, group: item.group })),
+      ...services.map((item) => ({ title: item.title, url: `/dich-vu/${item.slug}`, kind: "Dịch vụ", text: item.description, group: item.group })),
+      ...posts.map((item) => ({ title: item.title, url: `/tin-tuc/${item.slug}`, kind: "Bài viết", text: item.excerpt })),
+      ...architecture.map((item) => ({ title: item.title, url: `/mau-thiet-ke-kien-truc/${item.slug}`, kind: "Mẫu kiến trúc", text: item.description, group: "construction" })),
+      ...interior.map((item) => ({ title: item.title, url: `/mau-thiet-ke-noi-that/${item.slug}`, kind: "Mẫu nội thất", text: item.description, group: "interior" })),
+    ];
+    const terms = normalizeSearchText(`${dto.topic} ${dto.focusKeyword} ${dto.secondaryKeywords || ""}`).split(" ").filter((term) => term.length > 2);
+    return candidates
+      .map((candidate, index) => {
+        const haystack = normalizeSearchText(`${candidate.title} ${candidate.text || ""}`);
+        const relevance = terms.reduce((score, term) => score + (haystack.includes(term) ? 2 : 0), 0);
+        const groupScore = candidate.group && candidate.group === dto.group ? 3 : 0;
+        return { candidate, score: relevance + groupScore, index };
+      })
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .slice(0, 12)
+      .map(({ candidate }) => candidate);
+  }
+
   private async saveGeneratedImage(
     buffer: Buffer,
     options: {
@@ -440,7 +503,7 @@ export class AiController {
     },
   ) {
     const hash = crypto.createHash("sha256").update(buffer).digest("hex");
-    const existing = await this.prisma.mediaFile.findUnique({ where: { hash } });
+    const existing = await this.prisma.mediaFile.findFirst({ where: { hash }, orderBy: { id: "asc" } });
     if (existing) return existing;
 
     const now = new Date();
@@ -490,7 +553,7 @@ export class AiController {
   }
 }
 
-function buildPrompt(task: "outline" | "meta" | "article", dto: AiContentDto) {
+function buildPrompt(task: "outline" | "meta" | "article", dto: AiContentDto, linkCandidates: InternalLinkCandidate[] = []) {
   const common = [
     `Nhiệm vụ: ${task}`,
     `Chủ đề: ${dto.topic}`,
@@ -502,14 +565,90 @@ function buildPrompt(task: "outline" | "meta" | "article", dto: AiContentDto) {
     `Loại bài: ${dto.articleType || "Cẩm nang"}`,
     `Độ dài mong muốn: ${dto.length || "1200 từ"}`,
   ].join("\n");
+  const internalLinkRules = linkCandidates.length ? [
+    "Danh sách URL nội bộ đã xác minh từ dữ liệu đang xuất bản:",
+    ...linkCandidates.map((candidate, index) => `${index + 1}. [${candidate.kind}] ${candidate.title} — ${candidate.url}`),
+    "Chỉ được dùng URL nội bộ có nguyên văn trong danh sách trên; không tự tạo hoặc đoán URL.",
+    "Chọn 2 đến 4 URL liên quan nhất và chèn tự nhiên bằng anchor text mô tả đúng nội dung trang đích.",
+  ].join("\n") : "Không có URL nội bộ đã xác minh; không tự tạo internal link.";
 
   if (task === "outline") {
-    return `${common}\nHãy tạo outline SEO có H1, meta title, meta description, slug, H2/H3, FAQ, CTA, gợi ý ảnh, gợi ý internal link và dịch vụ/dự án liên quan.`;
+    return `${common}\n${internalLinkRules}\nHãy tạo outline SEO có H1, meta title, meta description, slug, H2/H3, FAQ, CTA, gợi ý ảnh, internalLinks là mảng chỉ gồm URL chính xác đã chọn và dịch vụ/dự án liên quan.`;
   }
   if (task === "meta") {
     return `${common}\nHãy tạo bộ metadata SEO gồm meta title, meta description, slug, OG title, OG description, focus keyword và FAQ schema đề xuất.`;
   }
-  return `${common}\nHãy viết bài SEO hoàn chỉnh bằng HTML sạch phù hợp TipTap. Có đoạn mở đầu, H2/H3, bullet list nếu cần, FAQ và CTA cuối bài. Không tự publish.`;
+  return `${common}\n${internalLinkRules}\nHãy viết bài SEO hoàn chỉnh bằng HTML sạch phù hợp TipTap. Có đoạn mở đầu, H2/H3, bullet list nếu cần, FAQ và CTA cuối bài. Trả thêm internalLinks là mảng URL nội bộ chính xác đã thực sự dùng trong contentHtml. Không tự publish.`;
+}
+
+function normalizeSearchText(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function normalizeOutlineInternalLinks(output: unknown, candidates: InternalLinkCandidate[]) {
+  if (!output || typeof output !== "object") return output;
+  const result = output as Record<string, unknown>;
+  const allowed = new Set(candidates.map((candidate) => candidate.url));
+  const proposed = Array.isArray(result.internalLinks) ? result.internalLinks.filter((url): url is string => typeof url === "string" && allowed.has(url)) : [];
+  result.internalLinks = Array.from(new Set(proposed.length ? proposed : candidates.slice(0, 4).map((candidate) => candidate.url))).slice(0, 4);
+  return result;
+}
+
+function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCandidate[]) {
+  if (!output || typeof output !== "object") return output;
+  const article = output as Record<string, unknown>;
+  if (typeof article.contentHtml !== "string") {
+    article.internalLinks = [];
+    return article;
+  }
+
+  const allowed = new Map(candidates.map((candidate) => [candidate.url, candidate]));
+  let html = article.contentHtml.replace(/<a\b([^>]*?)href=(['"])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi, (full, before: string, quote: string, href: string, after: string, label: string) => {
+    const normalizedHref = normalizeInternalHref(href);
+    if (!normalizedHref) return full;
+    if (allowed.has(normalizedHref) || normalizedHref === "/lien-he") {
+      return `<a${before}href=${quote}${normalizedHref}${quote}${after}>${label}</a>`;
+    }
+    return label;
+  });
+
+  const used = candidates.filter((candidate) => html.includes(`href="${candidate.url}"`) || html.includes(`href='${candidate.url}'`));
+  const needed = Math.max(0, Math.min(2, candidates.length) - used.length);
+  if (needed > 0) {
+    const additions = candidates.filter((candidate) => !used.some((item) => item.url === candidate.url)).slice(0, needed);
+    const links = additions.map((candidate) => `<a href="${candidate.url}">${escapeHtml(candidate.title)}</a>`);
+    if (links.length) {
+      const paragraph = `<p class="ai-internal-links">Tham khảo thêm ${joinVietnameseLinks(links)} để có thêm thông tin và phương án phù hợp.</p>`;
+      const ctaPattern = /<(h2|h3)([^>]*)>([^<]*(?:liên hệ|tư vấn|nhận báo giá)[^<]*)<\/\1>/i;
+      html = ctaPattern.test(html) ? html.replace(ctaPattern, `${paragraph}$&`) : `${html}${paragraph}`;
+      used.push(...additions);
+    }
+  }
+
+  article.contentHtml = html;
+  article.internalLinks = Array.from(new Set(used.map((candidate) => candidate.url))).slice(0, 4);
+  return article;
+}
+
+function normalizeInternalHref(href: string) {
+  const trimmed = href.trim();
+  if (trimmed.startsWith("/")) return trimmed.split(/[?#]/)[0];
+  try {
+    const url = new URL(trimmed);
+    if (url.hostname === "hathanhhome.vn" || url.hostname === "www.hathanhhome.vn") return url.pathname.replace(/\/$/, "") || "/";
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function joinVietnameseLinks(links: string[]) {
+  if (links.length < 2) return links[0] || "";
+  return `${links.slice(0, -1).join(", ")} và ${links.at(-1)}`;
 }
 
 function parseResponseJson(data: Record<string, unknown>) {
@@ -605,6 +744,7 @@ const articleSchema = {
     metaDescription: { type: "string" },
     focusKeyword: { type: "string" },
     contentHtml: { type: "string" },
+    internalLinks: { type: "array", items: { type: "string" } },
     faq: { type: "array", items: { type: "object", properties: { question: { type: "string" }, answer: { type: "string" } } } },
     cta: { type: "string" },
   },

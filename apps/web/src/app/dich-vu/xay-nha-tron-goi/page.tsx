@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { RelatedContent } from "@/components/related-content";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
   fetchLandingProjects,
@@ -40,6 +41,7 @@ import {
   xayNhaLandingWithDefaults,
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
+import { getConstructionGuidePosts } from "@/lib/related-content";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -54,9 +56,10 @@ const whyIcons = [Medal, ClipboardCheck, Banknote, ShieldCheck, Headphones, Badg
 const statIcons = [TimerReset, Building2, Sparkles, Headphones];
 
 export default async function XayNhaTronGoiPage() {
-  const [settings, estimatorConfig] = await Promise.all([
+  const [settings, estimatorConfig, guidePosts] = await Promise.all([
     getSiteSettings(),
     getConstructionEstimatorConfig(),
+    getConstructionGuidePosts(),
   ]);
   const landing = xayNhaLandingWithDefaults(settings["site.landing.xayNhaTronGoi"]);
   const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "construction" });
@@ -92,6 +95,7 @@ export default async function XayNhaTronGoiPage() {
         <WhyChooseSection landing={landing} />
         <StatsStrip items={landing.stats} />
         <Testimonials items={landing.testimonials} landing={landing} />
+        <RelatedContent items={guidePosts} title="Cẩm nang xây dựng hữu ích" />
         <FAQSection items={landing.faqs} landing={landing} />
         <FinalCTA landing={landing} />
       </main>

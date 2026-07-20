@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { TemplateDetail } from "@/components/design-templates";
+import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, thumbnailUrl, type InteriorDesign } from "@/lib/api";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
+import { getRelatedInterior } from "@/lib/related-content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -15,6 +17,7 @@ export default async function InteriorDesignDetailPage({ params }: { params: Pro
   const { slug } = await params;
   const item = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (!item) notFound();
+  const related = await getRelatedInterior(item);
 
   const imageUrl = thumbnailUrl(item, "");
   const schemas = [
@@ -37,6 +40,7 @@ export default async function InteriorDesignDetailPage({ params }: { params: Pro
       <SiteHeader />
       <JsonLd data={schemas} />
       <TemplateDetail item={item} kind="interior" />
+      <RelatedContent items={related} title="Mẫu nội thất liên quan" />
       <SiteFooter />
     </>
   );

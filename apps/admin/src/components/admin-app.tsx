@@ -8,11 +8,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { EditorContent, useEditor } from "@tiptap/react";
+import { Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import Underline from "@tiptap/extension-underline";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TableKit } from "@tiptap/extension-table";
+import TextAlign from "@tiptap/extension-text-align";
 import {
   ArrowLeft,
   AlertTriangle,
@@ -72,6 +75,40 @@ import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
 
 
 const apiFetch = adminApiFetch;
+
+const ImageFigure = Node.create({
+  name: "imageFigure",
+  group: "block",
+  atom: true,
+  draggable: true,
+  addAttributes() {
+    return {
+      src: { default: null, parseHTML: (element) => element.querySelector("img")?.getAttribute("src") },
+      alt: { default: "", parseHTML: (element) => element.querySelector("img")?.getAttribute("alt") || "" },
+      caption: { default: "", parseHTML: (element) => element.querySelector("figcaption")?.textContent || "" },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "figure[data-content-image]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    const caption = String(HTMLAttributes.caption || "");
+    return [
+      "figure",
+      { "data-content-image": "", class: "content-image" },
+      ["img", { src: HTMLAttributes.src, alt: HTMLAttributes.alt || "", loading: "lazy" }],
+      ...(caption ? [["figcaption", {}, caption]] : []),
+    ];
+  },
+});
+
+function askUploadMetadata(file: File) {
+  const suggested = file.name.replace(/\.[^.]+$/, "");
+  const altText = window.prompt(`Mô tả ảnh (alt) - bắt buộc\n${file.name}`, suggested)?.trim();
+  if (!altText) return null;
+  const caption = window.prompt(`Chú thích ảnh (không bắt buộc)\n${file.name}`, "")?.trim() || "";
+  return { altText, caption };
+}
 
 type User = { email: string; roles: string[] };
 type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings" | "pages";
@@ -619,12 +656,14 @@ function MediaLibrary({ roles }: { roles: string[] }) {
   const [selected, setSelected] = useState<CmsItem | null>(null);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const canUpload = roles.includes("Super Admin") || roles.includes("Admin") || roles.includes("SEO Editor");
 
-  async function load() {
+  async function load(preferredId?: number, requestedSort = sort) {
     try {
-      const params = new URLSearchParams({ page: "1", limit: "60" });
+      const params = new URLSearchParams({ page: "1", limit: "60", sort: requestedSort });
       if (search) params.set("search", search);
       if (type) params.set("type", type);
       const response = await apiFetch(`/api/cms/media?${params}`);
@@ -635,7 +674,10 @@ function MediaLibrary({ roles }: { roles: string[] }) {
       if (!response.ok) throw new Error(await readApiError(response, "Không tải được Media Library."));
       const payload: ListResponse<CmsItem> = await response.json();
       setRows(payload.data || []);
-      setSelected((current) => current || payload.data?.[0] || null);
+      setSelected((current) => {
+        if (preferredId) return payload.data.find((item) => item.id === preferredId) || payload.data?.[0] || null;
+        return current && payload.data.some((item) => item.id === current.id) ? payload.data.find((item) => item.id === current.id) || null : payload.data?.[0] || null;
+      });
     } catch (error) {
       notify({ tone: "error", title: "Không tải được Media Library", description: describeClientError(error, "Kiểm tra API hoặc kết nối mạng.") });
     }
@@ -649,16 +691,26 @@ function MediaLibrary({ roles }: { roles: string[] }) {
     if (!files?.length) return;
     setUploading(true);
     let failed = 0;
+    let newestUploadId: number | undefined;
     for (const file of Array.from(files)) {
       try {
+        const metadata = askUploadMetadata(file);
+        if (!metadata) {
+          failed += 1;
+          continue;
+        }
         const formData = new FormData();
         formData.append("file", file);
         formData.append("type", type || "general");
-        formData.append("altText", file.name.replace(/\.[^.]+$/, ""));
+        formData.append("altText", metadata.altText);
+        if (metadata.caption) formData.append("caption", metadata.caption);
         const response = await apiFetch("/api/cms/media/upload", { method: "POST", body: formData });
         if (!response.ok) {
           failed += 1;
           notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${await readApiError(response, "File không hợp lệ hoặc vượt quá dung lượng.")}` });
+        } else {
+          const payload = await response.json();
+          newestUploadId = Number(payload.media?.id) || newestUploadId;
         }
       } catch (error) {
         failed += 1;
@@ -666,7 +718,8 @@ function MediaLibrary({ roles }: { roles: string[] }) {
       }
     }
     setUploading(false);
-    await load();
+    setSort("newest");
+    await load(newestUploadId, "newest");
     if (failed < files.length) notify({ tone: "success", title: "Upload hoàn tất", description: failed ? `Đã upload ${files.length - failed}/${files.length} ảnh.` : "Thư viện ảnh đã được cập nhật." });
   }
 
@@ -674,6 +727,32 @@ function MediaLibrary({ roles }: { roles: string[] }) {
     if (!url) return;
     await navigator.clipboard.writeText(url);
     notify({ tone: "success", title: "Đã copy URL ảnh" });
+  }
+
+  async function saveSelected() {
+    if (!selected) return;
+    const altText = String(selected.altText || "").trim();
+    if (!altText) {
+      notify({ tone: "error", title: "Thiếu mô tả ảnh", description: "Alt text là bắt buộc." });
+      return;
+    }
+    setSaving(true);
+    try {
+      const response = await apiFetch(`/api/cms/media/${selected.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ altText, caption: String(selected.caption || "").trim(), type: selected.type || "general" }),
+      });
+      if (!response.ok) throw new Error(await readApiError(response, "Không lưu được thông tin ảnh."));
+      const saved = await response.json();
+      setSelected(saved);
+      setRows((current) => current.map((item) => item.id === saved.id ? saved : item));
+      notify({ tone: "success", title: "Đã lưu thông tin ảnh" });
+    } catch (error) {
+      notify({ tone: "error", title: "Không lưu được ảnh", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -685,7 +764,8 @@ function MediaLibrary({ roles }: { roles: string[] }) {
             <option value="">Tất cả loại ảnh</option>
             {["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
-          <button className="secondary-button" onClick={load} type="button">Lọc</button>
+          <select value={sort} onChange={(event) => setSort(event.target.value as "newest" | "oldest")}><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option></select>
+          <button className="secondary-button" onClick={() => load()} type="button">Lọc</button>
           {canUpload ? <label className="primary-button upload-control">{uploading ? "Đang upload..." : "Upload ảnh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label> : null}
         </div>
         <div className="media-grid">
@@ -706,10 +786,14 @@ function MediaLibrary({ roles }: { roles: string[] }) {
             <img alt={String(selected.altText || selected.originalName || "Media")} src={String(selected.webpUrl)} />
             <dl>
               <div><dt>Tên file</dt><dd>{String(selected.originalName || selected.fileName)}</dd></div>
-              <div><dt>Loại</dt><dd>{String(selected.type || "general")}</dd></div>
               <div><dt>URL WebP</dt><dd>{String(selected.webpUrl)}</dd></div>
             </dl>
-            <button className="primary-button" onClick={() => copyUrl(selected.webpUrl)} type="button">Copy URL WebP</button>
+            <div className="media-edit-fields">
+              <label><span>Alt text *</span><input value={String(selected.altText || "")} onChange={(event) => setSelected({ ...selected, altText: event.target.value })} /></label>
+              <label><span>Chú thích</span><textarea rows={3} value={String(selected.caption || "")} onChange={(event) => setSelected({ ...selected, caption: event.target.value })} /></label>
+              <label><span>Loại</span><select value={String(selected.type || "general")} onChange={(event) => setSelected({ ...selected, type: event.target.value })}>{["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}</select></label>
+            </div>
+            <div className="media-detail-actions"><button className="primary-button" disabled={saving} onClick={saveSelected} type="button">{saving ? "Đang lưu..." : "Lưu thông tin"}</button><button className="secondary-button" onClick={() => copyUrl(selected.webpUrl)} type="button">Copy URL WebP</button></div>
           </>
         ) : <p className="muted">Chọn một ảnh để xem thông tin.</p>}
       </aside>
@@ -3669,16 +3753,35 @@ function GalleryPickerField({ form }: { form: ReturnType<typeof useForm<Record<s
 
 export function RichTextField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [mode, setMode] = useState<"visual" | "html">("visual");
+  const [source, setSource] = useState(value || "");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const editor = useEditor({
-    extensions: [StarterKit, Underline, Link.configure({ openOnClick: false }), ImageExtension.configure({ inline: false, allowBase64: false }), Placeholder.configure({ placeholder: "Soạn nội dung chi tiết..." })],
+    extensions: [
+      StarterKit,
+      Underline,
+      Link.configure({ openOnClick: false }),
+      ImageExtension.configure({ inline: false, allowBase64: false }),
+      ImageFigure,
+      TableKit.configure({ table: { resizable: true } }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Placeholder.configure({ placeholder: "Soạn nội dung chi tiết..." }),
+    ],
     content: value || "",
     immediatelyRender: false,
-    onUpdate: ({ editor }) => onChange(editor.getHTML()),
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setSource(html);
+      onChange(html);
+    },
   });
 
   useEffect(() => {
+    if (mode === "html") return;
+    setSource(value || "");
     if (editor && value !== editor.getHTML()) editor.commands.setContent(value || "", { emitUpdate: false });
-  }, [value, editor]);
+  }, [value, editor, mode]);
 
   if (!editor) return <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={9} />;
 
@@ -3700,12 +3803,36 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
   function insertImage(media: CmsItem) {
     const src = String(media.webpUrl || media.largeUrl || media.mediumUrl || media.thumbUrl || "");
     if (!src) return;
-    editor?.chain().focus().setImage({ src, alt: String(media.altText || media.originalName || "") }).run();
+    const suggestedAlt = String(media.altText || "").trim();
+    const alt = suggestedAlt || window.prompt("Nhập mô tả ảnh (alt) - bắt buộc", String(media.originalName || ""))?.trim();
+    if (!alt) {
+      window.alert("Cần nhập mô tả ảnh (alt) trước khi chèn.");
+      return;
+    }
+    const savedCaption = String(media.caption || "").trim();
+    const caption = savedCaption || window.prompt("Chú thích dưới ảnh (không bắt buộc)", "")?.trim() || "";
+    editor?.chain().focus().insertContent({ type: "imageFigure", attrs: { src, alt, caption } }).run();
     setPickerOpen(false);
   }
 
+  function switchMode(nextMode: "visual" | "html") {
+    if (nextMode === "visual" && editor) editor.commands.setContent(source || "", { emitUpdate: false });
+    if (nextMode === "html" && editor) setSource(editor.getHTML());
+    setMode(nextMode);
+  }
+
+  const previewHtml = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:24px;color:#29352f;font:16px/1.75 system-ui,sans-serif}img{max-width:100%;height:auto;border-radius:12px}figure{margin:24px 0;text-align:center}figcaption{margin-top:8px;color:#66756e;font-size:14px}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{border:1px solid #d8ddd9;padding:9px;text-align:left}blockquote{border-left:4px solid #c99a4a;margin:18px 0;padding:10px 16px;background:#faf7ef}pre{overflow:auto;padding:14px;color:white;background:#183b2d}</style></head><body>${source}</body></html>`;
+
   return (
     <div className="editor-shell">
+      <div className="editor-modebar">
+        <div>
+          <button className={mode === "visual" ? "active" : ""} onClick={() => switchMode("visual")} type="button">Soạn thảo</button>
+          <button className={mode === "html" ? "active" : ""} onClick={() => switchMode("html")} type="button"><Code2 size={15} /> HTML</button>
+        </div>
+        <button className={previewOpen ? "active" : ""} onClick={() => setPreviewOpen((current) => !current)} type="button">Xem trước</button>
+      </div>
+      {mode === "visual" ? <>
       <div className="editor-toolbar">
         <button className={editor.isActive("paragraph") ? "active" : ""} onClick={() => editor.chain().focus().setParagraph().run()} type="button"><Pilcrow size={15} /> P</button>
         <button className={editor.isActive("heading", { level: 1 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} type="button"><Heading1 size={15} /> H1</button>
@@ -3723,6 +3850,15 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
         <button onClick={() => editor.chain().focus().setHorizontalRule().run()} type="button"><Minus size={15} /> HR</button>
         <button onClick={addLink} type="button"><LinkIcon size={15} /> Link</button>
         <button onClick={() => setPickerOpen(true)} type="button"><ImagePlus size={15} /> Ảnh</button>
+        <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} type="button"><Table2 size={15} /> Bảng</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().addRowAfter().run()} type="button">+ hàng</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().deleteRow().run()} type="button">− hàng</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().addColumnAfter().run()} type="button">+ cột</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().deleteColumn().run()} type="button">− cột</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().mergeCells().run()} type="button">Gộp ô</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().splitCell().run()} type="button">Tách ô</button>
+        <button disabled={!editor.isActive("table")} onClick={() => editor.chain().focus().deleteTable().run()} type="button">Xóa bảng</button>
+        {(["left", "center", "right", "justify"] as const).map((alignment) => <button className={editor.isActive({ textAlign: alignment }) ? "active" : ""} key={alignment} onClick={() => editor.chain().focus().setTextAlign(alignment).run()} type="button">{alignment === "left" ? "Trái" : alignment === "center" ? "Giữa" : alignment === "right" ? "Phải" : "Đều"}</button>)}
         <button onClick={() => insertPreset("callout")} type="button"><BadgeCheck size={15} /> Callout</button>
         <button onClick={() => insertPreset("cta")} type="button"><Sparkles size={15} /> CTA</button>
         <button onClick={() => insertPreset("faq")} type="button"><Table2 size={15} /> FAQ</button>
@@ -3731,6 +3867,16 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
         <button disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()} type="button"><Redo2 size={15} /> Redo</button>
       </div>
       <EditorContent editor={editor} />
+      </> : <textarea className="editor-html-source" spellCheck={false} value={source} onChange={(event) => { setSource(event.target.value); onChange(event.target.value); }} rows={18} />}
+      {previewOpen ? (
+        <div className="editor-preview-shell">
+          <div className="editor-preview-toolbar">
+            <strong>Xem trước an toàn</strong>
+            <div><button className={previewDevice === "desktop" ? "active" : ""} onClick={() => setPreviewDevice("desktop")} type="button">Desktop</button><button className={previewDevice === "mobile" ? "active" : ""} onClick={() => setPreviewDevice("mobile")} type="button">Mobile</button></div>
+          </div>
+          <iframe className={`editor-preview-frame ${previewDevice}`} sandbox="" srcDoc={previewHtml} title="Xem trước nội dung" />
+        </div>
+      ) : null}
       <p className="editor-hint">Chèn ảnh trực tiếp từ Media Library, có thể upload nhanh ngay trong popup chọn ảnh.</p>
       {pickerOpen ? <MediaPickerModal onClose={() => setPickerOpen(false)} onSelect={insertImage} /> : null}
     </div>
@@ -3743,6 +3889,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
   const [selected, setSelected] = useState<CmsItem | null>(null);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -3751,10 +3898,10 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
   const gridRef = useRef<HTMLDivElement | null>(null);
   const pageSize = 48;
 
-  async function load(pageNum = 1, append = false) {
+  async function load(pageNum = 1, append = false, preferredId?: number, requestedSort = sort) {
     if (append) setLoadingMore(true); else setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(pageNum), limit: String(pageSize) });
+      const params = new URLSearchParams({ page: String(pageNum), limit: String(pageSize), sort: requestedSort });
       if (search) params.set("search", search);
       if (type) params.set("type", type);
       const response = await apiFetch(`/api/cms/media?${params}`);
@@ -3770,7 +3917,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
       const totalPages = payload?.meta?.totalPages ?? 1;
       setHasMore(pageNum < totalPages);
       if (!append) {
-        setSelected((current) => current && incoming.some((item) => item.id === current.id) ? current : incoming[0] || null);
+        setSelected((current) => preferredId ? incoming.find((item) => item.id === preferredId) || incoming[0] || null : current && incoming.some((item) => item.id === current.id) ? incoming.find((item) => item.id === current.id) || null : incoming[0] || null);
       }
     } catch (error) {
       notify({ tone: "error", title: "Không tải được thư viện ảnh", description: describeClientError(error, "Kiểm tra API hoặc quyền tài khoản.") });
@@ -3808,16 +3955,26 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
     if (!files?.length) return;
     setUploading(true);
     let failed = 0;
+    let newestUploadId: number | undefined;
     for (const file of Array.from(files)) {
       try {
+        const metadata = askUploadMetadata(file);
+        if (!metadata) {
+          failed += 1;
+          continue;
+        }
         const formData = new FormData();
         formData.append("file", file);
         formData.append("type", type || "general");
-        formData.append("altText", file.name.replace(/\.[^.]+$/, ""));
+        formData.append("altText", metadata.altText);
+        if (metadata.caption) formData.append("caption", metadata.caption);
         const response = await apiFetch("/api/cms/media/upload", { method: "POST", body: formData });
         if (!response.ok) {
           failed += 1;
           notify({ tone: "error", title: "Upload thất bại", description: `${file.name}: ${await readApiError(response, "File không hợp lệ hoặc vượt quá dung lượng.")}` });
+        } else {
+          const payload = await response.json();
+          newestUploadId = Number(payload.media?.id) || newestUploadId;
         }
       } catch (error) {
         failed += 1;
@@ -3825,7 +3982,8 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
       }
     }
     setUploading(false);
-    await load(1, false);
+    setSort("newest");
+    await load(1, false, newestUploadId, "newest");
     if (failed < files.length) notify({ tone: "success", title: "Upload hoàn tất", description: failed ? `Đã upload ${files.length - failed}/${files.length} ảnh.` : "Bạn có thể chọn ảnh vừa upload trong thư viện." });
   }
 
@@ -3848,6 +4006,7 @@ function MediaPickerModal({ onClose, onSelect }: { onClose: () => void; onSelect
             <option value="">Tất cả loại ảnh</option>
             {["project", "construction", "interior", "blog", "banner", "service", "general"].map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
+          <select value={sort} onChange={(event) => setSort(event.target.value as "newest" | "oldest")}><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option></select>
           <button className="secondary-button" onClick={() => load(1, false)} type="button">Lọc</button>
           <label className="primary-button upload-control">{uploading ? "Đang upload..." : "Upload ảnh"}<input accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => upload(event.target.files)} type="file" /></label>
         </div>

@@ -140,7 +140,7 @@ async function downloadAndStoreImage(
 
   const hash = md5(absoluteUrl);
 
-  const existing = await prisma.mediaFile.findUnique({ where: { hash } });
+  const existing = await prisma.mediaFile.findFirst({ where: { hash }, orderBy: { id: "asc" } });
   if (existing) {
     imageCacheByUrl.set(absoluteUrl, existing.id);
     return existing.id;

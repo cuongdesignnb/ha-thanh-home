@@ -1,4 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
+import sanitizeHtml from "sanitize-html";
 import { TextDecoder } from "util";
 
 export const contentStatuses = ["draft", "pending_review", "scheduled", "published", "archived"] as const;
@@ -58,7 +59,42 @@ export function cleanHtml(value?: string | null) {
     return value;
   }
 
-  return value.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+  return sanitizeHtml(value, {
+    allowedTags: [
+      "p", "br", "h1", "h2", "h3", "h4", "h5", "h6", "strong", "b", "em", "i", "u", "s",
+      "blockquote", "ul", "ol", "li", "a", "hr", "pre", "code", "div", "span", "details", "summary",
+      "img", "figure", "figcaption", "table", "thead", "tbody", "tfoot", "tr", "th", "td",
+    ],
+    allowedAttributes: {
+      "*": ["class", "style"],
+      a: ["href", "target", "rel", "title"],
+      img: ["src", "alt", "title", "width", "height", "loading"],
+      figure: ["data-content-image"],
+      th: ["colspan", "rowspan", "scope"],
+      td: ["colspan", "rowspan"],
+    },
+    allowedStyles: {
+      "*": {
+        "text-align": [/^(left|center|right|justify)$/],
+        "max-width": [/^\d+(\.\d+)?(px|%|rem|em|vw)$/],
+        width: [/^\d+(\.\d+)?(px|%|rem|em|vw)$/],
+        height: [/^\d+(\.\d+)?(px|%|rem|em|vh)$/],
+      },
+    },
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemesByTag: { img: ["http", "https", "data"] },
+    allowProtocolRelative: false,
+    transformTags: {
+      a: (_tagName, attribs) => ({
+        tagName: "a",
+        attribs: {
+          ...attribs,
+          ...(attribs.target === "_blank" ? { rel: "noopener noreferrer" } : {}),
+        },
+      }),
+      img: (_tagName, attribs) => ({ tagName: "img", attribs: { ...attribs, alt: attribs.alt || "" } }),
+    },
+  });
 }
 
 const utf8Decoder = new TextDecoder("utf-8", { fatal: false });
@@ -123,4 +159,3 @@ export function safeString(value?: string | null, length = 191): string | null {
   if (value === undefined || value === null) return null;
   return value.substring(0, length);
 }
-

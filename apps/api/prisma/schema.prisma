@@ -409,7 +409,7 @@ model MediaFile {
   size         Int
   width        Int?
   height       Int?
-  hash         String    @unique
+  hash         String
   disk         String    @default("local")
   originalUrl  String?
   webpUrl      String
@@ -431,6 +431,7 @@ model MediaFile {
   updatedAt    DateTime  @updatedAt
 
   @@index([type])
+  @@index([hash])
   @@index([createdAt])
 }
 

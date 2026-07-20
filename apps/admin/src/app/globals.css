@@ -2058,6 +2058,38 @@ select {
   line-height: 1.55;
 }
 
+.media-edit-fields {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.media-edit-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--admin-green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.media-edit-fields input,
+.media-edit-fields textarea,
+.media-edit-fields select {
+  width: 100%;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--admin-charcoal);
+  background: #fff;
+  font: inherit;
+}
+
+.media-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .theme-settings-section {
   margin-top: 8px;
 }
@@ -2084,6 +2116,43 @@ select {
   overflow: hidden;
   border: 1px solid var(--admin-line);
   border-radius: 16px;
+  background: #fffdf8;
+}
+
+.editor-modebar,
+.editor-preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px;
+  border-bottom: 1px solid var(--admin-line);
+  background: #f4ede1;
+}
+
+.editor-modebar > div,
+.editor-preview-toolbar > div {
+  display: flex;
+  gap: 6px;
+}
+
+.editor-modebar button,
+.editor-preview-toolbar button {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 6px 10px;
+  color: var(--admin-green);
+  background: transparent;
+  font-weight: 900;
+}
+
+.editor-modebar button.active,
+.editor-preview-toolbar button.active {
+  border-color: var(--admin-line-strong);
   background: #fffdf8;
 }
 
@@ -2169,6 +2238,89 @@ select {
 .ProseMirror img {
   max-width: 100%;
   border-radius: 14px;
+}
+
+.ProseMirror figure {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.ProseMirror figcaption {
+  margin-top: 7px;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.ProseMirror .tableWrapper {
+  overflow-x: auto;
+}
+
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 18px 0;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  position: relative;
+  min-width: 80px;
+  border: 1px solid var(--admin-line-strong);
+  padding: 8px 10px;
+  vertical-align: top;
+}
+
+.ProseMirror th {
+  color: var(--admin-green);
+  background: #f4ede1;
+}
+
+.ProseMirror .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(201, 154, 74, 0.2);
+}
+
+.editor-html-source {
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  border: 0;
+  padding: 16px;
+  outline: 0;
+  color: #f7f7f2;
+  background: #12271f;
+  font: 13px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.editor-preview-shell {
+  padding: 12px;
+  border-top: 1px solid var(--admin-line);
+  background: #e9e4da;
+}
+
+.editor-preview-toolbar {
+  padding: 0 0 9px;
+  border: 0;
+  background: transparent;
+}
+
+.editor-preview-frame {
+  width: 100%;
+  min-height: 430px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 12px;
+  background: white;
+  transition: width .2s ease;
+}
+
+.editor-preview-frame.mobile {
+  width: min(390px, 100%);
 }
 
 .ProseMirror .content-callout,

@@ -18,6 +18,7 @@ import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { HorizontalSliderWrapper } from "@/components/horizontal-slider-wrapper";
 import {
   defaultHomepage,
+  getAboutPageConfig,
   getHome,
   getSiteSettings,
   homepageWithDefaults,
@@ -33,9 +34,10 @@ import {
   type SiteHomepage,
   PLACEHOLDER_IMAGE,
 } from "@/lib/api";
+import type { AboutPageConfig } from "@/lib/about-page-config";
 
 export default async function HomePage() {
-  const [data, settings] = await Promise.all([getHome(), getSiteSettings()]);
+  const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
   const homepage = homepageWithDefaults(settings["site.homepage"]);
 
   return (
@@ -51,7 +53,7 @@ export default async function HomePage() {
         <InteriorTemplatesSection homepage={homepage} designs={data.interiorDesigns || []} />
         <ServicesSection homepage={homepage} services={data.services} />
         <ProcessAndStats homepage={homepage} />
-        <Testimonials homepage={homepage} />
+        <Testimonials aboutPage={aboutPage} homepage={homepage} />
         <NewsSection homepage={homepage} posts={data.posts} />
       </main>
       <SiteFooter />
@@ -232,9 +234,21 @@ function ProcessAndStats({ homepage }: { homepage: SiteHomepage }) {
   );
 }
 
-function Testimonials({ homepage }: { homepage: SiteHomepage }) {
+function Testimonials({ homepage, aboutPage }: { homepage: SiteHomepage; aboutPage: AboutPageConfig }) {
+  const items = aboutPage.testimonials.items || [];
+  if (!items.length) return null;
   return (
-    <section className="section"><div className="container"><div className="section-title"><h2>{homepage.testimonialsTitle || defaultHomepage.testimonialsTitle}</h2></div><div className="testimonials">{["Anh Minh Tuấn - Biệt thự Hà Nội", "Chị Thu Hằng - Nội thất căn hộ Ninh Bình", "Anh Quốc Huy - Văn phòng Hải Phòng"].map((name) => <article className="testimonial" key={name}><div className="avatar" /><strong>{name}</strong><div className="stars">{Array.from({ length: 5 }).map((_, index) => <Star key={index} size={16} fill="currentColor" />)}</div><p>Hà Thành Home làm việc chuyên nghiệp, tư vấn rõ ràng và hoàn thiện đúng tinh thần thiết kế ban đầu.</p></article>)}</div></div></section>
+    <section className="section"><div className="container"><div className="section-title"><h2>{aboutPage.testimonials.title || homepage.testimonialsTitle || defaultHomepage.testimonialsTitle}</h2></div><div className="testimonials">{items.slice(0, 6).map((item, itemIndex) => {
+      const rating = Math.max(1, Math.min(5, Number(item.rating) || 5));
+      const initials = item.name.split(/\s+/).filter(Boolean).slice(-2).map((part) => part[0]).join("").toUpperCase();
+      return <article className="testimonial" key={`${item.name}-${itemIndex}`}>
+        {item.avatarUrl ? <img className="avatar" alt={item.name} src={item.avatarUrl} /> : <div className="avatar avatar-fallback" aria-hidden="true">{initials || "HT"}</div>}
+        <strong>{item.name}</strong>
+        {item.location ? <span className="testimonial-location">{item.location}</span> : null}
+        <div className="stars" aria-label={`${rating} trên 5 sao`}>{Array.from({ length: rating }).map((_, index) => <Star key={index} size={16} fill="currentColor" />)}</div>
+        <p>“{item.quote}”</p>
+      </article>;
+    })}</div></div></section>
   );
 }
 

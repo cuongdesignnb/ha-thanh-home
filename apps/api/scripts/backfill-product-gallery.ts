@@ -38,7 +38,7 @@ async function ensureMedia(rawUrl: string, parentTitle: string, type: MediaType,
   if (!absoluteUrl) return null;
   const hash = md5(absoluteUrl);
 
-  const existing = await prisma.mediaFile.findUnique({ where: { hash } });
+  const existing = await prisma.mediaFile.findFirst({ where: { hash }, orderBy: { id: "asc" } });
   if (existing) return existing.id;
 
   try {

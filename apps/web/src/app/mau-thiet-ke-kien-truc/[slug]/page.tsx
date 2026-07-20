@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { TemplateDetail } from "@/components/design-templates";
+import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, thumbnailUrl, type ArchitectureDesign } from "@/lib/api";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
+import { getRelatedArchitecture } from "@/lib/related-content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -15,6 +17,7 @@ export default async function ArchitectureDesignDetailPage({ params }: { params:
   const { slug } = await params;
   const item = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
   if (!item) notFound();
+  const related = await getRelatedArchitecture(item);
 
   const imageUrl = thumbnailUrl(item, "");
   const schemas = [
@@ -37,6 +40,7 @@ export default async function ArchitectureDesignDetailPage({ params }: { params:
       <SiteHeader />
       <JsonLd data={schemas} />
       <TemplateDetail item={item} kind="architecture" />
+      <RelatedContent items={related} title="Mẫu kiến trúc liên quan" />
       <SiteFooter />
     </>
   );

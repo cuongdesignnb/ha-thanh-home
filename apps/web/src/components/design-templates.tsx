@@ -196,10 +196,6 @@ export async function TemplateDetail({ item, kind }: { item: ArchitectureDesign 
             </section>
 
             <article className="template-article">
-              <div className="template-section-heading">
-                <span>Bài viết mẫu thiết kế</span>
-                <h2>Chi tiết ý tưởng và phương án triển khai</h2>
-              </div>
               {item.contentHtml
                 ? <div className="detail-content" dangerouslySetInnerHTML={{ __html: item.contentHtml }} />
                 : <DefaultTemplateArticle item={item} kind={kind} />}

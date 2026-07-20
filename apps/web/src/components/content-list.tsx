@@ -150,7 +150,6 @@ export async function ProjectDetail({ project }: { project: Project }) {
               <TemplateGalleryModal images={albumImages} title={project.title} />
             </section>
             <article className="template-article">
-              <div className="template-section-heading"><span>Nội dung dự án</span><h2>Thông tin triển khai và giải pháp thiết kế</h2></div>
               <div className="detail-content" dangerouslySetInnerHTML={{ __html: project.contentHtml || defaultProjectArticle(project) }} />
             </article>
             <section className="template-lead-box">
@@ -211,7 +210,6 @@ export async function ServiceDetail({ service }: { service: Service }) {
             ) : null}
 
             <article className="template-article">
-              <div className="template-section-heading"><span>Mô tả chi tiết</span><h2>Nội dung dịch vụ và quy trình triển khai</h2></div>
               <div className="detail-content" dangerouslySetInnerHTML={{ __html: service.contentHtml || `<p>${service.description || "Nội dung dịch vụ đang được cập nhật."}</p>` }} />
             </article>
 
