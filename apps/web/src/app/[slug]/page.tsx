@@ -3,7 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { PageHero } from "@/components/content-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { contentMetadata, getDetail, type CustomPage, type Post, type Project, type Service, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
+import { contentMetadata, getDetail, type CustomPage, type Post, type Project, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
 import { buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -22,11 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const project = await getDetail<Project>(`/projects/${slug}`);
   if (project) {
     return contentMetadata(project, "Dự án | Hà Thành Home", `/du-an/${slug}`);
-  }
-
-  const service = await getDetail<Service>(`/services/${slug}`);
-  if (service) {
-    return contentMetadata(service, "Dịch vụ | Hà Thành Home", `/dich-vu/${slug}`);
   }
 
   const arch = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
@@ -79,12 +74,6 @@ export default async function CustomPageDetailPage({ params }: { params: Promise
   const project = await getDetail<Project>(`/projects/${slug}`);
   if (project) {
     permanentRedirect(`/du-an/${slug}`);
-  }
-
-  // Check if slug belongs to a service (dich-vu)
-  const service = await getDetail<Service>(`/services/${slug}`);
-  if (service) {
-    permanentRedirect(`/dich-vu/${slug}`);
   }
 
   // Check if slug belongs to an architecture design template (mau-thiet-ke-kien-truc)
