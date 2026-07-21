@@ -111,7 +111,7 @@ function askUploadMetadata(file: File) {
 }
 
 type User = { email: string; roles: string[] };
-type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings" | "pages";
+type Entity = "dashboard" | "projects" | "project-categories" | "project-filter-options" | "architecture-designs" | "interior-designs" | "services" | "service-pages" | "posts" | "post-categories" | "leads" | "media" | "ai" | "menus" | "estimator" | "settings" | "about-settings" | "pages";
 type CmsItem = Record<string, unknown> & {
   id: number;
   title?: string;
@@ -289,6 +289,7 @@ const modules = [
   {
     group: "Dịch vụ",
     items: [
+      { id: "services", label: "Dịch vụ", description: "Các trang /dich-vu/[slug] đang xuất bản", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"] },
       { id: "service-pages", label: "Xây nhà trọn gói", description: "Landing /dich-vu/xay-nha-tron-goi", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "xay-nha-tron-goi" },
       { id: "service-pages", label: "Sản Xuất Thi Công Nội Thất", description: "Landing /dich-vu/san-xuat-thi-cong-noi-that", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "san-xuat-thi-cong-noi-that" },
       { id: "service-pages", label: "Thi Công Nhà Xưởng", description: "Landing /dich-vu/thi-cong-nha-xuong", icon: BriefcaseBusiness, roles: ["Super Admin", "Admin", "Viewer"], serviceSlug: "thi-cong-nha-xuong" },
@@ -329,6 +330,7 @@ const moduleMeta: Record<Entity, { title: string; subtitle: string; createLabel?
   "project-filter-options": { title: "Bộ lọc dự án", subtitle: "Quản lý option dropdown lọc dự án ngoài website.", createLabel: "Thêm option lọc" },
   "architecture-designs": { title: "Mẫu thiết kế kiến trúc", subtitle: "Catalog mẫu biệt thự, nhà phố, nhà cấp 4 với bộ lọc chi tiết.", createLabel: "Thêm mẫu kiến trúc" },
   "interior-designs": { title: "Mẫu thiết kế nội thất", subtitle: "Catalog phong cách nội thất, loại phòng, diện tích và ngân sách.", createLabel: "Thêm mẫu nội thất" },
+  services: { title: "Quản lý dịch vụ", subtitle: "Quản lý các trang dịch vụ dạng /dich-vu/[slug] đang có trong hệ thống.", createLabel: "Thêm dịch vụ" },
   "service-pages": { title: "Cấu hình trang dịch vụ", subtitle: "Quản lý các landing page dịch vụ cố định." },
   posts: { title: "Bài viết SEO", subtitle: "Soạn bài, lưu nháp, đặt lịch và xuất bản.", createLabel: "Thêm bài viết" },
   "post-categories": { title: "Danh mục bài viết", subtitle: "Tạo nhóm chủ đề để chọn đúng danh mục khi viết bài SEO.", createLabel: "Thêm danh mục" },
@@ -349,6 +351,7 @@ const entitySingular: Record<Entity, string> = {
   "project-filter-options": "option lọc dự án",
   "architecture-designs": "mẫu kiến trúc",
   "interior-designs": "mẫu nội thất",
+  services: "dịch vụ",
   "service-pages": "trang dịch vụ",
   posts: "bài viết",
   "post-categories": "danh mục bài viết",
@@ -577,6 +580,7 @@ function getPublicEntityPath(entity: Entity, row: CmsItem) {
   const slug = encodeURIComponent(row.slug);
   const paths: Partial<Record<Entity, string>> = {
     projects: `/du-an/${slug}`,
+    services: `/dich-vu/${slug}`,
     posts: `/tin-tuc/${slug}`,
     "architecture-designs": `/mau-thiet-ke-kien-truc/${slug}`,
     "interior-designs": `/mau-thiet-ke-noi-that/${slug}`,
@@ -2725,7 +2729,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     try {
       const params = new URLSearchParams({ page: String(page), limit: "10" });
       if (search) params.set("search", search);
-      if (group && ["projects", "project-categories", "project-filter-options"].includes(entity)) params.set("group", group);
+      if (group && ["projects", "services", "project-categories", "project-filter-options"].includes(entity)) params.set("group", group);
       if (filterOne && entity === "posts") params.set("categoryId", filterOne);
       if (filterOne && entity === "project-filter-options") params.set("type", filterOne);
       if (filterTwo && entity === "project-filter-options") params.set("module", filterTwo);
@@ -2998,7 +3002,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
         </div>
         <div className="entity-toolbar">
           <div className="search-field"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm..." /></div>
-          {["projects", "project-categories", "project-filter-options"].includes(entity) ? (
+          {["projects", "services", "project-categories", "project-filter-options"].includes(entity) ? (
             <select value={group} onChange={(event) => setGroup(event.target.value)}>
               <option value="">Tất cả nhóm</option>
               <option value="construction">Công trình</option>
@@ -3310,7 +3314,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           {["architecture-designs", "interior-designs"].includes(entity) ? <label>Mã mẫu<input {...form.register("code")} placeholder="BTHDAMB03010, NT-PK-HD-001..." /></label> : null}
           {entity === "architecture-designs" ? <ArchitectureDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
           {entity === "interior-designs" ? <InteriorDesignFields filterOptions={filterOptions} form={form} onTaxonomyCreated={onTaxonomyCreated} /> : null}
-          {entity === "projects" ? (
+          {["projects", "services"].includes(entity) ? (
             <label>
               Nhóm nội dung
               <select {...form.register("group")}>
@@ -3331,7 +3335,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
         <div className="form-section-title"><span>02</span><div><h3>Ảnh & SEO</h3><p>Ảnh đại diện, metadata và dữ liệu Open Graph cho Google/social.</p></div></div>
         <div className="form-grid">
           <ThumbnailPickerField form={form} />
-          {["projects", "architecture-designs", "interior-designs"].includes(entity) ? <GalleryPickerField form={form} /> : null}
+          {["projects", "services", "architecture-designs", "interior-designs"].includes(entity) ? <GalleryPickerField form={form} /> : null}
           <label>Meta title<input {...form.register("metaTitle")} placeholder="Tối đa khoảng 60 ký tự" /></label>
           <label>Canonical URL<input {...form.register("canonicalUrl")} placeholder="https://domain.com/duong-dan-chuan" /></label>
           <label className="wide">Meta description<textarea {...form.register("metaDescription")} rows={3} placeholder="Tối đa khoảng 155 ký tự" /></label>
@@ -3352,8 +3356,8 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           <label>Trạng thái<select {...form.register("status")}><option value="draft">Nháp</option><option value="pending_review">Chờ duyệt</option><option value="scheduled">Đặt lịch</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
           {entity === "posts" ? <label>Lịch đăng<input type="datetime-local" {...form.register("scheduledAt")} /></label> : null}
           {entity === "posts" ? <label>Ngày xuất bản<input type="datetime-local" {...form.register("publishedAt")} /></label> : null}
-          {["projects", "pages"].includes(entity) ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
-          {["projects", "posts"].includes(entity) ? (
+          {["projects", "services", "pages"].includes(entity) ? <label>Thứ tự hiển thị<input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} /></label> : null}
+          {["projects", "services", "posts"].includes(entity) ? (
             <div className="check-row-container wide">
               <label className="check-row" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <input type="checkbox" {...form.register("isFeatured")} />
@@ -4342,6 +4346,37 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
     delete payload.scheduledAt;
     delete payload.publishedAt;
   }
+  if (entity === "services") {
+    delete payload.category;
+    delete payload.categoryId;
+    delete payload.projectType;
+    delete payload.area;
+    delete payload.areaValue;
+    delete payload.scale;
+    delete payload.clientName;
+    delete payload.excerpt;
+    delete payload.focusKeyword;
+    delete payload.scheduledAt;
+    delete payload.publishedAt;
+    delete payload.code;
+    delete payload.houseType;
+    delete payload.style;
+    delete payload.interiorStyle;
+    delete payload.roomType;
+    delete payload.layoutType;
+    delete payload.materialTone;
+    delete payload.roofType;
+    delete payload.floors;
+    delete payload.facadeWidth;
+    delete payload.depth;
+    delete payload.bedrooms;
+    delete payload.bathrooms;
+    delete payload.estimatedBudget;
+    delete payload.constructionTime;
+    delete payload.budgetRange;
+    delete payload.budgetMin;
+    delete payload.budgetMax;
+  }
   return payload;
 }
 
@@ -4387,7 +4422,7 @@ function can(userRoles: string[], allowedRoles: string[]) {
 
 function canWriteEntity(entity: Entity, roles: string[]) {
   if (roles.includes("Super Admin")) return true;
-  if (["projects", "project-categories", "project-filter-options", "architecture-designs", "interior-designs", "menus"].includes(entity)) return roles.includes("Admin");
+  if (["projects", "services", "project-categories", "project-filter-options", "architecture-designs", "interior-designs", "menus"].includes(entity)) return roles.includes("Admin");
   if (entity === "estimator") return roles.includes("Admin");
   if (["posts", "post-categories", "pages"].includes(entity)) return roles.includes("Admin") || roles.includes("SEO Editor");
   if (entity === "leads") return roles.includes("Admin") || roles.includes("Sales");
