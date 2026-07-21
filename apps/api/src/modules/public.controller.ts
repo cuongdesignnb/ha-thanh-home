@@ -84,7 +84,7 @@ export class PublicController {
     }
     if (query.space) and.push({ OR: [{ projectType: query.space }, { category: { contains: query.space } }, { scale: { contains: query.space } }, { style: { contains: query.space } }] });
     if (query.search) and.push({ OR: [{ title: { contains: query.search } }, { clientName: { contains: query.search } }, { location: { contains: query.search } }] });
-    const where: Prisma.ProjectWhereInput = {
+    const where = publicProjectWhere({
       status: ContentStatus.published,
       ...(query.featured === "true" ? { isFeatured: true } : {}),
       ...(query.group ? { group: { in: query.group.split(",").map((g) => g.trim() as ProjectGroup).filter(Boolean) } } : {}),
@@ -95,7 +95,7 @@ export class PublicController {
       ...(query.budgetRange ? { budgetRange: query.budgetRange } : {}),
       ...(query.areaMin || query.areaMax ? { areaValue: { gte: optionalNumber(query.areaMin), lte: optionalNumber(query.areaMax) } } : {}),
       ...(and.length ? { AND: and } : {}),
-    };
+    });
     const [data, total] = await Promise.all([
       this.prisma.project.findMany({ where, skip, take: limit, include: { thumbnailMedia: true, categoryRef: true }, orderBy: projectOrder(query.sort) }),
       this.prisma.project.count({ where }),
@@ -140,7 +140,7 @@ export class PublicController {
 
   @Get("projects/:slug")
   async project(@Param("slug") slug: string) {
-    const data = await this.prisma.project.findFirst({ where: { slug, status: ContentStatus.published }, include: { thumbnailMedia: true, categoryRef: true } });
+    const data = await this.prisma.project.findFirst({ where: publicProjectWhere({ slug, status: ContentStatus.published }), include: { thumbnailMedia: true, categoryRef: true } });
     if (!data) throw new NotFoundException("Project not found");
     return repairPublicText(await this.withGalleryMedia(data));
   }
@@ -322,6 +322,50 @@ function projectOrder(sort?: string) {
   if (sort === "area_desc") return [{ areaValue: "desc" as const }, { publishedAt: "desc" as const }];
   if (sort === "year_desc") return [{ year: "desc" as const }, { publishedAt: "desc" as const }];
   return [{ sortOrder: "asc" as const }, { publishedAt: "desc" as const }];
+}
+
+function publicProjectWhere(where: Prisma.ProjectWhereInput): Prisma.ProjectWhereInput {
+  const existingAnd = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+  return {
+    ...where,
+    AND: [
+      ...existingAnd,
+      {
+        NOT: {
+          AND: [
+            { group: ProjectGroup.xay_nha_tron_goi },
+            {
+              OR: [
+                { title: { contains: "Báo Giá" } },
+                { title: { contains: "Báo Gía" } },
+                { title: { contains: "Báo giá" } },
+                { title: { contains: "Cập Nhật Báo" } },
+                { title: { contains: "Cập Nhập Báo" } },
+                { title: { contains: "Dịch Vụ" } },
+                { title: { contains: "Dịch vụ" } },
+                { title: { contains: "Cách Tính" } },
+                { title: { contains: "Mẫu Hợp Đồng" } },
+                { title: { contains: "Bao Nhiêu Tiền" } },
+                { title: { contains: "Là Gì" } },
+                { title: { contains: "Có Nên Chọn" } },
+                { slug: { startsWith: "bao-gia-" } },
+                { slug: { startsWith: "dich-vu-" } },
+                { slug: { startsWith: "cach-tinh-" } },
+                { slug: { startsWith: "mau-hop-dong-" } },
+                { slug: { contains: "bao-nhieu-tien" } },
+                { slug: { contains: "la-gi" } },
+                { slug: { contains: "co-nen-chon" } },
+                { slug: { contains: "cap-nhat-bao-gia" } },
+                { slug: { contains: "cap-nhap-bao-gia" } },
+                { slug: { startsWith: "xay-nha-tron-goi-tai-" } },
+                { slug: { startsWith: "xay-nha-tron-goi-" } },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  };
 }
 
 function optionalNumber(value?: string) {
