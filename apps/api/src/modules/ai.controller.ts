@@ -460,7 +460,7 @@ export class AiController {
       }
       const parsed = parseResponseJson(data);
       output = options.task === "article"
-        ? enforceArticleInternalLinks(parsed, linkCandidates)
+        ? enforceArticleInternalLinks(parsed, linkCandidates, options.dto)
         : options.task === "outline"
           ? normalizeOutlineInternalLinks(parsed, linkCandidates)
           : parsed;
@@ -608,9 +608,16 @@ function buildPrompt(task: "outline" | "meta" | "article", dto: AiContentDto, li
   ].join("\n");
   const internalLinkRules = linkCandidates.length ? [
     "Danh sách URL nội bộ đã xác minh từ dữ liệu đang xuất bản:",
-    ...linkCandidates.map((candidate, index) => `${index + 1}. [${candidate.kind}] ${candidate.title} — ${candidate.url}`),
+    ...linkCandidates.map((candidate, index) => {
+      const anchors = buildAnchorSuggestions(candidate, dto).join(" | ");
+      return `${index + 1}. [${candidate.kind}] ${candidate.title} — ${candidate.url} — anchor gợi ý: ${anchors}`;
+    }),
     "Chỉ được dùng URL nội bộ có nguyên văn trong danh sách trên; không tự tạo hoặc đoán URL.",
-    "Chọn 2 đến 4 URL liên quan nhất và chèn tự nhiên bằng anchor text mô tả đúng nội dung trang đích.",
+    "Chọn 2 đến 4 URL liên quan nhất, ưu tiên bài viết/dịch vụ/dự án/mẫu thiết kế gần nhất với chủ đề và từ khóa.",
+    "Tỷ lệ anchor hợp lý: khoảng 1 internal link mỗi 350-500 từ, tối đa 4 link trong bài; không đặt nhiều link sát nhau trong cùng một đoạn.",
+    "Anchor text phải tự nhiên trong câu: dùng đúng từ khóa chính tối đa 1 lần nếu phù hợp ngữ cảnh; các link còn lại dùng từ khóa phụ, tiêu đề bài liên quan hoặc biến thể mô tả đúng trang đích.",
+    "Không nhồi anchor kiểu máy móc, không dùng các cụm chung chung như 'xem tại đây', 'bấm vào đây', 'tham khảo thêm' làm anchor.",
+    "Đặt link trong đoạn văn đang giải thích ý liên quan, không gom thành block link riêng nếu không thật cần thiết.",
   ].join("\n") : "Không có URL nội bộ đã xác minh; không tự tạo internal link.";
 
   if (task === "outline") {
@@ -635,7 +642,7 @@ function normalizeOutlineInternalLinks(output: unknown, candidates: InternalLink
   return result;
 }
 
-function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCandidate[]) {
+function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCandidate[], dto: AiContentDto) {
   if (!output || typeof output !== "object") return output;
   const article = output as Record<string, unknown>;
   if (typeof article.contentHtml !== "string") {
@@ -644,31 +651,143 @@ function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCa
   }
 
   const allowed = new Map(candidates.map((candidate) => [candidate.url, candidate]));
+  const retainedUrls: string[] = [];
   let html = article.contentHtml.replace(/<a\b([^>]*?)href=(['"])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi, (full, before: string, quote: string, href: string, after: string, label: string) => {
     const normalizedHref = normalizeInternalHref(href);
     if (!normalizedHref) return full;
-    if (allowed.has(normalizedHref) || normalizedHref === "/lien-he") {
+    if (normalizedHref === "/lien-he") {
+      return `<a${before}href=${quote}${normalizedHref}${quote}${after}>${label}</a>`;
+    }
+    if (allowed.has(normalizedHref) && retainedUrls.length < 4 && !retainedUrls.includes(normalizedHref)) {
+      retainedUrls.push(normalizedHref);
       return `<a${before}href=${quote}${normalizedHref}${quote}${after}>${label}</a>`;
     }
     return label;
   });
 
-  const used = candidates.filter((candidate) => html.includes(`href="${candidate.url}"`) || html.includes(`href='${candidate.url}'`));
-  const needed = Math.max(0, Math.min(2, candidates.length) - used.length);
+  const used = candidates.filter((candidate) => retainedUrls.includes(candidate.url));
+  const targetLinkCount = getInternalLinkTargetCount(html, candidates.length);
+  const needed = Math.max(0, targetLinkCount - used.length);
   if (needed > 0) {
     const additions = candidates.filter((candidate) => !used.some((item) => item.url === candidate.url)).slice(0, needed);
-    const links = additions.map((candidate) => `<a href="${candidate.url}">${escapeHtml(candidate.title)}</a>`);
-    if (links.length) {
-      const paragraph = `<p class="ai-internal-links">Tham khảo thêm ${joinVietnameseLinks(links)} để có thêm thông tin và phương án phù hợp.</p>`;
-      const ctaPattern = /<(h2|h3)([^>]*)>([^<]*(?:liên hệ|tư vấn|nhận báo giá)[^<]*)<\/\1>/i;
-      html = ctaPattern.test(html) ? html.replace(ctaPattern, `${paragraph}$&`) : `${html}${paragraph}`;
-      used.push(...additions);
-    }
+    const usedAnchors = new Set(extractAnchorLabels(html));
+    additions.forEach((candidate, index) => {
+      const anchor = pickAnchorText(candidate, dto, usedAnchors, index === 0 && used.length === 0);
+      usedAnchors.add(normalizeSearchText(anchor));
+      const sentence = buildNaturalInternalLinkSentence(candidate, `<a href="${candidate.url}">${escapeHtml(anchor)}</a>`);
+      html = injectSentenceIntoNaturalParagraph(html, sentence, index + used.length);
+      used.push(candidate);
+    });
   }
 
   article.contentHtml = html;
   article.internalLinks = Array.from(new Set(used.map((candidate) => candidate.url))).slice(0, 4);
   return article;
+}
+
+function buildAnchorSuggestions(candidate: InternalLinkCandidate, dto: AiContentDto) {
+  const suggestions = [
+    candidate.title,
+    dto.focusKeyword,
+    ...(dto.secondaryKeywords || "").split(","),
+    `${candidate.kind} ${candidate.title}`,
+  ]
+    .map((value) => safeAnchorText(value))
+    .filter((value): value is string => Boolean(value));
+  return Array.from(new Set(suggestions.map((value) => value.trim()))).slice(0, 4);
+}
+
+function pickAnchorText(candidate: InternalLinkCandidate, dto: AiContentDto, usedAnchors: Set<string>, allowExactKeyword: boolean) {
+  const candidates = [
+    allowExactKeyword ? dto.focusKeyword : "",
+    candidate.title,
+    ...buildAnchorSuggestions(candidate, dto),
+  ];
+  for (const item of candidates) {
+    const anchor = safeAnchorText(item);
+    if (anchor && !usedAnchors.has(normalizeSearchText(anchor))) return anchor;
+  }
+  return safeAnchorText(candidate.title) || "nội dung liên quan";
+}
+
+function safeAnchorText(value: unknown) {
+  if (typeof value !== "string") return "";
+  return stripHtml(value)
+    .replace(/\s+/g, " ")
+    .replace(/^[,.;:|\-\s]+|[,.;:|\-\s]+$/g, "")
+    .trim()
+    .slice(0, 90);
+}
+
+function getInternalLinkTargetCount(html: string, candidateCount: number) {
+  if (!candidateCount) return 0;
+  const wordCount = countHtmlWords(html);
+  const ratioBasedCount = Math.ceil(wordCount / 450);
+  const minimum = wordCount >= 700 ? 2 : 1;
+  return Math.min(4, candidateCount, Math.max(minimum, ratioBasedCount));
+}
+
+function countHtmlWords(html: string) {
+  const normalized = normalizeSearchText(stripHtml(html));
+  return normalized ? normalized.split(/\s+/).filter(Boolean).length : 0;
+}
+
+function stripHtml(value: string) {
+  return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
+}
+
+function extractAnchorLabels(html: string) {
+  const labels: string[] = [];
+  html.replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, (_full, label: string) => {
+    const anchor = safeAnchorText(label);
+    if (anchor) labels.push(normalizeSearchText(anchor));
+    return "";
+  });
+  return labels;
+}
+
+function buildNaturalInternalLinkSentence(candidate: InternalLinkCandidate, anchorHtml: string) {
+  if (candidate.url.startsWith("/tin-tuc/")) {
+    return `Bạn có thể đọc thêm ${anchorHtml} để mở rộng góc nhìn trước khi chốt phương án.`;
+  }
+  if (candidate.url.startsWith("/dich-vu/")) {
+    return `Khi cần triển khai bài bản hơn, ${anchorHtml} là phần nên đối chiếu để hiểu rõ phạm vi công việc.`;
+  }
+  if (candidate.url.startsWith("/du-an/")) {
+    return `Một ví dụ gần với chủ đề này là ${anchorHtml}, giúp bạn hình dung cách xử lý không gian trong thực tế.`;
+  }
+  if (candidate.url.startsWith("/mau-thiet-ke-")) {
+    return `Nếu muốn xem thêm hướng bố trí cụ thể, ${anchorHtml} sẽ là gợi ý đáng tham khảo.`;
+  }
+  return `Nội dung ${anchorHtml} cũng giúp bổ sung thêm góc nhìn liên quan cho phần này.`;
+}
+
+function injectSentenceIntoNaturalParagraph(html: string, sentence: string, preferredIndex: number) {
+  let paragraphIndex = 0;
+  let inserted = false;
+  const updated = html.replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (full, attrs: string, body: string) => {
+    if (inserted) return full;
+    const plain = stripHtml(body);
+    const hasLink = /<a\b/i.test(body);
+    const hasImage = /<img\b/i.test(body);
+    const looksLikeCta = /(liên hệ|tư vấn|nhận báo giá|hotline)/i.test(plain);
+    const isUsefulParagraph = plain.length >= 90 && !hasLink && !hasImage && !looksLikeCta;
+    if (isUsefulParagraph) {
+      const currentIndex = paragraphIndex;
+      paragraphIndex += 1;
+      if (currentIndex >= preferredIndex) {
+        inserted = true;
+        const separator = /[.!?…]\s*$/.test(plain) ? " " : ". ";
+        return `<p${attrs}>${body}${separator}${sentence}</p>`;
+      }
+    }
+    return full;
+  });
+  if (inserted) return updated;
+
+  const paragraph = `<p>${sentence}</p>`;
+  const ctaPattern = /<(h2|h3)([^>]*)>([^<]*(?:liên hệ|tư vấn|nhận báo giá)[^<]*)<\/\1>/i;
+  return ctaPattern.test(html) ? html.replace(ctaPattern, `${paragraph}$&`) : `${html}${paragraph}`;
 }
 
 function normalizeInternalHref(href: string) {
