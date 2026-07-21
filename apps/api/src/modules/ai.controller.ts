@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { cleanHtml, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
+import { fixedServicePageWhere } from "./public-content-rules";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./roles.guard";
 
@@ -492,7 +493,7 @@ export class AiController {
         orderBy: { id: "desc" }, take: 24,
       }),
       this.prisma.service.findMany({
-        where: { status: ContentStatus.published },
+        where: fixedServicePageWhere({ status: ContentStatus.published }),
         select: { title: true, slug: true, description: true, group: true },
         orderBy: { id: "desc" }, take: 16,
       }),

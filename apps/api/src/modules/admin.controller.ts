@@ -29,6 +29,7 @@ import { Type } from "class-transformer";
 import { cleanHtml, listMeta, parsePagination, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
+import { fixedServicePageWhere } from "./public-content-rules";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./roles.guard";
 
@@ -1120,7 +1121,7 @@ export class AdminController {
 
     const [projects, services, posts, postCategories, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
-      this.prisma.service.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
+      this.prisma.service.findMany({ where: fixedServicePageWhere(), select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.post.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
       this.prisma.postCategory.findMany({ select: { id: true, name: true, slug: true, isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], take: 60 }),
       this.prisma.architectureDesignTemplate.findMany({ select: { id: true, title: true, slug: true, status: true }, orderBy: { updatedAt: "desc" }, take: 60 }),
