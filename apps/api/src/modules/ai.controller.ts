@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpException, Post, Req, UseGuards } from "@nestjs/common";
 import { ContentStatus, MediaType, Prisma } from "@prisma/client";
 import { IsBoolean, IsIn, IsOptional, IsString } from "class-validator";
 import { Request } from "express";
@@ -24,6 +24,23 @@ type InternalLinkCandidate = {
   kind: string;
   text?: string | null;
   group?: string | null;
+};
+
+type AiContentConfig = {
+  apiKey: string;
+  baseUrl: string;
+  wireApi: "chat_completions" | "responses";
+  model: string;
+  reasoningEffort: "low" | "medium" | "high";
+  maxTokens: number;
+  provider: string;
+};
+
+type AiImageConfig = {
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+  quality: "low" | "medium" | "high" | "auto";
 };
 
 class AiContentDto {
@@ -183,10 +200,13 @@ export class AiController {
   @Roles("Admin", "SEO Editor")
   async generateImage(@Body() dto: AiImageDto, @Req() request: Request & { user?: JwtUser }) {
     const aiSettingRecord = await this.prisma.setting.findUnique({ where: { key: "site.ai" } });
-    const aiSetting = (aiSettingRecord?.value as Record<string, string>) || {};
+    const aiSetting = asAiSetting(aiSettingRecord?.value);
 
     const provider = aiSetting.imageProvider || process.env.IMAGE_PROVIDER || "openai";
-    const model = aiSetting.openaiImageModel || process.env.OPENAI_IMAGE_MODEL || process.env.OPENAI_MODEL_IMAGE || "gpt-image-2";
+    const imageConfig = provider === "openai" ? resolveOpenAiImageConfig(aiSetting) : null;
+    const model = provider === "openai"
+      ? imageConfig!.model
+      : settingString(aiSetting, "openaiImageModel", "openai_image_model") || process.env.GEMINI_IMAGE_MODEL || "gemini-3-pro-image-preview";
 
     if (!dto.prompt.trim()) {
       throw new BadRequestException("Image prompt is required");
@@ -197,7 +217,7 @@ export class AiController {
       ...dto,
       prompt,
       size: dto.size || "1536x1024",
-      quality: dto.quality || "medium",
+      quality: dto.quality || imageConfig?.quality || "medium",
     };
 
     let status = "success";
@@ -274,15 +294,14 @@ export class AiController {
         }
       } else {
         // OpenAI (ChatGPT Image)
-        const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
-        if (!apiKey) {
-          throw new BadRequestException("OPENAI_API_KEY is not configured");
+        if (!imageConfig?.apiKey) {
+          throw new BadRequestException("OPENAI_IMAGE_API_KEY is not configured");
         }
 
         // Validate and map parameters for OpenAI ChatGPT Image / DALL-E
-        const openaiModel = model || "gpt-image-2";
+        const openaiModel = imageConfig.model || "gpt-image-2";
         let size = input.size;
-        let quality: string | undefined = input.quality;
+        let quality: string | undefined = dto.quality || imageConfig.quality;
 
         if (openaiModel.includes("dall-e-3")) {
           // Standard OpenAI DALL-E 3 mappings
@@ -300,10 +319,10 @@ export class AiController {
           // (which support size like 1536x1024 and quality like low, medium, high, auto)
         }
 
-        const response = await fetch("https://api.openai.com/v1/images/generations", {
+        const response = await fetch(`${imageConfig.baseUrl}/images/generations`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${imageConfig.apiKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -312,6 +331,7 @@ export class AiController {
             size,
             quality,
             n: 1,
+            output_format: "png",
           }),
         });
         const data = await response.json() as Record<string, unknown>;
@@ -375,47 +395,68 @@ export class AiController {
     createdBy?: number;
   }) {
     const aiSettingRecord = await this.prisma.setting.findUnique({ where: { key: "site.ai" } });
-    const aiSetting = (aiSettingRecord?.value as Record<string, string>) || {};
+    const aiSetting = asAiSetting(aiSettingRecord?.value);
+    const config = resolveOpenAiContentConfig(aiSetting);
 
-    const apiKey = aiSetting.openaiApiKey || process.env.OPENAI_API_KEY;
-    const model = aiSetting.openaiModelWriter || aiSetting.openaiModelFast || process.env.OPENAI_MODEL_WRITER || process.env.OPENAI_MODEL_FAST;
-    if (!apiKey) {
+    if (!config.apiKey) {
       throw new BadRequestException("OPENAI_API_KEY is not configured");
     }
-    if (!model) {
-      throw new BadRequestException("OPENAI_MODEL_WRITER or OPENAI_MODEL_FAST is not configured");
+    if (!config.model) {
+      throw new BadRequestException("OPENAI_MODEL is not configured");
     }
 
     const linkCandidates = options.task === "meta" ? [] : await this.buildInternalLinkCandidates(options.dto);
     const prompt = buildPrompt(options.task, options.dto, linkCandidates);
+    const instructions = "Bạn là chuyên gia SEO tiếng Việt cho thương hiệu kiến trúc và nội thất cao cấp Hà Thành Home. Trả về JSON hợp lệ theo schema, không thêm markdown ngoài JSON.";
     let status = "success";
     let output: unknown = null;
     try {
-      const response = await fetch("https://api.openai.com/v1/responses", {
+      const requestUrl = config.wireApi === "responses"
+        ? `${config.baseUrl}/responses`
+        : `${config.baseUrl}/chat/completions`;
+      const requestBody = config.wireApi === "responses"
+        ? {
+            model: config.model,
+            instructions,
+            input: prompt,
+            reasoning: { effort: config.reasoningEffort },
+            max_output_tokens: config.maxTokens,
+            store: false,
+            text: {
+              format: {
+                type: "json_schema",
+                name: options.schemaName,
+                schema: options.schema,
+                strict: false,
+              },
+            },
+          }
+        : {
+            model: config.model,
+            messages: [
+              { role: "system", content: `${instructions}\nSchema mục tiêu: ${JSON.stringify(options.schema)}` },
+              { role: "user", content: prompt },
+            ],
+            max_tokens: config.maxTokens,
+          };
+
+      const response = await fetch(requestUrl, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${config.apiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          model,
-          instructions: "Bạn là chuyên gia SEO tiếng Việt cho thương hiệu kiến trúc và nội thất cao cấp Hà Thành Home. Trả về JSON hợp lệ theo schema, không thêm markdown ngoài JSON.",
-          input: prompt,
-          text: {
-            format: {
-              type: "json_schema",
-              name: options.schemaName,
-              schema: options.schema,
-              strict: false,
-            },
-          },
-        }),
+        body: JSON.stringify(requestBody),
       });
       const data = await response.json() as Record<string, unknown>;
       if (!response.ok) {
         status = "error";
         output = data;
-        throw new BadRequestException(readOpenAiError(data));
+        throw new HttpException({
+          error: "Upstream request failed",
+          message: readOpenAiError(data),
+          provider_status: response.status,
+        }, 424);
       }
       const parsed = parseResponseJson(data);
       output = options.task === "article"
@@ -432,8 +473,8 @@ export class AiController {
       await this.prisma.aiGeneration.create({
         data: {
           prompt,
-          provider: "openai",
-          model,
+          provider: config.provider,
+          model: config.model,
           input: options.dto as unknown as Prisma.InputJsonValue,
           output: output as Prisma.InputJsonValue,
           status,
@@ -651,17 +692,111 @@ function joinVietnameseLinks(links: string[]) {
   return `${links.slice(0, -1).join(", ")} và ${links.at(-1)}`;
 }
 
+function asAiSetting(value: unknown): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, item == null ? "" : String(item)]));
+}
+
+function settingString(settings: Record<string, string>, camelKey: string, snakeKey: string) {
+  return nonEmpty(settings[camelKey]) || nonEmpty(settings[snakeKey]);
+}
+
+function nonEmpty(value: unknown) {
+  const text = typeof value === "string" ? value.trim() : "";
+  return text || undefined;
+}
+
+function normalizeHttpsBaseUrl(value: string, fallback: string) {
+  const candidate = (value || fallback).trim().replace(/\/+$/, "");
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== "https:") throw new Error("Base URL must use HTTPS");
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    throw new BadRequestException("AI Base URL must be a valid HTTPS URL");
+  }
+}
+
+function clampInteger(value: unknown, fallback: number, min: number, max: number) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(parsed)));
+}
+
+function resolveOpenAiContentConfig(settings: Record<string, string>): AiContentConfig {
+  const wireApi = settingString(settings, "openaiWireApi", "openai_wire_api") || process.env.OPENAI_WIRE_API || "chat_completions";
+  const normalizedWireApi = wireApi === "responses" ? "responses" : "chat_completions";
+  const effort = settingString(settings, "openaiReasoningEffort", "openai_reasoning_effort") || process.env.OPENAI_REASONING_EFFORT || "high";
+  const normalizedEffort = effort === "low" || effort === "medium" || effort === "high" ? effort : "high";
+  const maxTokens = clampInteger(
+    settingString(settings, "openaiMaxTokens", "openai_max_tokens") || process.env.OPENAI_MAX_TOKENS,
+    4096,
+    1,
+    128000,
+  );
+
+  return {
+    apiKey: settingString(settings, "openaiApiKey", "openai_api_key") || process.env.OPENAI_API_KEY || "",
+    baseUrl: normalizeHttpsBaseUrl(
+      settingString(settings, "openaiBaseUrl", "openai_base_url") || process.env.OPENAI_BASE_URL || "",
+      "https://modelapi.vn/v1",
+    ),
+    wireApi: normalizedWireApi,
+    model: settingString(settings, "openaiModel", "openai_model")
+      || settingString(settings, "openaiModelWriter", "openai_model_writer")
+      || settingString(settings, "openaiModelFast", "openai_model_fast")
+      || process.env.OPENAI_MODEL
+      || process.env.OPENAI_MODEL_WRITER
+      || process.env.OPENAI_MODEL_FAST
+      || "gpt-5.5",
+    reasoningEffort: normalizedEffort,
+    maxTokens,
+    provider: "openai-compatible",
+  };
+}
+
+function resolveOpenAiImageConfig(settings: Record<string, string>): AiImageConfig {
+  const quality = settingString(settings, "openaiImageQuality", "openai_image_quality") || process.env.OPENAI_IMAGE_QUALITY || "medium";
+  const normalizedQuality = quality === "low" || quality === "medium" || quality === "high" || quality === "auto" ? quality : "medium";
+
+  return {
+    apiKey: settingString(settings, "openaiImageApiKey", "openai_image_api_key") || process.env.OPENAI_IMAGE_API_KEY || "",
+    baseUrl: normalizeHttpsBaseUrl(
+      settingString(settings, "openaiImageBaseUrl", "openai_image_base_url") || process.env.OPENAI_IMAGE_BASE_URL || "",
+      "https://api.openai.com/v1",
+    ),
+    model: settingString(settings, "openaiImageModel", "openai_image_model") || process.env.OPENAI_IMAGE_MODEL || "gpt-image-2",
+    quality: normalizedQuality,
+  };
+}
+
 function parseResponseJson(data: Record<string, unknown>) {
   const direct = data.output_text;
-  if (typeof direct === "string") return JSON.parse(direct);
+  if (typeof direct === "string") return parseJsonText(direct);
   const output = Array.isArray(data.output) ? data.output : [];
   for (const item of output as Array<Record<string, unknown>>) {
     const content = Array.isArray(item.content) ? item.content : [];
     for (const part of content as Array<Record<string, unknown>>) {
-      if (typeof part.text === "string") return JSON.parse(part.text);
+      if (typeof part.text === "string") return parseJsonText(part.text);
+    }
+  }
+  const choices = Array.isArray(data.choices) ? data.choices : [];
+  for (const choice of choices as Array<Record<string, unknown>>) {
+    const message = choice.message;
+    if (message && typeof message === "object" && "content" in message) {
+      const content = (message as { content?: unknown }).content;
+      if (typeof content === "string") return parseJsonText(content);
     }
   }
   throw new BadRequestException("AI response did not contain JSON text");
+}
+
+function parseJsonText(value: string) {
+  const cleaned = value.trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  return JSON.parse(cleaned);
 }
 
 function readOpenAiError(data: Record<string, unknown>) {

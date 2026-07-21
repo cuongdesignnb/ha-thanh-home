@@ -379,7 +379,7 @@ const statusLabels: Record<string, string> = {
   spam: "Spam",
 };
 
-type ToastTone = "success" | "error" | "info";
+type ToastTone = "success" | "error" | "info" | "warning";
 type ToastItem = { id: number; tone: ToastTone; title: string; description?: string };
 type ConfirmOptions = { title: string; description?: string; confirmLabel?: string; cancelLabel?: string; tone?: "danger" | "default" };
 type FeedbackContextValue = {
@@ -516,7 +516,7 @@ function FeedbackProvider({ children }: { children: ReactNode }) {
       <div className="toast-stack" aria-live="polite">
         {toasts.map((toast) => (
           <div className={`toast toast-${toast.tone}`} key={toast.id}>
-            <span>{toast.tone === "success" ? <CheckCircle2 size={18} /> : toast.tone === "error" ? <AlertTriangle size={18} /> : <BadgeCheck size={18} />}</span>
+            <span>{toast.tone === "success" ? <CheckCircle2 size={18} /> : toast.tone === "error" || toast.tone === "warning" ? <AlertTriangle size={18} /> : <BadgeCheck size={18} />}</span>
             <div><strong>{T(toast.title)}</strong>{toast.description ? <p>{T(toast.description)}</p> : null}</div>
             <button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} aria-label="Đóng thông báo"><X size={15} /></button>
           </div>
@@ -866,7 +866,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         body: JSON.stringify({ ...form, createDraft }),
       });
       if (!response.ok) {
-        notify({ tone: "error", title: "AI chưa chạy được", description: await readApiError(response, "Kiểm tra OPENAI_API_KEY và model trong .env.") });
+        notify({ tone: "error", title: "AI chưa chạy được", description: await readApiError(response, "Kiểm tra cấu hình AI Provider trong trang Cấu hình hoặc biến môi trường backend.") });
         setLoading("");
         return;
       }
@@ -904,7 +904,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         }),
       });
       if (!response.ok) {
-        notify({ tone: "error", title: "Chưa tạo được ảnh", description: await readApiError(response, "Kiểm tra OPENAI_API_KEY và OPENAI_IMAGE_MODEL trong .env.") });
+        notify({ tone: "error", title: "Chưa tạo được ảnh", description: await readApiError(response, "Kiểm tra OpenAI Image API Key, model ảnh và billing trong trang Cấu hình.") });
         setLoading("");
         return;
       }
@@ -1061,7 +1061,7 @@ function AiContentStudio({ setActive }: { setActive: (entity: Entity) => void })
         <div className="panel-heading" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
           <div>
             <h2>Tạo nội dung SEO</h2>
-            <p>AI chỉ tạo draft, không tự xuất bản. Model và API key lấy từ cấu hình môi trường.</p>
+            <p>AI chỉ tạo draft, không tự xuất bản. Model và API key lấy từ trang Cấu hình, có fallback theo biến môi trường backend.</p>
           </div>
           <div style={{ display: "flex", gap: "4px", background: "#f0ece4", padding: "4px", borderRadius: "6px" }}>
             <button
@@ -2049,9 +2049,17 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     testimonialsTitle: "Khách hàng nói gì về chúng tôi",
     newsTitle: "Tin tức & cảm hứng",
     openaiApiKey: "",
-    openaiModelWriter: "gpt-5.4-mini",
-    openaiModelFast: "gpt-5.4-mini",
+    openaiBaseUrl: "https://modelapi.vn/v1",
+    openaiWireApi: "chat_completions",
+    openaiModel: "gpt-5.5",
+    openaiReasoningEffort: "high",
+    openaiMaxTokens: "4096",
+    openaiModelWriter: "gpt-5.5",
+    openaiModelFast: "gpt-5.5",
+    openaiImageApiKey: "",
+    openaiImageBaseUrl: "https://api.openai.com/v1",
     openaiImageModel: "gpt-image-2",
+    openaiImageQuality: "medium",
     imageProvider: "openai",
     geminiApiKey: "",
     logoUrl: "",
@@ -2133,10 +2141,18 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           processTitle: String(homepage.processTitle || current.processTitle),
           testimonialsTitle: String(homepage.testimonialsTitle || current.testimonialsTitle),
           newsTitle: String(homepage.newsTitle || current.newsTitle),
-          openaiApiKey: String(ai.openaiApiKey || ""),
-          openaiModelWriter: String(ai.openaiModelWriter || "gpt-5.4-mini"),
-          openaiModelFast: String(ai.openaiModelFast || "gpt-5.4-mini"),
-          openaiImageModel: String(ai.openaiImageModel || "gpt-image-2"),
+          openaiApiKey: String(ai.openaiApiKey || ai.openai_api_key || ""),
+          openaiBaseUrl: String(ai.openaiBaseUrl || ai.openai_base_url || "https://modelapi.vn/v1"),
+          openaiWireApi: String(ai.openaiWireApi || ai.openai_wire_api || "chat_completions"),
+          openaiModel: String(ai.openaiModel || ai.openai_model || ai.openaiModelWriter || "gpt-5.5"),
+          openaiReasoningEffort: String(ai.openaiReasoningEffort || ai.openai_reasoning_effort || "high"),
+          openaiMaxTokens: String(ai.openaiMaxTokens || ai.openai_max_tokens || "4096"),
+          openaiModelWriter: String(ai.openaiModelWriter || ai.openaiModel || ai.openai_model || "gpt-5.5"),
+          openaiModelFast: String(ai.openaiModelFast || ai.openaiModel || ai.openai_model || "gpt-5.5"),
+          openaiImageApiKey: String(ai.openaiImageApiKey || ai.openai_image_api_key || ""),
+          openaiImageBaseUrl: String(ai.openaiImageBaseUrl || ai.openai_image_base_url || "https://api.openai.com/v1"),
+          openaiImageModel: String(ai.openaiImageModel || ai.openai_image_model || "gpt-image-2"),
+          openaiImageQuality: String(ai.openaiImageQuality || ai.openai_image_quality || "medium"),
           imageProvider: String(ai.imageProvider || "openai"),
           geminiApiKey: String(ai.geminiApiKey || ""),
           smtpHost: String(smtp.smtpHost || ""),
@@ -2227,10 +2243,18 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     };
     const ai = {
       openaiApiKey: values.openaiApiKey,
+      openaiBaseUrl: values.openaiBaseUrl,
+      openaiWireApi: values.openaiWireApi,
+      openaiModel: values.openaiModel,
+      openaiReasoningEffort: values.openaiReasoningEffort,
+      openaiMaxTokens: values.openaiMaxTokens,
       geminiApiKey: values.geminiApiKey,
-      openaiModelWriter: values.openaiModelWriter,
-      openaiModelFast: values.openaiModelFast,
+      openaiModelWriter: values.openaiModel,
+      openaiModelFast: values.openaiModel,
+      openaiImageApiKey: values.openaiImageApiKey,
+      openaiImageBaseUrl: values.openaiImageBaseUrl,
       openaiImageModel: values.openaiImageModel,
+      openaiImageQuality: values.openaiImageQuality,
       imageProvider: values.imageProvider,
     };
     const smtp = {
@@ -2421,13 +2445,36 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           <div className="form-section wide theme-settings-section">
             <div className="form-section-title">
               <span>Cấu hình AI</span>
-              <div><h3>Trợ lý viết bài & Sinh ảnh (AI Content Studio)</h3><p>Nhập API Key và cấu hình model để sử dụng AI Content Studio trực tiếp từ Admin.</p></div>
+              <div><h3>AI viết bài & sinh ảnh</h3><p>Tách riêng provider viết bài và OpenAI chính hãng cho ảnh. Giá trị trong Admin sẽ ưu tiên hơn cấu hình môi trường.</p></div>
             </div>
             <div className="form-grid">
-              <label className="wide">OpenAI API Key<input type="password" value={values.openaiApiKey || ""} onChange={(event) => setValues({ ...values, openaiApiKey: event.target.value })} placeholder="sk-proj-..." /></label>
-              <label className="wide">Gemini API Key<input type="password" value={values.geminiApiKey || ""} onChange={(event) => setValues({ ...values, geminiApiKey: event.target.value })} placeholder="AIzaSy..." /></label>
-              <label>Model viết bài (Writer)<input value={values.openaiModelWriter || ""} onChange={(event) => setValues({ ...values, openaiModelWriter: event.target.value })} placeholder="gpt-5.4-mini" /></label>
-              <label>Model viết nhanh (Fast)<input value={values.openaiModelFast || ""} onChange={(event) => setValues({ ...values, openaiModelFast: event.target.value })} placeholder="gpt-5.4-mini" /></label>
+              <div className="form-section-title wide compact-section-title">
+                <span>AI Provider</span>
+                <div><h3>Viết bài SEO</h3><p>Dùng API tương thích OpenAI như modelapi.vn. Không dùng key này cho sinh ảnh.</p></div>
+              </div>
+              <label className="wide">AI Provider API Key<input type="password" value={values.openaiApiKey || ""} onChange={(event) => setValues({ ...values, openaiApiKey: event.target.value })} placeholder="Key của provider viết bài" /></label>
+              <label className="wide">AI Provider Base URL<input value={values.openaiBaseUrl || ""} onChange={(event) => setValues({ ...values, openaiBaseUrl: event.target.value })} placeholder="https://modelapi.vn/v1" /></label>
+              <label>Wire API
+                <select value={values.openaiWireApi || "chat_completions"} onChange={(event) => setValues({ ...values, openaiWireApi: event.target.value })}>
+                  <option value="chat_completions">Chat Completions</option>
+                  <option value="responses">Responses API</option>
+                </select>
+              </label>
+              <label>Model sinh nội dung<input value={values.openaiModel || ""} onChange={(event) => setValues({ ...values, openaiModel: event.target.value })} placeholder="gpt-5.5" /></label>
+              <label>Reasoning Effort
+                <select value={values.openaiReasoningEffort || "high"} onChange={(event) => setValues({ ...values, openaiReasoningEffort: event.target.value })}>
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high">high</option>
+                </select>
+              </label>
+              <label>Max Output Tokens<input type="number" min={1} max={128000} step={256} value={values.openaiMaxTokens || "4096"} onChange={(event) => setValues({ ...values, openaiMaxTokens: event.target.value })} /></label>
+              <div className="form-section-title wide compact-section-title">
+                <span>OpenAI Images</span>
+                <div><h3>Sinh ảnh bài viết</h3><p>Dùng API key OpenAI chính hãng riêng. Nếu thiếu key ảnh, phần viết bài vẫn dùng provider nội dung bình thường.</p></div>
+              </div>
+              <label className="wide">OpenAI Image API Key<input type="password" value={values.openaiImageApiKey || ""} onChange={(event) => setValues({ ...values, openaiImageApiKey: event.target.value })} placeholder="sk-proj-..." /></label>
+              <label className="wide">OpenAI Image Base URL<input value={values.openaiImageBaseUrl || ""} onChange={(event) => setValues({ ...values, openaiImageBaseUrl: event.target.value })} placeholder="https://api.openai.com/v1" /></label>
               <label>Nhà cung cấp ảnh
                 <select
                   value={values.imageProvider || "openai"}
@@ -2460,6 +2507,15 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
                   )}
                 </select>
               </label>
+              <label>Chất lượng ảnh
+                <select value={values.openaiImageQuality || "medium"} onChange={(event) => setValues({ ...values, openaiImageQuality: event.target.value })}>
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high">high</option>
+                  <option value="auto">auto</option>
+                </select>
+              </label>
+              <label className="wide">Gemini API Key (tùy chọn, legacy)<input type="password" value={values.geminiApiKey || ""} onChange={(event) => setValues({ ...values, geminiApiKey: event.target.value })} placeholder="AIzaSy..." /></label>
             </div>
           </div>
 
@@ -3057,43 +3113,55 @@ function PostAiGenerator({ form }: { form: ReturnType<typeof useForm<Record<stri
         form.setValue("slug", payload.slug);
       }
 
+      let imageGenerated = false;
+
       // 2. Sinh ảnh đại diện nếu có yêu cầu
       if (withImage) {
         notify({ tone: "info", title: "AI đang sinh ảnh", description: "Đang tạo ảnh minh họa phong cách chuyên nghiệp và lưu vào Media Library..." });
         
         const imagePrompt = getDynamicImagePrompt(title);
-        
-        const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: imagePrompt,
-            topic: title,
-            type: "blog",
-            size: "1536x1024",
-            quality: "medium",
-            altText: title,
-          }),
-        });
 
-        if (!imageResponse.ok) {
-          throw new Error(await readApiError(imageResponse, "Không sinh được ảnh đại diện bài viết."));
-        }
+        try {
+          const imageResponse = await apiFetch("/api/cms/ai/generate-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: imagePrompt,
+              topic: title,
+              type: "blog",
+              size: "1536x1024",
+              quality: "medium",
+              altText: title,
+            }),
+          });
 
-        const imagePayload = await imageResponse.json();
-        const media = imagePayload.media;
-        if (media) {
-          form.setValue("thumbnailMediaId", media.id);
-          form.setValue("thumbnailMedia", media);
-          
-          // Chèn ảnh vào đầu bài viết
-          const mediaUrl = media.largeUrl || media.webpUrl || media.mediumUrl;
-          const imageHtml = `<p><img src="${mediaUrl}" alt="${title}" style="width:100%; max-width:800px; height:auto; border-radius:8px; display:block; margin: 0 auto 20px;" /></p>`;
-          form.setValue("contentHtml", imageHtml + (payload.contentHtml || ""));
+          if (!imageResponse.ok) {
+            notify({ tone: "warning", title: "Bài viết đã tạo, ảnh chưa tạo được", description: await readApiError(imageResponse, "Kiểm tra OpenAI Image API Key và billing trong trang Cấu hình.") });
+          } else {
+            const imagePayload = await imageResponse.json();
+            const media = imagePayload.media;
+            if (media) {
+              form.setValue("thumbnailMediaId", media.id);
+              form.setValue("thumbnailMedia", media);
+
+              // Chèn ảnh vào đầu bài viết
+              const mediaUrl = media.largeUrl || media.webpUrl || media.mediumUrl;
+              const imageHtml = `<p><img src="${mediaUrl}" alt="${title}" style="width:100%; max-width:800px; height:auto; border-radius:8px; display:block; margin: 0 auto 20px;" /></p>`;
+              form.setValue("contentHtml", imageHtml + (payload.contentHtml || ""));
+              imageGenerated = true;
+            }
+          }
+        } catch (imageError) {
+          notify({ tone: "warning", title: "Bài viết đã tạo, ảnh chưa tạo được", description: describeClientError(imageError, "Không kết nối được API tạo ảnh.") });
         }
       }
 
-      notify({ tone: "success", title: "Hoàn tất sinh bài viết", description: withImage ? "Đã điền nội dung chi tiết và ảnh đại diện thành công!" : "Đã điền nội dung chi tiết thành công!" });
+      const successDescription = !withImage
+        ? "Đã điền nội dung chi tiết thành công!"
+        : imageGenerated
+          ? "Đã điền nội dung chi tiết và ảnh đại diện thành công!"
+          : "Đã điền nội dung chi tiết thành công. Ảnh đại diện chưa tạo được, bạn có thể thử lại sau.";
+      notify({ tone: "success", title: "Hoàn tất sinh bài viết", description: successDescription });
     } catch (error) {
       notify({ tone: "error", title: "AI chưa chạy được", description: error instanceof Error ? error.message : "Đã xảy ra lỗi không xác định." });
     } finally {
