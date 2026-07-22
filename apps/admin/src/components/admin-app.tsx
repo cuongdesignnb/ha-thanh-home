@@ -3381,7 +3381,7 @@ function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreat
 
   // Reset category if it doesn't belong to the selected group
   useEffect(() => {
-    if (categoryId) {
+    if (categoryId !== null && categoryId !== undefined && categoryId !== "") {
       const selectedCat = projectCategories.find((c) => c.id === Number(categoryId));
       if (selectedCat && selectedCat.group !== group) {
         form.setValue("categoryId", null);
@@ -3395,7 +3395,7 @@ function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreat
     <>
       <label>
         Danh mục dự án
-        <select {...form.register("categoryId", { valueAsNumber: true })}>
+        <select {...form.register("categoryId", { setValueAs: nullableNumberValue })}>
           <option value="">Chọn danh mục</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -4245,6 +4245,12 @@ function prepareSubmitValues(entity: Entity, values: Record<string, unknown>) {
   return submitValues;
 }
 
+function nullableNumberValue(value: unknown) {
+  if (value === "" || value === null || value === undefined) return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 function canonicalBasePath(entity: Entity) {
   if (entity === "projects") return "/du-an";
   if (entity === "services") return "/dich-vu";
@@ -4332,6 +4338,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
   delete payload.thumbnailMedia;
   if (usesNameAsPrimaryField(entity)) delete payload.title;
   if ("canonicalUrl" in payload) payload.canonicalUrl = normalizeCanonicalUrl(entity, payload.canonicalUrl);
+  if ("categoryId" in payload) payload.categoryId = nullableNumberValue(payload.categoryId);
   if (payload.thumbnailMediaId === "") payload.thumbnailMediaId = null;
   ["categoryId", "area", "areaValue", "floors", "facadeWidth", "depth", "bedrooms", "bathrooms", "estimatedBudget", "budgetMin", "budgetMax", "sortOrder"].forEach((key) => {
     if (Number.isNaN(payload[key]) || payload[key] === "") payload[key] = null;
