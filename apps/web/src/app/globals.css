@@ -1856,6 +1856,24 @@ h3 {
   padding: 18px;
 }
 
+.news-card .card-body {
+  display: flex;
+  min-height: 282px;
+  flex-direction: column;
+}
+
+.news-card p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 18px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.news-card .card-body > span:last-child {
+  margin-top: auto;
+}
+
 .card h3,
 .service-card h3 {
   font-family: var(--site-body-font);
