@@ -686,6 +686,13 @@ export async function getAboutPageConfig(): Promise<AboutPageConfig> {
   };
 }
 
+function cleanMetadataTitle(title: string) {
+  return title
+    .replace(/\s*[|–—-]\s*(Hà Thành Home|Ha Thanh Home)\s*$/gi, "")
+    .replace(/\s*[|–—-]\s*(Hà Thành Home|Ha Thanh Home)\s*$/gi, "")
+    .trim() || "Hà Thành Home";
+}
+
 
 export function getConstructionEstimatorConfig() {
   return fetchJson<EstimatorPublicConfig>("/construction-estimator/config", {});
@@ -1161,16 +1168,17 @@ export function contentMetadata(
   fallbackTitle: string,
   canonicalPath?: string,
 ) {
-  if (!item) return { title: fallbackTitle };
+  if (!item) return { title: cleanMetadataTitle(fallbackTitle) };
   const description = item.metaDescription || item.description || item.excerpt || undefined;
   const image = thumbnailUrl(item, "");
   const path = canonicalPath ? (canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`) : undefined;
+  const title = cleanMetadataTitle(item.metaTitle || item.title);
   return {
-    title: item.metaTitle || `${item.title} | Hà Thành Home`,
+    title,
     description,
     alternates: (item.canonicalUrl || path) ? { canonical: item.canonicalUrl || path } : undefined,
     openGraph: {
-      title: item.ogTitle || item.metaTitle || item.title,
+      title: item.ogTitle || title,
       description: item.ogDescription || description,
       images: image ? [{ url: image }] : undefined,
     },
