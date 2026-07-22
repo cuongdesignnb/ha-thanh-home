@@ -3338,7 +3338,7 @@ function EntityFields({ entity, filterOptions, form, postCategories, projectCate
           <ThumbnailPickerField form={form} />
           {["projects", "services", "architecture-designs", "interior-designs"].includes(entity) ? <GalleryPickerField form={form} /> : null}
           <label>Meta title<input {...form.register("metaTitle")} placeholder="Tối đa khoảng 60 ký tự" /></label>
-          <label>Canonical URL<input {...form.register("canonicalUrl")} placeholder="https://domain.com/duong-dan-chuan" /></label>
+          <label>Canonical URL <small>(nâng cao, để trống để tự sinh)</small><input {...form.register("canonicalUrl")} placeholder="Để trống hoặc nhập /du-an/duong-dan-chuan" /></label>
           <label className="wide">Meta description<textarea {...form.register("metaDescription")} rows={3} placeholder="Tối đa khoảng 155 ký tự" /></label>
           <label>OG title<input {...form.register("ogTitle")} placeholder="Tiêu đề khi chia sẻ mạng xã hội" /></label>
           {entity === "posts" ? <label>Từ khóa chính<input {...form.register("focusKeyword")} placeholder="Từ khóa SEO chính" /></label> : null}
@@ -4245,6 +4245,32 @@ function prepareSubmitValues(entity: Entity, values: Record<string, unknown>) {
   return submitValues;
 }
 
+function canonicalBasePath(entity: Entity) {
+  if (entity === "projects") return "/du-an";
+  if (entity === "services") return "/dich-vu";
+  if (entity === "posts") return "/tin-tuc";
+  if (entity === "architecture-designs") return "/mau-thiet-ke-kien-truc";
+  if (entity === "interior-designs") return "/mau-thiet-ke-noi-that";
+  if (entity === "pages") return "";
+  return undefined;
+}
+
+function normalizeCanonicalUrl(entity: Entity, value: unknown) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+  if (/^(https?:)?\/\//i.test(raw)) return raw;
+  if (/^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(raw)) return `https://${raw}`;
+  if (raw.startsWith("/")) return raw.replace(/\/{2,}/g, "/");
+  const base = canonicalBasePath(entity);
+  if (base === undefined) return raw;
+  const baseWithoutSlash = base.replace(/^\//, "");
+  if (baseWithoutSlash && (raw === baseWithoutSlash || raw.startsWith(`${baseWithoutSlash}/`))) {
+    return `/${raw}`.replace(/\/{2,}/g, "/");
+  }
+  const slug = raw.replace(/^\/+/, "");
+  return base ? `${base}/${slug}`.replace(/\/{2,}/g, "/") : `/${slug}`.replace(/\/{2,}/g, "/");
+}
+
 function defaultValues(entity: Entity) {
   if (entity === "leads") return { status: "new", note: "" };
   const values: Record<string, unknown> = {
@@ -4305,6 +4331,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>) {
   const payload = { ...values };
   delete payload.thumbnailMedia;
   if (usesNameAsPrimaryField(entity)) delete payload.title;
+  if ("canonicalUrl" in payload) payload.canonicalUrl = normalizeCanonicalUrl(entity, payload.canonicalUrl);
   if (payload.thumbnailMediaId === "") payload.thumbnailMediaId = null;
   ["categoryId", "area", "areaValue", "floors", "facadeWidth", "depth", "bedrooms", "bathrooms", "estimatedBudget", "budgetMin", "budgetMax", "sortOrder"].forEach((key) => {
     if (Number.isNaN(payload[key]) || payload[key] === "") payload[key] = null;
