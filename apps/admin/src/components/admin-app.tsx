@@ -2840,7 +2840,8 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   }
 
   async function submit(values: Record<string, unknown>) {
-    const parsed = contentSchema.safeParse(values);
+    const submitValues = prepareSubmitValues(entity, values);
+    const parsed = contentSchema.safeParse(submitValues);
     if (!parsed.success) {
       notify({ tone: "error", title: "Dữ liệu không hợp lệ", description: parsed.error.issues[0]?.message || "Kiểm tra lại các trường bắt buộc." });
       return;
@@ -2850,7 +2851,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       response = await apiFetch(editing ? `/api/cms/${entity}/${editing.id}` : `/api/cms/${entity}`, {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(normalizePayload(entity, values)),
+        body: JSON.stringify(normalizePayload(entity, submitValues)),
       });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được dữ liệu", description: describeClientError(error, "Không kết nối được API.") });
@@ -2861,13 +2862,13 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       return;
     }
     const saved = await response.json();
-    if (entity === "posts" && values.status === "scheduled" && values.scheduledAt && saved?.id) {
+    if (entity === "posts" && submitValues.status === "scheduled" && submitValues.scheduledAt && saved?.id) {
       let scheduleResponse: Response;
       try {
         scheduleResponse = await apiFetch(`/api/cms/posts/${saved.id}/schedule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ scheduledAt: values.scheduledAt }),
+          body: JSON.stringify({ scheduledAt: submitValues.scheduledAt }),
         });
       } catch (error) {
         notify({ tone: "error", title: "Không đặt được lịch đăng", description: describeClientError(error, "Bài đã lưu nhưng API lịch đăng không phản hồi.") });
@@ -4229,9 +4230,24 @@ function SimpleTable({ rows, columns, emptyText }: { rows: CmsItem[]; columns: s
   return <table className="data-table compact"><tbody>{rows.map((row) => <tr key={row.id}>{columns.map((column) => <td key={column}>{column === "status" ? statusLabels[String(row[column])] || String(row[column] || "-") : String(row[column] || "-")}</td>)}</tr>)}</tbody></table>;
 }
 
+function usesNameAsPrimaryField(entity: Entity) {
+  return ["project-categories", "project-filter-options", "post-categories"].includes(entity);
+}
+
+function prepareSubmitValues(entity: Entity, values: Record<string, unknown>) {
+  const submitValues = { ...values };
+  if (usesNameAsPrimaryField(entity)) {
+    delete submitValues.title;
+    if (typeof submitValues.name === "string") submitValues.name = submitValues.name.trim();
+  } else if (typeof submitValues.title === "string") {
+    submitValues.title = submitValues.title.trim();
+  }
+  return submitValues;
+}
+
 function defaultValues(entity: Entity) {
   if (entity === "leads") return { status: "new", note: "" };
-  return {
+  const values: Record<string, unknown> = {
     title: "",
     name: "",
     slug: "",
@@ -4281,11 +4297,14 @@ function defaultValues(entity: Entity) {
     isFeatured: false,
     isActive: true,
   };
+  if (usesNameAsPrimaryField(entity)) delete values.title;
+  return values;
 }
 
 function normalizePayload(entity: Entity, values: Record<string, unknown>) {
   const payload = { ...values };
   delete payload.thumbnailMedia;
+  if (usesNameAsPrimaryField(entity)) delete payload.title;
   if (payload.thumbnailMediaId === "") payload.thumbnailMediaId = null;
   ["categoryId", "area", "areaValue", "floors", "facadeWidth", "depth", "bedrooms", "bathrooms", "estimatedBudget", "budgetMin", "budgetMax", "sortOrder"].forEach((key) => {
     if (Number.isNaN(payload[key]) || payload[key] === "") payload[key] = null;
