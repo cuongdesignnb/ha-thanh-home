@@ -3331,13 +3331,22 @@ h3 {
   }
 
   .detail-content {
+    max-width: 100%;
+    overflow-x: auto;
     overflow-wrap: anywhere;
+    -webkit-overflow-scrolling: touch;
   }
 
   .detail-content table {
-    display: block;
-    overflow-x: auto;
+    width: max-content !important;
+    min-width: 680px;
+    max-width: none;
     white-space: nowrap;
+  }
+
+  .detail-content th,
+  .detail-content td {
+    min-width: 140px;
   }
 
   .contact-hero-grid {
