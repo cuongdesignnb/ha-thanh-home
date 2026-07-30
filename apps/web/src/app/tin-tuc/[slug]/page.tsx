@@ -5,6 +5,7 @@ import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, type Post } from "@/lib/api";
+import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 import { getRelatedPosts } from "@/lib/related-content";
 
@@ -36,7 +37,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
       <PageHero title={post.title} description={post.excerpt} />
       <section className="section">
         <article className="detail-content">
-          <div dangerouslySetInnerHTML={{ __html: post.contentHtml || `<p>${post.excerpt || "Nội dung bài viết đang được cập nhật."}</p>` }} />
+          <div dangerouslySetInnerHTML={{ __html: prepareDetailHtml(post.contentHtml || `<p>${post.excerpt || "Nội dung bài viết đang được cập nhật."}</p>`) }} />
         </article>
       </section>
       <RelatedContent items={related} title="Bài viết liên quan" />

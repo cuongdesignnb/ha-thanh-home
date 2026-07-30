@@ -3095,6 +3095,7 @@ h3 {
   margin: 0 auto;
   font-size: 18px;
   line-height: 1.85;
+  min-width: 0;
 }
 
 .detail-content p {
@@ -3132,6 +3133,27 @@ h3 {
   border-collapse: collapse;
   margin: 26px 0;
   font-size: 16px;
+}
+
+.detail-content .content-table-scroll {
+  max-width: 100%;
+  margin: 26px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-content .content-table-scroll:focus {
+  outline: 2px solid rgba(201, 154, 74, .45);
+  outline-offset: 3px;
+}
+
+.detail-content .content-table-scroll table {
+  margin: 0;
+  border: 0;
 }
 
 .detail-content th,
@@ -3320,6 +3342,14 @@ h3 {
 
   .template-detail-grid {
     grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .template-detail-main,
+  .template-article,
+  .detailed-intro-text {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .template-specs-card {
@@ -3332,21 +3362,40 @@ h3 {
 
   .detail-content {
     max-width: 100%;
-    overflow-x: auto;
+    min-width: 0;
+    overflow-x: clip;
     overflow-wrap: anywhere;
+  }
+
+  .detail-content .content-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .detail-content table {
+  .detail-content table,
+  .detail-content .content-table-scroll table {
+    display: table;
     width: max-content !important;
     min-width: 680px;
     max-width: none;
-    white-space: nowrap;
+    table-layout: auto;
+  }
+
+  .detail-content > table,
+  .detail-content > div:not(.content-table-scroll) > table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .detail-content th,
   .detail-content td {
     min-width: 140px;
+    overflow-wrap: normal;
   }
 
   .contact-hero-grid {

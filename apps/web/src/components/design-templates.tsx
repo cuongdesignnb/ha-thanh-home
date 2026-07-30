@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
+import { prepareDetailHtml } from "@/lib/rich-content";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -199,7 +200,7 @@ export async function TemplateDetail({ item, kind }: { item: ArchitectureDesign 
 
             <article className="template-article">
               {item.contentHtml
-                ? <div className="detail-content" dangerouslySetInnerHTML={{ __html: item.contentHtml }} />
+                ? <div className="detail-content" dangerouslySetInnerHTML={{ __html: prepareDetailHtml(item.contentHtml) }} />
                 : <DefaultTemplateArticle item={item} kind={kind} />}
             </article>
 

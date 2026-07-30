@@ -4,6 +4,7 @@ import { PageHero } from "@/components/content-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, type CustomPage, type Post, type Project, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
+import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -56,7 +57,7 @@ export default async function CustomPageDetailPage({ params }: { params: Promise
         <PageHero title={page.title} description={page.description} />
         <section className="section">
           <article className="detail-content">
-            <div dangerouslySetInnerHTML={{ __html: page.contentHtml || `<p>Nội dung trang đang được cập nhật.</p>` }} />
+            <div dangerouslySetInnerHTML={{ __html: prepareDetailHtml(page.contentHtml || `<p>Nội dung trang đang được cập nhật.</p>`) }} />
           </article>
         </section>
         <SiteFooter />

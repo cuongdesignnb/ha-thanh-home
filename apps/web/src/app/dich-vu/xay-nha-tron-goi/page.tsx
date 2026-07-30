@@ -42,6 +42,7 @@ import {
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 import { getConstructionGuidePosts } from "@/lib/related-content";
+import { prepareDetailHtml } from "@/lib/rich-content";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -377,7 +378,7 @@ function DetailedIntroSection({ landing }: { landing: ReturnType<typeof xayNhaLa
     <section className="section detailed-intro-section">
       <div className={`container xay-nha-detailed-intro ${hasImage ? "has-image" : ""}`}>
         <div className="detailed-intro-text">
-          <div className="detail-content" dangerouslySetInnerHTML={{ __html: landing.detailedIntroHtml }} />
+          <div className="detail-content" dangerouslySetInnerHTML={{ __html: prepareDetailHtml(landing.detailedIntroHtml) }} />
           {landing.detailedIntroCtaLabel && landing.detailedIntroCtaUrl && (
             <div className="detailed-intro-actions">
               <a className="cta" href={landing.detailedIntroCtaUrl}>

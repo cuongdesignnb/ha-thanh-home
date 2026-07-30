@@ -1,6 +1,7 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
+import { prepareDetailHtml } from "@/lib/rich-content";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -152,7 +153,7 @@ export async function ProjectDetail({ project }: { project: Project }) {
               <TemplateGalleryModal images={albumImages} title={project.title} />
             </section>
             <article className="template-article">
-              <div className="detail-content" dangerouslySetInnerHTML={{ __html: project.contentHtml || defaultProjectArticle(project) }} />
+              <div className="detail-content" dangerouslySetInnerHTML={{ __html: prepareDetailHtml(project.contentHtml || defaultProjectArticle(project)) }} />
             </article>
             <section className="template-lead-box">
               <div><span>Tư vấn dự án tương tự</span><h2>Cần triển khai công trình hoặc nội thất theo phong cách tương tự?</h2><p>Hà Thành Home sẽ tư vấn lại theo diện tích, vị trí, ngân sách và yêu cầu vận hành thực tế của anh/chị.</p></div>
@@ -212,7 +213,7 @@ export async function ServiceDetail({ service }: { service: Service }) {
             ) : null}
 
             <article className="template-article">
-              <div className="detail-content" dangerouslySetInnerHTML={{ __html: service.contentHtml || `<p>${service.description || "Nội dung dịch vụ đang được cập nhật."}</p>` }} />
+              <div className="detail-content" dangerouslySetInnerHTML={{ __html: prepareDetailHtml(service.contentHtml || `<p>${service.description || "Nội dung dịch vụ đang được cập nhật."}</p>`) }} />
             </article>
 
             <section className="template-lead-box">
