@@ -520,7 +520,7 @@ export class AiController {
       ...posts.map((item) => ({ title: item.title, url: `/tin-tuc/${item.slug}`, kind: "Bài viết", text: item.excerpt })),
       ...architecture.map((item) => ({ title: item.title, url: `/mau-thiet-ke-kien-truc/${item.slug}`, kind: "Mẫu kiến trúc", text: item.description, group: "construction" })),
       ...interior.map((item) => ({ title: item.title, url: `/mau-thiet-ke-noi-that/${item.slug}`, kind: "Mẫu nội thất", text: item.description, group: "interior" })),
-    ];
+    ].filter((candidate) => isAllowedInternalCandidateUrl(candidate.url));
     const terms = normalizeSearchText(`${dto.topic} ${dto.focusKeyword} ${dto.secondaryKeywords || ""}`).split(" ").filter((term) => term.length > 2);
     return candidates
       .map((candidate, index) => {
@@ -638,7 +638,11 @@ function normalizeOutlineInternalLinks(output: unknown, candidates: InternalLink
   if (!output || typeof output !== "object") return output;
   const result = output as Record<string, unknown>;
   const allowed = new Set(candidates.map((candidate) => candidate.url));
-  const proposed = Array.isArray(result.internalLinks) ? result.internalLinks.filter((url): url is string => typeof url === "string" && allowed.has(url)) : [];
+  const proposed = Array.isArray(result.internalLinks)
+    ? result.internalLinks
+        .map((url) => typeof url === "string" ? normalizeInternalHref(url) : null)
+        .filter((url): url is string => Boolean(url && allowed.has(url)))
+    : [];
   result.internalLinks = Array.from(new Set(proposed.length ? proposed : candidates.slice(0, 4).map((candidate) => candidate.url))).slice(0, 4);
   return result;
 }
@@ -655,7 +659,7 @@ function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCa
   const retainedUrls: string[] = [];
   let html = article.contentHtml.replace(/<a\b([^>]*?)href=(['"])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi, (full, before: string, quote: string, href: string, after: string, label: string) => {
     const normalizedHref = normalizeInternalHref(href);
-    if (!normalizedHref) return full;
+    if (!normalizedHref) return shouldKeepNonInternalHref(href) ? full : label;
     if (normalizedHref === "/lien-he") {
       return `<a${before}href=${quote}${normalizedHref}${quote}${after}>${label}</a>`;
     }
@@ -793,14 +797,42 @@ function injectSentenceIntoNaturalParagraph(html: string, sentence: string, pref
 
 function normalizeInternalHref(href: string) {
   const trimmed = href.trim();
-  if (trimmed.startsWith("/")) return trimmed.split(/[?#]/)[0];
+  if (!trimmed || trimmed.startsWith("#") || /^(mailto|tel|sms|zalo):/i.test(trimmed)) return null;
+  const normalizePath = (value: string) => {
+    const pathOnly = value.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
+    return pathOnly.startsWith("/") ? pathOnly : `/${pathOnly}`;
+  };
+  if (trimmed.startsWith("/")) return normalizePath(trimmed);
+  if (/^(du-an|tin-tuc|dich-vu|mau-thiet-ke-kien-truc|mau-thiet-ke-noi-that)\//i.test(trimmed)) {
+    return normalizePath(trimmed);
+  }
   try {
     const url = new URL(trimmed);
-    if (url.hostname === "hathanhhome.vn" || url.hostname === "www.hathanhhome.vn") return url.pathname.replace(/\/$/, "") || "/";
+    if (url.hostname === "hathanhhome.vn" || url.hostname === "www.hathanhhome.vn") return normalizePath(url.pathname);
   } catch {
     return null;
   }
   return null;
+}
+
+function shouldKeepNonInternalHref(href: string) {
+  const trimmed = href.trim();
+  return Boolean(trimmed && (trimmed.startsWith("#") || /^(https?:)?\/\//i.test(trimmed) || /^(mailto|tel|sms|zalo):/i.test(trimmed)));
+}
+
+function isAllowedInternalCandidateUrl(url: string) {
+  const normalized = normalizeInternalHref(url);
+  if (!normalized || normalized !== url) return false;
+  return (
+    normalized.startsWith("/du-an/") ||
+    normalized.startsWith("/tin-tuc/") ||
+    normalized.startsWith("/mau-thiet-ke-kien-truc/") ||
+    normalized.startsWith("/mau-thiet-ke-noi-that/") ||
+    normalized === "/dich-vu/xay-nha-tron-goi" ||
+    normalized === "/dich-vu/san-xuat-thi-cong-noi-that" ||
+    normalized === "/dich-vu/thi-cong-nha-xuong" ||
+    normalized === "/dich-vu/thi-cong-noi-that-van-phong"
+  );
 }
 
 function escapeHtml(value: string) {
