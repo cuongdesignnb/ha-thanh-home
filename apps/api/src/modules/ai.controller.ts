@@ -6,7 +6,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
-import { cleanHtml, uniqueSlug, safeString } from "./cms-utils";
+import { cleanHtml, createSlug, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { fixedServicePageWhere } from "./public-content-rules";
@@ -176,7 +176,7 @@ export class AiController {
     }
 
     const title = article.title || dto.topic;
-    const slug = await uniqueSlug(title, article.slug, (candidate) =>
+    const slug = await createSlug(title, article.slug, (candidate) =>
       this.prisma.post.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     const post = await this.prisma.post.create({
@@ -657,7 +657,18 @@ function enforceArticleInternalLinks(output: unknown, candidates: InternalLinkCa
 
   const allowed = new Map(candidates.map((candidate) => [candidate.url, candidate]));
   const retainedUrls: string[] = [];
-  let html = article.contentHtml.replace(/<a\b([^>]*?)href=(['"])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi, (full, before: string, quote: string, href: string, after: string, label: string) => {
+  // Some providers still return Markdown links despite the HTML-only prompt.
+  // Convert only real URLs first so the same allow-list is applied to both
+  // formats and anchor text never gets rendered as an unlinked label.
+  let html = article.contentHtml.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (full, label: string, href: string) => {
+    const normalizedHref = normalizeInternalHref(href);
+    if (normalizedHref && (allowed.has(normalizedHref) || normalizedHref === "/lien-he")) {
+      return `<a href="${normalizedHref}">${escapeHtml(stripHtml(label))}</a>`;
+    }
+    return shouldKeepNonInternalHref(href) ? `<a href="${escapeHtml(href.trim())}">${escapeHtml(stripHtml(label))}</a>` : label;
+  });
+
+  html = html.replace(/<a\b([^>]*?)href=(['"])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi, (full, before: string, quote: string, href: string, after: string, label: string) => {
     const normalizedHref = normalizeInternalHref(href);
     if (!normalizedHref) return shouldKeepNonInternalHref(href) ? full : label;
     if (normalizedHref === "/lien-he") {

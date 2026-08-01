@@ -1,4 +1,4 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, ConflictException } from "@nestjs/common";
 import sanitizeHtml from "sanitize-html";
 import { TextDecoder } from "util";
 
@@ -42,6 +42,35 @@ export async function uniqueSlug(
   const base = slugify(providedSlug || title);
   if (!base) {
     throw new BadRequestException("Slug cannot be empty");
+  }
+
+  let candidate = base;
+  let index = 2;
+  while (await exists(candidate)) {
+    candidate = `${base}-${index}`;
+    index += 1;
+  }
+
+  return candidate;
+}
+
+/**
+ * Resolve a slug for a new record without silently creating an SEO duplicate.
+ * Explicit slugs are user/API intent: if one already exists, fail clearly so
+ * the caller can update the existing record instead of creating `-2`, `-3`, ….
+ */
+export async function createSlug(
+  title: string,
+  providedSlug: string | undefined,
+  exists: (slug: string) => Promise<boolean>,
+) {
+  const base = slugify(providedSlug || title);
+  if (!base) {
+    throw new BadRequestException("Slug cannot be empty");
+  }
+
+  if (providedSlug && await exists(base)) {
+    throw new ConflictException("Slug already exists. Update the existing record instead of creating a duplicate.");
   }
 
   let candidate = base;

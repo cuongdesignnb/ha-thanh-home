@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ConflictException,
   Delete,
   Get,
   NotFoundException,
@@ -26,7 +27,7 @@ import {
   MinLength,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { cleanHtml, listMeta, parsePagination, uniqueSlug, safeString } from "./cms-utils";
+import { cleanHtml, createSlug, listMeta, parsePagination, uniqueSlug, safeString } from "./cms-utils";
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { fixedServicePageWhere } from "./public-content-rules";
@@ -1141,7 +1142,14 @@ export class AdminController {
   @Post("projects")
   @Roles("Admin")
   async createProject(@Body() dto: ProjectDto) {
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const contentHtml = cleanHtml(dto.contentHtml);
+    if (contentHtml) {
+      const duplicate = await this.prisma.project.findFirst({ where: { title: safeString(dto.title, 191)!, contentHtml } });
+      if (duplicate) {
+        throw new ConflictException(`A project with the same title and content already exists (ID ${duplicate.id}). Update that record instead of creating a duplicate.`);
+      }
+    }
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.project.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.project.create({
@@ -1151,7 +1159,7 @@ export class AdminController {
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
-        contentHtml: cleanHtml(dto.contentHtml),
+        contentHtml,
         galleryMediaIds: dto.galleryMediaIds || undefined,
         status: dto.status || ContentStatus.draft,
         publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
@@ -1213,7 +1221,7 @@ export class AdminController {
   @Post("architecture-designs")
   @Roles("Admin")
   async createArchitectureDesign(@Body() dto: ArchitectureDesignDto) {
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.architectureDesignTemplate.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.architectureDesignTemplate.create({
@@ -1281,7 +1289,7 @@ export class AdminController {
   @Post("interior-designs")
   @Roles("Admin")
   async createInteriorDesign(@Body() dto: InteriorDesignDto) {
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.interiorDesignTemplate.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.interiorDesignTemplate.create({
@@ -1347,7 +1355,7 @@ export class AdminController {
   @Post("services")
   @Roles("Admin")
   async createService(@Body() dto: ServiceDto) {
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.service.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.service.create({
@@ -1418,7 +1426,15 @@ export class AdminController {
     if (publishedAt && Number.isNaN(publishedAt.getTime())) {
       throw new BadRequestException("Invalid publishedAt date");
     }
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const contentHtml = cleanHtml(dto.contentHtml);
+    const title = safeString(dto.title, 191)!;
+    if (contentHtml) {
+      const duplicate = await this.prisma.post.findFirst({ where: { title, contentHtml } });
+      if (duplicate) {
+        throw new ConflictException(`A post with the same title and content already exists (ID ${duplicate.id}). Update that record instead of creating a duplicate.`);
+      }
+    }
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.post.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.post.create({
@@ -1428,12 +1444,12 @@ export class AdminController {
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
         slug,
-        title: safeString(dto.title, 191)!,
+        title,
         focusKeyword: safeString(dto.focusKeyword, 191),
         metaTitle: safeString(dto.metaTitle, 191),
         canonicalUrl: safeString(dto.canonicalUrl, 191),
         ogTitle: safeString(dto.ogTitle, 191),
-        contentHtml: cleanHtml(dto.contentHtml),
+        contentHtml,
         status: dto.status || ContentStatus.draft,
         scheduledAt: scheduledAt || null,
         publishedAt: dto.status === ContentStatus.published ? (publishedAt || new Date()) : null,
@@ -1698,7 +1714,7 @@ export class AdminController {
   @Post("pages")
   @Roles("Admin")
   async createPage(@Body() dto: PageDto) {
-    const slug = await uniqueSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
       this.prisma.page.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.page.create({
