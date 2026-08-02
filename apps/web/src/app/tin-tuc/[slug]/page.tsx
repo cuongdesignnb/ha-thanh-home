@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PageHero } from "@/components/content-list";
 import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
@@ -35,12 +34,20 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
     <>
       <SiteHeader />
       <JsonLd data={schemas} />
-      <PageHero title={post.title} description={post.excerpt} />
-      {imageUrl ? (
-        <section className="post-featured-media" aria-label="Ảnh đại diện bài viết">
-          <div className="container"><img src={imageUrl} alt={post.title} /></div>
-        </section>
-      ) : null}
+      <section
+        className="template-detail-hero post-detail-hero"
+        style={imageUrl ? { backgroundImage: `linear-gradient(90deg, rgba(15,61,46,.88), rgba(15,61,46,.28)), url(${imageUrl})` } : undefined}
+      >
+        <div className="container template-detail-hero-content">
+          <span>Tin tức &amp; cảm hứng</span>
+          <h1>{post.title}</h1>
+          {post.excerpt ? <p>{post.excerpt}</p> : null}
+          <div className="template-detail-actions">
+            <a className="cta" href="/lien-he">Nhận tư vấn</a>
+            <a className="cta secondary" href="/tin-tuc">Xem tin tức khác</a>
+          </div>
+        </div>
+      </section>
       <section className="section">
         <article className="detail-content">
           <div dangerouslySetInnerHTML={{ __html: prepareDetailHtml(post.contentHtml || `<p>${post.excerpt || "Nội dung bài viết đang được cập nhật."}</p>`) }} />

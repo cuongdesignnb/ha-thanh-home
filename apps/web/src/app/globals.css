@@ -3090,24 +3090,6 @@ h3 {
   line-height: 1.75;
 }
 
-.post-featured-media {
-  padding-top: 34px;
-  background: #fff;
-}
-
-.post-featured-media .container {
-  max-width: 1000px;
-}
-
-.post-featured-media img {
-  display: block;
-  width: 100%;
-  max-height: 560px;
-  border-radius: 24px;
-  object-fit: cover;
-  box-shadow: 0 18px 50px rgba(15, 61, 46, .12);
-}
-
 .detail-content {
   max-width: 850px;
   margin: 0 auto;
