@@ -105,6 +105,7 @@ export function cleanHtml(value?: string | null) {
     allowedStyles: {
       "*": {
         "text-align": [/^(left|center|right|justify)$/],
+        "font-size": [/^\d+(\.\d+)?(px|rem|em|%)$/],
         "max-width": [/^\d+(\.\d+)?(px|%|rem|em|vw)$/],
         width: [/^\d+(\.\d+)?(px|%|rem|em|vw)$/],
         height: [/^\d+(\.\d+)?(px|%|rem|em|vh)$/],

@@ -2178,10 +2178,41 @@ select {
 .editor-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 9px;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 12px;
   border-bottom: 1px solid var(--admin-line);
-  background: #fbf7ef;
+  background: linear-gradient(180deg, #fffdf8 0%, #f8f1e6 100%);
+}
+
+.editor-font-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 10px;
+  padding: 0 8px 0 10px;
+  color: var(--admin-green);
+  background: #fffdf8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-font-size-control span {
+  color: var(--admin-gold);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.editor-font-size-control select {
+  min-height: 30px;
+  border: 0;
+  padding: 0 22px 0 0;
+  color: var(--admin-green);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
 }
 
 .editor-toolbar button {
@@ -2209,11 +2240,28 @@ select {
 }
 
 .ProseMirror {
-  min-height: 220px;
-  padding: 15px;
+  min-height: 420px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 42px 48px;
   outline: 0;
   color: var(--admin-charcoal);
+  background: #fff;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.7;
+}
+
+.ProseMirror:focus {
+  background: #fffefa;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  float: left;
+  height: 0;
+  color: var(--admin-muted);
+  content: attr(data-placeholder);
+  pointer-events: none;
 }
 
 .ProseMirror p {

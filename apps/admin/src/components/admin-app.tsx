@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { Node } from "@tiptap/core";
+import { Mark, mergeAttributes, Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
@@ -75,6 +75,25 @@ import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
 
 
 const apiFetch = adminApiFetch;
+
+const FontSize = Mark.create({
+  name: "fontSize",
+  addAttributes() {
+    return {
+      size: {
+        default: null,
+        parseHTML: (element) => element.style.fontSize || null,
+        renderHTML: (attributes) => attributes.size ? { style: `font-size: ${attributes.size}` } : {},
+      },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "span[style*=font-size]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["span", mergeAttributes(HTMLAttributes), 0];
+  },
+});
 
 const ImageFigure = Node.create({
   name: "imageFigure",
@@ -3830,10 +3849,12 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
   const [source, setSource] = useState(value || "");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [selectedFontSize, setSelectedFontSize] = useState("");
   const editor = useEditor({
     extensions: [
       StarterKit,
       Underline,
+      FontSize,
       Link.configure({ openOnClick: false }),
       ImageExtension.configure({ inline: false, allowBase64: false }),
       ImageFigure,
@@ -3847,6 +3868,9 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
       const html = editor.getHTML();
       setSource(html);
       onChange(html);
+    },
+    onSelectionUpdate: ({ editor }) => {
+      setSelectedFontSize(editor.getAttributes("fontSize").size || "");
     },
   });
 
@@ -3907,6 +3931,28 @@ export function RichTextField({ value, onChange }: { value: string; onChange: (v
       </div>
       {mode === "visual" ? <>
       <div className="editor-toolbar">
+        <label className="editor-font-size-control" title="Cỡ chữ">
+          <span>Aa</span>
+          <select
+            aria-label="Cỡ chữ"
+            value={selectedFontSize}
+            onChange={(event) => {
+              const size = event.target.value;
+              setSelectedFontSize(size);
+              const chain = editor.chain().focus();
+              if (size) chain.setMark("fontSize", { size }).run();
+              else chain.unsetMark("fontSize").run();
+            }}
+          >
+            <option value="">Mặc định</option>
+            <option value="14px">Nhỏ · 14</option>
+            <option value="16px">Chuẩn · 16</option>
+            <option value="18px">Lớn · 18</option>
+            <option value="20px">Rộng · 20</option>
+            <option value="24px">Tiêu đề · 24</option>
+            <option value="28px">Lớn · 28</option>
+          </select>
+        </label>
         <button className={editor.isActive("paragraph") ? "active" : ""} onClick={() => editor.chain().focus().setParagraph().run()} type="button"><Pilcrow size={15} /> P</button>
         <button className={editor.isActive("heading", { level: 1 }) ? "active" : ""} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} type="button"><Heading1 size={15} /> H1</button>
         <button className={editor.isActive("bold") ? "active" : ""} onClick={() => editor.chain().focus().toggleBold().run()} type="button"><Bold size={15} /> B</button>
