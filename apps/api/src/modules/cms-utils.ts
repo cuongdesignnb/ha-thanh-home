@@ -174,7 +174,7 @@ export function repairMojibakeText(value: string) {
 }
 
 export function repairPublicText<T>(value: T): T {
-  if (typeof value === "string") return repairMojibakeText(value) as T;
+  if (typeof value === "string") return normalizePublicAssetUrl(repairMojibakeText(value)) as T;
   if (!value || typeof value !== "object") return value;
   if (value instanceof Date) return value;
   if (Array.isArray(value)) return value.map((item) => repairPublicText(item)) as T;
@@ -182,6 +182,18 @@ export function repairPublicText<T>(value: T): T {
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, repairPublicText(item)]),
   ) as T;
+}
+
+/** Keep media URLs usable when old records still contain localhost or
+ * `/storage/uploads` paths. New uploads already use PUBLIC_UPLOAD_URL, but
+ * normalizing at the public API boundary also repairs legacy media instantly.
+ */
+function normalizePublicAssetUrl(value: string) {
+  const match = value.match(/^(?:https?:\/\/[^/]+)?\/(?:storage\/)?uploads\/(.+)$/i);
+  if (!match) return value;
+
+  const publicBase = (process.env.PUBLIC_UPLOAD_URL || "/uploads").trim().replace(/\/$/, "");
+  return `${publicBase}/${match[1]}`;
 }
 
 export function safeString(value?: string | null, length = 191): string | null {
