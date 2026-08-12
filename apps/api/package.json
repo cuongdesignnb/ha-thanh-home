@@ -6,6 +6,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "start:prod": "node dist/main.js",
+    "test:estimator": "tsx src/modules/construction-estimator.service.spec.ts",
     "start:dev": "tsx watch src/main.ts",
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",

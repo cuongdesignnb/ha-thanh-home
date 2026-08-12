@@ -1720,12 +1720,12 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
   function buildPayload() {
     if (!config) throw new Error("Cấu hình chưa sẵn sàng.");
     return {
-      id: Number(config.id || 1),
+      id: Number(config.id ?? 1),
       name: String(config.name || "Dự toán công trình"),
       isActive: Boolean(config.isActive ?? true),
       currency: String(config.currency || "VND"),
-      minFactor: Number(config.minFactor || 0.9),
-      maxFactor: Number(config.maxFactor || 1.15),
+      minFactor: Number(config.minFactor ?? 0.9),
+      maxFactor: Number(config.maxFactor ?? 1.15),
       disclaimer: String(config.disclaimer || ""),
       ctaTitle: String(config.ctaTitle || ""),
       ctaDescription: String(config.ctaDescription || ""),
@@ -1836,8 +1836,8 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
         <div className="form-grid">
           <label>Tên cấu hình<input value={String(config.name || "")} onChange={(event) => setConfig({ ...config, name: event.target.value })} /></label>
           <label>Tiền tệ<input value={String(config.currency || "VND")} onChange={(event) => setConfig({ ...config, currency: event.target.value })} /></label>
-          <label>Biên thấp nhất<input type="number" step="0.01" value={Number(config.minFactor || 0.9)} onChange={(event) => setConfig({ ...config, minFactor: Number(event.target.value) })} /></label>
-          <label>Biên cao nhất<input type="number" step="0.01" value={Number(config.maxFactor || 1.15)} onChange={(event) => setConfig({ ...config, maxFactor: Number(event.target.value) })} /></label>
+          <label>Biên thấp nhất<input type="number" step="0.01" value={Number(config.minFactor ?? 0.9)} onChange={(event) => setConfig({ ...config, minFactor: Number(event.target.value) })} /></label>
+          <label>Biên cao nhất<input type="number" step="0.01" value={Number(config.maxFactor ?? 1.15)} onChange={(event) => setConfig({ ...config, maxFactor: Number(event.target.value) })} /></label>
         </div>
 
         <div className="estimator-simple-grid">
@@ -1870,9 +1870,9 @@ function EstimatorPanel({ roles }: { roles: string[] }) {
           </EstimatorSettingCard>
 
           <EstimatorSettingCard title="Dữ liệu mẫu để preview" description="Dùng để kiểm tra ngay sau khi đổi đơn giá hoặc hệ số.">
-            <EstimatorNumber label="Diện tích một sàn" value={Number(previewInput.area || 100)} suffix="m2" onChange={(value) => updatePreviewValue("area", value)} />
-            <EstimatorNumber label="Số tầng nổi" value={Number(previewInput.floors || 2)} suffix="tầng" step={1} onChange={(value) => updatePreviewValue("floors", value)} />
-            <EstimatorNumber label="Diện tích tầng hầm" value={Number(previewInput.basementArea || 0)} suffix="m2" onChange={(value) => updatePreviewValue("basementArea", value)} />
+            <EstimatorNumber label="Diện tích một sàn" value={Number(previewInput.area ?? 100)} suffix="m2" onChange={(value) => updatePreviewValue("area", value)} />
+            <EstimatorNumber label="Số tầng nổi" value={Number(previewInput.floors ?? 2)} suffix="tầng" step={1} onChange={(value) => updatePreviewValue("floors", value)} />
+            <EstimatorNumber label="Diện tích tầng hầm" value={Number(previewInput.basementArea ?? 0)} suffix="m2" onChange={(value) => updatePreviewValue("basementArea", value)} />
           </EstimatorSettingCard>
 
           <div className="estimator-preview-box">
@@ -1998,7 +1998,7 @@ function sampleEstimatorInput(schema: unknown) {
   if (!Array.isArray(schema)) return {};
   return Object.fromEntries(schema.map((field) => {
     const item = field as { name?: string; type?: string; defaultValue?: unknown; min?: number; options?: Array<{ value: string }> };
-    return [item.name || "", item.defaultValue ?? (item.type === "number" ? item.min || 0 : item.options?.[0]?.value || "")];
+    return [item.name || "", item.defaultValue ?? (item.type === "number" ? item.min ?? 0 : item.options?.[0]?.value ?? "")];
   }).filter(([name]) => Boolean(name)));
 }
 

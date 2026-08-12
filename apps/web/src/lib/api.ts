@@ -609,6 +609,16 @@ export async function fetchJson<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
+async function fetchJsonNoStore<T>(path: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(`${apiBase()}${path}`, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return response.json();
+  } catch {
+    return fallback;
+  }
+}
+
 export function getHome() {
   return fetchJson<HomeData>("/home", fallbackHome);
 }
@@ -695,7 +705,7 @@ function cleanMetadataTitle(title: string) {
 
 
 export function getConstructionEstimatorConfig() {
-  return fetchJson<EstimatorPublicConfig>("/construction-estimator/config", {});
+  return fetchJsonNoStore<EstimatorPublicConfig>("/construction-estimator/config", {});
 }
 
 export async function getMenu(location: "header" | "footer") {

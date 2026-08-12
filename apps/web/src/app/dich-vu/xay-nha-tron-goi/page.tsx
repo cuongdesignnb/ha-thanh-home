@@ -43,6 +43,7 @@ import {
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 import { getConstructionGuidePosts } from "@/lib/related-content";
 import { prepareDetailHtml } from "@/lib/rich-content";
+import { formatEstimatorOptionLabel } from "@/lib/construction-estimator";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -224,7 +225,9 @@ function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]
 function EstimateSection({ config, landing }: { config: EstimatorPublicConfig; landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
   const scopeField = config.inputSchema?.find((field) => field.name === "scope");
   const scopeOptions = scopeField?.options?.length ? scopeField.options : [];
-  const prices = scopeOptions.map((option) => Number(option.variables?.unit_price || 0)).filter(Boolean);
+  const prices = scopeOptions
+    .map((option) => Number(option.variables?.unit_price))
+    .filter((price) => Number.isFinite(price));
   const min = prices.length ? Math.min(...prices) : 0;
   const max = prices.length ? Math.max(...prices) : 0;
 
@@ -235,7 +238,7 @@ function EstimateSection({ config, landing }: { config: EstimatorPublicConfig; l
           <span className="eyebrow">{landing.estimateEyebrow}</span>
           <h2>{landing.estimateTitle}</h2>
           <div className="xay-nha-tabs" role="list" aria-label={scopeField?.label || "Gói thi công"}>
-            {(scopeOptions.length ? scopeOptions : [{ label: "Mở dự toán", value: "du-toan" }]).slice(0, 4).map((option, index) => <span className={index === 0 ? "active" : ""} key={option.value}>{shortScopeLabel(option.label)}</span>)}
+            {(scopeOptions.length ? scopeOptions : [{ label: "Mở dự toán", value: "du-toan" }]).slice(0, 4).map((option, index) => <span className={index === 0 ? "active" : ""} key={option.value}>{formatEstimatorOptionLabel(scopeField || { name: "scope" }, option)}</span>)}
           </div>
           <div className="xay-nha-price-box">
             <div className="xay-nha-price-image" style={{ backgroundImage: `url(${projectImages[0]})` }} />
@@ -243,7 +246,7 @@ function EstimateSection({ config, landing }: { config: EstimatorPublicConfig; l
               <small>{config.name || "Cấu hình dự toán công trình"}</small>
               <strong>{min && max ? `${moneyPerM2(min)} - ${moneyPerM2(max)}` : "Mở dự toán để tính chi tiết"}</strong>
               <ul className="xay-nha-checklist">
-                {scopeOptions.slice(0, 4).map((option) => <li key={option.value}><CheckCircle2 size={17} /> {option.label}</li>)}
+                {scopeOptions.slice(0, 4).map((option) => <li key={option.value}><CheckCircle2 size={17} /> {formatEstimatorOptionLabel(scopeField || { name: "scope" }, option)}</li>)}
               </ul>
               <a className="cta" href="#du-toan-chi-phi" data-estimator-open>Mở dự toán nhanh <ArrowRight size={17} /></a>
             </div>
@@ -352,21 +355,6 @@ function IconText({ icon: Icon, item }: { icon: LucideIcon; item: LandingListIte
 
 function moneyPerM2(value: number) {
   return `${value.toLocaleString("vi-VN")}đ/m2`;
-}
-
-function shortScopeLabel(label: string) {
-  if (label.includes("-")) {
-    return label.split("-")[0]?.trim() || label;
-  }
-  // Check if label contains a price pattern (digit + currency/unit indicator)
-  if (/\d/.test(label) && (label.includes("triệu") || label.includes("đ") || label.includes("tr/") || label.includes("đ/"))) {
-    // Find space followed by a digit or parenthesis
-    const priceMatch = label.match(/\s+[\(\d]/);
-    if (priceMatch && priceMatch.index !== undefined) {
-      return label.substring(0, priceMatch.index).trim();
-    }
-  }
-  return label;
 }
 
 function DetailedIntroSection({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {

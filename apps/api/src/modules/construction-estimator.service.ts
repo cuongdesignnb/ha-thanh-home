@@ -202,7 +202,7 @@ export class ConstructionEstimatorService {
   async getAdminConfig() {
     const config = await this.prisma.constructionEstimatorConfig.findFirst({ orderBy: [{ isActive: "desc" }, { updatedAt: "desc" }] });
     if (!config) return defaultConfig;
-    return this.upgradeLegacyConfig(config);
+    return normalizeLegacyConfigForRuntime(config);
   }
 
   async getPublicConfig() {
@@ -311,30 +311,7 @@ export class ConstructionEstimatorService {
   private async getActiveConfig() {
     const config = await this.prisma.constructionEstimatorConfig.findFirst({ where: { isActive: true }, orderBy: { updatedAt: "desc" } });
     if (!config) throw new NotFoundException("Construction estimator config not found");
-    return this.upgradeLegacyConfig(config);
-  }
-
-  private async upgradeLegacyConfig(config: EstimatorRuntimeConfig) {
-    if (!isLegacyFormula(config.formulaItemsJson)) return config;
-    const upgraded = {
-      name: defaultConfig.name,
-      isActive: true,
-      currency: config.currency || defaultConfig.currency,
-      minFactor: defaultConfig.minFactor,
-      maxFactor: defaultConfig.maxFactor,
-      inputSchemaJson: defaultEstimatorInputSchema,
-      formulaItemsJson: defaultEstimatorFormulaItems,
-      disclaimer: defaultConfig.disclaimer,
-      ctaTitle: defaultConfig.ctaTitle,
-      ctaDescription: defaultConfig.ctaDescription,
-    };
-    if (config.id) {
-      return this.prisma.constructionEstimatorConfig.update({
-        where: { id: Number(config.id) },
-        data: upgraded,
-      });
-    }
-    return { id: config.id, ...upgraded };
+    return normalizeLegacyConfigForRuntime(config);
   }
 
   private normalizeConfig(dto: EstimatorConfigInput) {
@@ -366,18 +343,18 @@ export class ConstructionEstimatorService {
     const input = normalizeInput(inputSchema, rawInput);
     const variables = buildVariables(inputSchema, input);
 
-    variables.house_factor = variables.house_factor || 1;
-    variables.location_factor = variables.location_factor || 1;
-    variables.unit_price = variables.unit_price || 5800000;
-    variables.foundation_area_factor = variables.foundation_area_factor || 0;
-    variables.roof_area_factor = variables.roof_area_factor || 0;
-    variables.basement_area_factor = variables.basement_area_factor || 0;
-    variables.design_percent = variables.design_percent || 0;
+    variables.house_factor = finiteOrDefault(variables.house_factor, 1);
+    variables.location_factor = finiteOrDefault(variables.location_factor, 1);
+    variables.unit_price = finiteOrDefault(variables.unit_price, 5800000);
+    variables.foundation_area_factor = finiteOrDefault(variables.foundation_area_factor, 0);
+    variables.roof_area_factor = finiteOrDefault(variables.roof_area_factor, 0);
+    variables.basement_area_factor = finiteOrDefault(variables.basement_area_factor, 0);
+    variables.design_percent = finiteOrDefault(variables.design_percent, 0);
 
     variables.floor_area = variables.area * variables.floors;
     variables.foundation_area = variables.area * variables.foundation_area_factor;
     variables.roof_area = variables.area * variables.roof_area_factor;
-    variables.basement_area = variables.basementArea || variables.basement_area || 0;
+    variables.basement_area = finiteOrDefault(variables.basementArea, finiteOrDefault(variables.basement_area, 0));
     variables.basement_priced_area = variables.basement_area * variables.basement_area_factor;
     variables.priced_area = variables.floor_area + variables.foundation_area + variables.roof_area + variables.basement_priced_area;
     variables.construction_cost = variables.priced_area * variables.unit_price * variables.house_factor * variables.location_factor;
@@ -421,7 +398,7 @@ function ensureFormulaItems(value: unknown): FormulaItem[] {
 function normalizeInput(fields: EstimatorField[], rawInput: Record<string, unknown>) {
   return Object.fromEntries(
     fields.map((field) => {
-      const fallback = field.defaultValue ?? (field.type === "number" ? 0 : field.options?.[0]?.value || "");
+      const fallback = field.defaultValue ?? (field.type === "number" ? 0 : field.options?.[0]?.value ?? "");
       const raw = rawInput[field.name] ?? fallback;
       if (field.type === "number") {
         const value = Number(raw);
@@ -439,7 +416,7 @@ function buildVariables(fields: EstimatorField[], input: Record<string, unknown>
   const variables: Record<string, number> = {};
   for (const field of fields) {
     if (field.type === "number") {
-      variables[field.name] = Number(input[field.name] || 0);
+      variables[field.name] = finiteOrDefault(Number(input[field.name] ?? 0), 0);
     }
     if (field.type === "select") {
       const option = field.options?.find((item) => item.value === input[field.name]);
@@ -450,13 +427,35 @@ function buildVariables(fields: EstimatorField[], input: Record<string, unknown>
 }
 
 function sampleInput(fields: EstimatorField[]) {
-  return Object.fromEntries(fields.map((field) => [field.name, field.defaultValue ?? (field.type === "number" ? field.min || 0 : field.options?.[0]?.value || "")]));
+  return Object.fromEntries(fields.map((field) => [field.name, field.defaultValue ?? (field.type === "number" ? field.min ?? 0 : field.options?.[0]?.value ?? "")]));
+}
+
+export function normalizeLegacyConfigForRuntime(config: EstimatorRuntimeConfig): EstimatorRuntimeConfig {
+  if (!isLegacyFormula(config.formulaItemsJson)) return config;
+  return {
+    ...config,
+    name: config.name || defaultConfig.name,
+    currency: config.currency || defaultConfig.currency,
+    minFactor: finiteOrDefault(config.minFactor, defaultConfig.minFactor),
+    maxFactor: finiteOrDefault(config.maxFactor, defaultConfig.maxFactor),
+    inputSchemaJson: defaultEstimatorInputSchema,
+    formulaItemsJson: defaultEstimatorFormulaItems,
+    disclaimer: config.disclaimer ?? defaultConfig.disclaimer,
+    ctaTitle: config.ctaTitle ?? defaultConfig.ctaTitle,
+    ctaDescription: config.ctaDescription ?? defaultConfig.ctaDescription,
+  };
 }
 
 function isLegacyFormula(value: unknown) {
   if (!Array.isArray(value)) return true;
   const source = JSON.stringify(value);
-  return source.includes("gross_area") || source.includes("foundation_extra_per_m2") || source.includes("roof_extra_per_m2");
+  return ["gross_area", "foundation_extra_per_m2", "roof_extra_per_m2", "scope_factor", "finish_factor", "basement_factor", "design_unit_price"]
+    .some((name) => source.includes(name));
+}
+
+function finiteOrDefault(value: unknown, fallback: number) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function roundMoney(value: number) {

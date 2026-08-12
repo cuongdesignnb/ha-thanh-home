@@ -2,11 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Calculator, Home, Loader2, MessageCircle, Phone, Send, X } from "lucide-react";
-
-type FieldOption = {
-  label: string;
-  value: string;
-};
+import { formatEstimatorOptionLabel, type EstimatorOption } from "@/lib/construction-estimator";
 
 type EstimatorField = {
   name: string;
@@ -18,7 +14,7 @@ type EstimatorField = {
   step?: number;
   unit?: string;
   defaultValue?: string | number;
-  options?: FieldOption[];
+  options?: EstimatorOption[];
 };
 
 type EstimatorConfig = {
@@ -59,7 +55,7 @@ export function ConstructionEstimatorWidget({ initialHotline }: { initialHotline
   const secondStepFields = fields.slice(5);
 
   useEffect(() => {
-    fetch(`${apiBase}/construction-estimator/config`)
+    fetch(`${apiBase}/construction-estimator/config`, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : null)
       .then((payload: EstimatorConfig | null) => {
         if (!payload) return;
@@ -199,7 +195,7 @@ function EstimatorFields({ fields, input, setInput }: { fields: EstimatorField[]
           <span>{field.label}{field.unit ? ` (${field.unit})` : ""}</span>
           {field.type === "select" ? (
             <select value={String(input[field.name] ?? field.defaultValue ?? "")} onChange={(event) => setInput({ ...input, [field.name]: event.target.value })}>
-              {(field.options || []).map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
+              {(field.options || []).map((option) => <option value={option.value} key={option.value}>{formatEstimatorOptionLabel(field, option)}</option>)}
             </select>
           ) : (
             <input type="number" min={field.min} max={field.max} step={field.step || 1} value={Number(input[field.name] ?? field.defaultValue ?? 0)} onChange={(event) => setInput({ ...input, [field.name]: Number(event.target.value) })} />
@@ -245,7 +241,7 @@ function EstimateResultView({ message, result, status, submitLead }: { message: 
 
 
 function sampleInput(fields: EstimatorField[]) {
-  return Object.fromEntries(fields.map((field) => [field.name, field.defaultValue ?? (field.type === "number" ? field.min || 0 : field.options?.[0]?.value || "")]));
+  return Object.fromEntries(fields.map((field) => [field.name, field.defaultValue ?? (field.type === "number" ? field.min ?? 0 : field.options?.[0]?.value ?? "")]));
 }
 
 function money(value: number) {
