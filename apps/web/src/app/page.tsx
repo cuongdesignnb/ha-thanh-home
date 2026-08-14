@@ -145,10 +145,14 @@ function ExpertiseSection({ homepage }: { homepage: SiteHomepage }) {
 }
 
 function ProjectsSection({ id, title, projects, cream }: { id?: string; title: string; projects: Project[]; cream?: boolean }) {
+  const href = cream ? "/du-an/noi-that" : "/du-an/cong-trinh";
   return (
     <section className={`section ${cream ? "cream" : ""}`} id={id}>
       <div className="container">
-        <div className="section-title"><h2>{title}</h2></div>
+        <div className="section-title with-link">
+          <h2>{title}</h2>
+          <a className="section-link" href={href}>Xem tất cả <ArrowRight size={16} /></a>
+        </div>
         <HorizontalSliderWrapper className="project-grid home-slider-grid">
           {projects.slice(0, 6).map((project) => (
             <a className="card" key={project.id} href={`/du-an/${project.slug}`}>
