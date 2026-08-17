@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { fetchJson, getListPayload, type Project, type ProjectFilters } from "@/lib/api";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildItemListSchema } from "@/lib/seo/jsonld";
+import { isUsableSlug } from "@/lib/content-validation";
 
 export const metadata: Metadata = {
   title: "Dự án",
@@ -31,7 +32,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
       type: "CollectionPage",
     }),
     buildItemListSchema(
-      payload.data.map((p) => ({ name: p.title, url: `/du-an/${p.slug}` })),
+      payload.data.filter((p) => isUsableSlug(p.slug)).map((p) => ({ name: p.title, url: `/du-an/${p.slug}` })),
     ),
   ].filter(Boolean);
 

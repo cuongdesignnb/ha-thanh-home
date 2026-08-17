@@ -27,7 +27,8 @@
     "docker:prod:logs": "docker compose --env-file .env.docker -f docker-compose.prod.yml logs -f --tail=150",
     "docker:prod:migrate": "docker compose --env-file .env.docker -f docker-compose.prod.yml exec api npx prisma migrate deploy",
     "docker:prod:seed": "docker compose --env-file .env.docker -f docker-compose.prod.yml exec api npm run seed -w @hathanh/api",
-    "check:encoding": "node scripts/check-vietnamese-encoding.mjs"
+    "check:encoding": "node scripts/check-vietnamese-encoding.mjs",
+    "test:seo": "tsx apps/web/src/lib/rich-content.spec.ts"
   },
   "engines": {
     "node": ">=20.9.0"
