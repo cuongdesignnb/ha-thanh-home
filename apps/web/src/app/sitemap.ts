@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo/site";
-import { apiBase } from "@/lib/api";
+import { apiBase, hasMeaningfulContentHtml, normalizeLegacyServiceSlug } from "@/lib/api";
 
-type ApiItem = { slug: string; updatedAt?: string; publishedAt?: string };
+type ApiItem = { slug: string; updatedAt?: string; publishedAt?: string; contentHtml?: string | null };
 
 async function fetchSlugs(path: string): Promise<ApiItem[]> {
   try {
@@ -38,12 +38,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 
   // Dynamic routes from API
-  const [projects, archDesigns, intDesigns, posts, customPages] = await Promise.all([
+  const [projects, archDesigns, intDesigns, posts, customPages, legacyServices] = await Promise.all([
     fetchSlugs("/projects?limit=500&status=published"),
     fetchSlugs("/architecture-designs?limit=500&status=published"),
     fetchSlugs("/interior-designs?limit=500&status=published"),
     fetchSlugs("/posts?limit=500&status=published"),
     fetchSlugs("/pages"),
+    fetchSlugs("/legacy-services?limit=500"),
   ]);
 
   const dynamicRoutes: MetadataRoute.Sitemap = [
@@ -79,5 +80,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  return [...staticRoutes, ...dynamicRoutes];
+  const occupiedSlugs = new Set([
+    ...projects.map((item) => normalizeLegacyServiceSlug(item.slug)),
+    ...archDesigns.map((item) => normalizeLegacyServiceSlug(item.slug)),
+    ...intDesigns.map((item) => normalizeLegacyServiceSlug(item.slug)),
+    ...posts.map((item) => normalizeLegacyServiceSlug(item.slug)),
+    ...customPages.map((item) => normalizeLegacyServiceSlug(item.slug)),
+  ]);
+  const legacyCanonicalRoutes = Array.from(
+    new Map(
+      legacyServices
+        .filter((service) => hasMeaningfulContentHtml(service.contentHtml))
+        .map((service) => [normalizeLegacyServiceSlug(service.slug), service]),
+    ).entries(),
+  )
+    .filter(([slug]) => !occupiedSlugs.has(slug))
+    .map(([slug, service]) => ({
+      url: `${base}/${slug}`,
+      lastModified: service.updatedAt || service.publishedAt ? new Date(service.updatedAt || service.publishedAt!) : undefined,
+      changeFrequency: "weekly" as const,
+      priority: 0.55,
+    }));
+
+  return [...staticRoutes, ...dynamicRoutes, ...legacyCanonicalRoutes];
 }

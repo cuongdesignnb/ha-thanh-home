@@ -2,7 +2,7 @@ import { Controller, Get, NotFoundException, Param, Query } from "@nestjs/common
 import { ContentStatus, MenuLocation, Prisma, ProjectFilterModule, ProjectGroup } from "@prisma/client";
 import { listMeta, parsePagination, repairPublicText } from "./cms-utils";
 import { PrismaService } from "./prisma.service";
-import { fixedServicePageWhere } from "./public-content-rules";
+import { FIXED_SERVICE_PAGE_SLUGS, fixedServicePageWhere, legacyServiceSlugCandidates } from "./public-content-rules";
 
 @Controller("api")
 export class PublicController {
@@ -225,6 +225,34 @@ export class PublicController {
     if (!data) throw new NotFoundException("Service not found");
     const withGallery = await this.withGalleryMedia(data);
     return repairPublicText(withGallery);
+  }
+
+  @Get("legacy-services")
+  async legacyServices() {
+    const data = await this.prisma.service.findMany({
+      where: {
+        status: ContentStatus.published,
+        slug: { notIn: FIXED_SERVICE_PAGE_SLUGS },
+        contentHtml: { not: null },
+      },
+      select: { slug: true, contentHtml: true, updatedAt: true, publishedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    return repairPublicText({ data });
+  }
+
+  @Get("legacy-services/:slug")
+  async legacyService(@Param("slug") slug: string) {
+    const data = await this.prisma.service.findFirst({
+      where: {
+        status: ContentStatus.published,
+        slug: { in: legacyServiceSlugCandidates(slug) },
+        NOT: { slug: { in: FIXED_SERVICE_PAGE_SLUGS } },
+      },
+      include: { thumbnailMedia: true },
+    });
+    if (!data) throw new NotFoundException("Legacy service not found");
+    return repairPublicText(await this.withGalleryMedia(data));
   }
 
   @Get("posts")

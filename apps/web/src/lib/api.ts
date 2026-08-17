@@ -328,6 +328,23 @@ export type Service = {
   ogDescription?: string | null;
 };
 
+export function hasMeaningfulContentHtml(value?: string | null) {
+  if (!value) return false;
+  const text = value
+    .replace(/<!--([\s\S]*?)-->/g, "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > 0;
+}
+
+export function normalizeLegacyServiceSlug(slug: string) {
+  return slug
+    .replace(/-24\/7$/, "-24-7")
+    .replace(/\/24\/7$/, "-24-7");
+}
+
 export type Post = {
   id: number;
   title: string;
@@ -725,6 +742,10 @@ export async function getListPayload<T>(path: string): Promise<{ data: T[]; meta
 
 export async function getDetail<T>(path: string): Promise<T | null> {
   return fetchJson<T | null>(path, null);
+}
+
+export function getLegacyServiceDetail(slug: string) {
+  return fetchJsonNoStore<Service | null>(`/legacy-services/${encodeURIComponent(slug)}`, null);
 }
 
 export async function fetchLandingProjects(
