@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { PageHero } from "@/components/content-list";
+import { PageHero, ServiceDetail } from "@/components/content-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { contentMetadata, getDetail, type CustomPage, type Post, type Project, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
+import { contentMetadata, getDetail, getLegacyServiceDetail, hasMeaningfulContentHtml, type CustomPage, type Post, type Project, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
-import { buildBreadcrumbSchema } from "@/lib/seo/jsonld";
+import { buildBreadcrumbSchema, buildServiceSchema } from "@/lib/seo/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -33,6 +33,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const interior = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (interior) {
     return contentMetadata(interior, "Mẫu thiết kế nội thất | Hà Thành Home", `/mau-thiet-ke-noi-that/${slug}`);
+  }
+
+  const legacyService = await getLegacyServiceDetail(slug);
+  if (legacyService && hasMeaningfulContentHtml(legacyService.contentHtml)) {
+    return contentMetadata({ ...legacyService, canonicalUrl: null }, "Dịch vụ | Hà Thành Home", `/${slug}`);
   }
 
   return { title: "Không tìm thấy trang | Hà Thành Home" };
@@ -87,6 +92,33 @@ export default async function CustomPageDetailPage({ params }: { params: Promise
   const interior = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (interior) {
     permanentRedirect(`/mau-thiet-ke-noi-that/${slug}`);
+  }
+
+  const legacyService = await getLegacyServiceDetail(slug);
+  if (legacyService && hasMeaningfulContentHtml(legacyService.contentHtml)) {
+    const service = { ...legacyService, canonicalUrl: null };
+    const groupLabel = service.group === "interior" ? "Nội thất" : service.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình";
+    const schemas = [
+      buildBreadcrumbSchema([
+        { name: "Trang chủ", url: "/" },
+        { name: service.title, url: `/${slug}` },
+      ]),
+      buildServiceSchema({
+        name: service.title,
+        description: service.metaDescription || service.description || undefined,
+        url: `/${slug}`,
+        serviceType: groupLabel,
+      }),
+    ];
+
+    return (
+      <>
+        <SiteHeader />
+        <JsonLd data={schemas} />
+        <ServiceDetail service={service} />
+        <SiteFooter />
+      </>
+    );
   }
 
   notFound();
