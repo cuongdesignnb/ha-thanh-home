@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="180" viewBox="0 0 640 180">
+  <rect width="640" height="180" rx="24" fill="#f7f3eb"/>
+  <rect x="30" y="30" width="120" height="120" rx="22" fill="#0f3d2e"/>
+  <path d="M60 123V67h19v21h42V67h19v56h-19v-20H79v20z" fill="#d5a44b"/>
+  <path d="m46 60 44-27 44 27v10L90 43 46 70z" fill="#d5a44b"/>
+  <text x="180" y="91" fill="#0f3d2e" font-family="Georgia,serif" font-size="40" font-weight="700">HÀ THÀNH HOME</text>
+  <text x="183" y="126" fill="#b38637" font-family="Arial,sans-serif" font-size="17" letter-spacing="2">THIẾT KẾ · THI CÔNG · NỘI THẤT</text>
+</svg>

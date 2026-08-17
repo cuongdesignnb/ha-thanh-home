@@ -302,8 +302,8 @@ export const fallbackHeaderMenu: MenuPayload = {
 export const fallbackFooterMenu: MenuPayload = {
   location: "footer",
   items: [
-    { id: 1, label: "Công trình", url: "/du-an/cong-trinh", children: [{ id: 11, label: "Dự án công trình", url: "/du-an/cong-trinh" }, { id: 12, label: "Dịch vụ công trình", url: "/dich-vu/cong-trinh" }, { id: 13, label: "Mẫu kiến trúc", url: "/mau-thiet-ke-kien-truc" }] },
-    { id: 2, label: "Nội thất", url: "/du-an/noi-that", children: [{ id: 21, label: "Dự án nội thất", url: "/du-an/noi-that" }, { id: 22, label: "Dịch vụ nội thất", url: "/dich-vu/noi-that" }, { id: 23, label: "Mẫu nội thất", url: "/mau-thiet-ke-noi-that" }] },
+    { id: 1, label: "Công trình", url: "/du-an/cong-trinh", children: [{ id: 11, label: "Dự án công trình", url: "/du-an/cong-trinh" }, { id: 12, label: "Dịch vụ công trình", url: "/dich-vu" }, { id: 13, label: "Mẫu kiến trúc", url: "/mau-thiet-ke-kien-truc" }] },
+    { id: 2, label: "Nội thất", url: "/du-an/noi-that", children: [{ id: 21, label: "Dự án nội thất", url: "/du-an/noi-that" }, { id: 22, label: "Dịch vụ nội thất", url: "/dich-vu" }, { id: 23, label: "Mẫu nội thất", url: "/mau-thiet-ke-noi-that" }] },
     { id: 3, label: "Chính sách", url: "/chinh-sach-bao-hanh", children: [{ id: 31, label: "Chính sách bảo hành", url: "/chinh-sach-bao-hanh" }, { id: 32, label: "Chính sách bảo mật", url: "/chinh-sach-bao-mat" }] },
     { id: 4, label: "Liên hệ", url: "/lien-he", children: [{ id: 41, label: "Tin tức", url: "/tin-tuc" }, { id: 42, label: "Nhận tư vấn", url: "/lien-he" }] },
   ],

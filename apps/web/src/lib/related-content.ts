@@ -8,6 +8,7 @@ import {
   type Service,
 } from "@/lib/api";
 import type { RelatedContentItem } from "@/components/related-content";
+import { isUsableSlug } from "@/lib/content-validation";
 
 function query(path: string, params: Record<string, string | number | null | undefined>) {
   const search = new URLSearchParams();
@@ -31,7 +32,7 @@ export async function getRelatedProjects(item: Project): Promise<RelatedContentI
     getList<Project>(query("/projects", { group: item.group, limit: 8 })),
     getList<Project>(query("/projects", { limit: 8 })),
   ]);
-  return uniqueRelated(item.id, sameCategory, sameGroup, latest).map((project) => ({
+  return uniqueRelated(item.id, sameCategory, sameGroup, latest).filter((project) => isUsableSlug(project.slug)).map((project) => ({
     id: project.id, title: project.title, href: `/du-an/${project.slug}`, imageUrl: thumbnailUrl(project, ""),
     label: project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình"), description: project.description,
   }));
@@ -42,7 +43,7 @@ export async function getRelatedServices(item: Service): Promise<RelatedContentI
     getList<Service>(query("/services", { group: item.group, limit: 8 })),
     getList<Service>(query("/services", { limit: 8 })),
   ]);
-  return uniqueRelated(item.id, sameGroup, latest).map((service) => ({
+  return uniqueRelated(item.id, sameGroup, latest).filter((service) => isUsableSlug(service.slug)).map((service) => ({
     id: service.id, title: service.title, href: `/dich-vu/${service.slug}`, imageUrl: thumbnailUrl(service, ""), label: "Dịch vụ", description: service.description,
   }));
 }
@@ -53,7 +54,7 @@ export async function getRelatedPosts(item: Post): Promise<RelatedContentItem[]>
     category ? getList<Post>(query("/posts", { category, limit: 8 })) : Promise.resolve([]),
     getList<Post>(query("/posts", { limit: 8 })),
   ]);
-  return uniqueRelated(item.id, sameCategory, latest).map((post) => ({
+  return uniqueRelated(item.id, sameCategory, latest).filter((post) => isUsableSlug(post.slug)).map((post) => ({
     id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: thumbnailUrl(post, ""), label: post.categoryRef?.name || "Tin tức", description: post.excerpt,
   }));
 }
@@ -65,7 +66,7 @@ export async function getRelatedArchitecture(item: ArchitectureDesign): Promise<
     getList<ArchitectureDesign>(query("/architecture-designs", { style: item.style, limit: 8 })),
     getList<ArchitectureDesign>(query("/architecture-designs", { limit: 8 })),
   ]);
-  return uniqueRelated(item.id, samePair, sameHouseType, sameStyle, latest).map((design) => ({
+  return uniqueRelated(item.id, samePair, sameHouseType, sameStyle, latest).filter((design) => isUsableSlug(design.slug)).map((design) => ({
     id: design.id, title: design.title, href: `/mau-thiet-ke-kien-truc/${design.slug}`, imageUrl: thumbnailUrl(design, ""), label: design.houseType || design.style || "Mẫu kiến trúc", description: design.description,
   }));
 }
@@ -77,7 +78,7 @@ export async function getRelatedInterior(item: InteriorDesign): Promise<RelatedC
     getList<InteriorDesign>(query("/interior-designs", { roomType: item.roomType, limit: 8 })),
     getList<InteriorDesign>(query("/interior-designs", { limit: 8 })),
   ]);
-  return uniqueRelated(item.id, samePair, sameStyle, sameRoom, latest).map((design) => ({
+  return uniqueRelated(item.id, samePair, sameStyle, sameRoom, latest).filter((design) => isUsableSlug(design.slug)).map((design) => ({
     id: design.id, title: design.title, href: `/mau-thiet-ke-noi-that/${design.slug}`, imageUrl: thumbnailUrl(design, ""), label: design.interiorStyle || design.roomType || "Mẫu nội thất", description: design.description,
   }));
 }
@@ -87,7 +88,7 @@ export async function getConstructionGuidePosts(): Promise<RelatedContentItem[]>
     getList<Post>(query("/posts", { category: "cam-nang-xay-dung", limit: 4 })),
     getList<Post>(query("/posts", { limit: 8 })),
   ]);
-  return uniqueRelated(0, guides, latest).map((post) => ({
+  return uniqueRelated(0, guides, latest).filter((post) => isUsableSlug(post.slug)).map((post) => ({
     id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: thumbnailUrl(post, ""), label: post.categoryRef?.name || "Cẩm nang xây dựng", description: post.excerpt,
   }));
 }

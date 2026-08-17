@@ -2,12 +2,13 @@ import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
+import { isUsableSlug } from "@/lib/content-validation";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
 export function ProjectList({ title, projects }: { title: string; projects: Project[] }) {
   return (
-    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
   );
 }
 
@@ -38,7 +39,7 @@ export function ProjectCatalog({ filters, group, meta, projects, searchParams }:
           <ProjectFilterBar filters={filters} group={group} searchParams={searchParams} />
           <div className="project-count"><h2>Dự án</h2><p>Hiển thị {meta.total} dự án</p></div>
           <div className="project-catalog-grid">
-            {projects.map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
+            {projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
           </div>
         </div>
       </section>
@@ -247,7 +248,7 @@ function extractContentImages(html: string): string[] {
 
 export function ServiceList({ title, services }: { title: string; services: Service[] }) {
   return (
-    <><PageHero title={title} /><section className="section"><div className="container services">{services.map((service) => <a className="service-card" href={`/dich-vu/${service.slug}`} key={service.id}><h3>{service.title}</h3><p>{service.description}</p><span>Tìm hiểu thêm <ArrowRight size={14} /></span></a>)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container services">{services.filter((service) => isUsableSlug(service.slug)).map((service) => <a className="service-card" href={`/dich-vu/${service.slug}`} key={service.id}><h3>{service.title}</h3><p>{service.description}</p><span>Tìm hiểu thêm <ArrowRight size={14} /></span></a>)}</div></section></>
   );
 }
 
@@ -263,7 +264,7 @@ export function PostList({ activeCategory, categories, posts }: { activeCategory
               {categories.map((category) => <a className={activeCategory === category.slug ? "active" : ""} href={`/tin-tuc?category=${category.slug}`} key={category.id}>{category.name}</a>)}
             </nav>
           ) : null}
-          <div className="news-grid">{posts.map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
+          <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
         </div>
       </section>
     </>
