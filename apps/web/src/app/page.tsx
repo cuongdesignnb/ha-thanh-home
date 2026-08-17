@@ -35,6 +35,7 @@ import {
   PLACEHOLDER_IMAGE,
 } from "@/lib/api";
 import type { AboutPageConfig } from "@/lib/about-page-config";
+import { isUsableSlug } from "@/lib/content-validation";
 
 export default async function HomePage() {
   const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
@@ -154,7 +155,7 @@ function ProjectsSection({ id, title, projects, cream }: { id?: string; title: s
           <a className="section-link" href={href}>Xem tất cả <ArrowRight size={16} /></a>
         </div>
         <HorizontalSliderWrapper className="project-grid home-slider-grid">
-          {projects.slice(0, 6).map((project) => (
+          {projects.filter((project) => isUsableSlug(project.slug)).slice(0, 6).map((project) => (
             <a className="card" key={project.id} href={`/du-an/${project.slug}`}>
               <div className="project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, PLACEHOLDER_IMAGE)})` }} />
               <div className="card-body">
@@ -180,7 +181,7 @@ function ArchitectureTemplatesSection({ designs, homepage }: { designs: Architec
           <a className="section-link" href="/mau-thiet-ke-kien-truc">Xem tất cả <ArrowRight size={16} /></a>
         </div>
         <HorizontalSliderWrapper className="template-grid home-template-grid">
-          {designs.slice(0, 6).map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}
+          {designs.filter((design) => isUsableSlug(design.slug)).slice(0, 6).map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}
         </HorizontalSliderWrapper>
       </div>
     </section>
@@ -198,7 +199,7 @@ function InteriorTemplatesSection({ designs, homepage }: { designs: InteriorDesi
           <a className="section-link" href="/mau-thiet-ke-noi-that">Xem tất cả <ArrowRight size={16} /></a>
         </div>
         <HorizontalSliderWrapper className="template-grid home-template-grid">
-          {designs.slice(0, 6).map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}
+          {designs.filter((design) => isUsableSlug(design.slug)).slice(0, 6).map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}
         </HorizontalSliderWrapper>
       </div>
     </section>
@@ -212,7 +213,7 @@ function ServicesSection({ services, homepage }: { services: Service[]; homepage
       <div className="container">
         <div className="section-title"><span className="eyebrow">{homepage.servicesEyebrow || defaultHomepage.servicesEyebrow}</span><h2>{homepage.servicesTitle || defaultHomepage.servicesTitle}</h2></div>
         <div className="services">
-          {services.slice(0, 4).map((service, index) => {
+          {services.filter((service) => isUsableSlug(service.slug)).slice(0, 4).map((service, index) => {
             const Icon = icons[index % icons.length];
             return (
               <a className="service-card" key={service.id} href={`/dich-vu/${service.slug}`}>
@@ -272,7 +273,7 @@ function NewsSection({ posts, homepage }: { posts: Post[]; homepage: SiteHomepag
       <div className="container">
         <div className="section-title"><h2>{homepage.newsTitle || defaultHomepage.newsTitle}</h2></div>
         <div className="news-grid">
-          {posts.slice(0, 4).map((post, index) => (
+          {posts.filter((post) => isUsableSlug(post.slug)).slice(0, 4).map((post, index) => (
             <a className="news-card" key={post.id} href={`/tin-tuc/${post.slug}`}>
               <div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} />
               {post.publishedAt ? (

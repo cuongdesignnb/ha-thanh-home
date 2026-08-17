@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
+import { isUsableSlug } from "@/lib/content-validation";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -16,7 +17,7 @@ export function ArchitectureDesignList({ designs, filters, meta, searchParams }:
       filters={<ArchitectureFilters filters={filters} values={searchParams} />}
     >
       <div className="template-grid">
-        {designs.map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}
+        {designs.filter((design) => isUsableSlug(design.slug)).map((design, index) => <ArchitectureCard design={design} index={index} key={design.id} />)}
       </div>
     </TemplatePageShell>
   );
@@ -31,7 +32,7 @@ export function InteriorDesignList({ designs, filters, meta, searchParams }: { d
       filters={<InteriorFilters filters={filters} values={searchParams} />}
     >
       <div className="template-grid">
-        {designs.map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}
+        {designs.filter((design) => isUsableSlug(design.slug)).map((design, index) => <InteriorCard design={design} index={index} key={design.id} />)}
       </div>
     </TemplatePageShell>
   );

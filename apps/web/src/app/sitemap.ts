@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo/site";
 import { apiBase } from "@/lib/api";
+import { isUsableSlug } from "@/lib/content-validation";
 
-type ApiItem = { slug: string; updatedAt?: string; publishedAt?: string };
+type ApiItem = { slug?: string | null; updatedAt?: string; publishedAt?: string };
 
 async function fetchSlugs(path: string): Promise<ApiItem[]> {
   try {
@@ -47,31 +48,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const dynamicRoutes: MetadataRoute.Sitemap = [
-    ...projects.map((p) => ({
+    ...projects.filter((p) => isUsableSlug(p.slug)).map((p) => ({
       url: `${base}/du-an/${p.slug}`,
       lastModified: p.updatedAt || p.publishedAt ? new Date(p.updatedAt || p.publishedAt!) : undefined,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
-    ...archDesigns.map((d) => ({
+    ...archDesigns.filter((d) => isUsableSlug(d.slug)).map((d) => ({
       url: `${base}/mau-thiet-ke-kien-truc/${d.slug}`,
       lastModified: d.updatedAt || d.publishedAt ? new Date(d.updatedAt || d.publishedAt!) : undefined,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
-    ...intDesigns.map((d) => ({
+    ...intDesigns.filter((d) => isUsableSlug(d.slug)).map((d) => ({
       url: `${base}/mau-thiet-ke-noi-that/${d.slug}`,
       lastModified: d.updatedAt || d.publishedAt ? new Date(d.updatedAt || d.publishedAt!) : undefined,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
-    ...posts.map((p) => ({
+    ...posts.filter((p) => isUsableSlug(p.slug)).map((p) => ({
       url: `${base}/tin-tuc/${p.slug}`,
       lastModified: p.updatedAt || p.publishedAt ? new Date(p.updatedAt || p.publishedAt!) : undefined,
       changeFrequency: "weekly" as const,
       priority: 0.6,
     })),
-    ...customPages.map((p) => ({
+    ...customPages.filter((p) => isUsableSlug(p.slug)).map((p) => ({
       url: `${base}/${p.slug}`,
       lastModified: p.updatedAt || p.publishedAt ? new Date(p.updatedAt || p.publishedAt!) : undefined,
       changeFrequency: "monthly" as const,
