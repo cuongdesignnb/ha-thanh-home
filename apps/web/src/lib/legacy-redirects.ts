@@ -15,7 +15,7 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/70 -mau-biet-thu-tan-co-dien-hien-dai-dep-nha-2026": "/mau-thiet-ke-kien-truc/70-mau-biet-thu-tan-co-dien-hien-dai-dep-2026",
   "/du-an/xay-nha-tron-goi-long-bien-ha-noi": "/du-an/xay-nha-tron-goi-long-bien-ha-noi-hathanhhome",
   "/du-an/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome": "/du-an/xay-nha-tron-goi-tai-ha-dong",
-  "/du-an/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026": "/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026",
+  "/du-an/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026": "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc",
   "/du-an/xay-nha-tron-goi-hai-ba-trung": "/du-an/xay-nha-tron-goi-hai-ba-trung-hathanhhome",
   "/90 -mau-biet-thu-hien-dai-dep-2026": "/mau-thiet-ke-kien-truc/90-mau-biet-thu-hien-dai-dep-2026",
   "/du-an/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat": "/du-an/xay-nha-tron-goi-chuong-my-cap-nhat-bao-gia-moi-nhat",
@@ -29,6 +29,14 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi-tai-phuong-ba-dinh": "/du-an/xay-nha-tron-goi-ba-dinh-ha-noi-cong-ty-xay-dung-uy-tin",
   "/cong-trinh-biet-thu-nha-vuon-ninh-binh": "/du-an/cong-trinh-biet-thu-nha-vuon-nha-anh-tran-cao-cuong-ninh-binh",
   "/Cong-trinh-biet-thu-nha-vuon-ninh-binh": "/du-an/cong-trinh-biet-thu-nha-vuon-nha-anh-tran-cao-cuong-ninh-binh",
+  "/bao-gia-xay-nha-tai-tien-du-bac-ninh-uy-tin-chat-luong": "/du-an/bao-gia-xay-nha-tron-goi-tai-tien-du-bac-ninh-uy-tin-chat-luong",
+  "/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome": "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet",
+  "/xay-nha-tron-goi-dong-da-bao-hanh-dai-han-hathanhhome": "/du-an/xay-nha-tron-goi-dong-da-bao-hanh-dai-han",
+  "/bao-gia-xay-nha-tron-goi-tai-ninh-binh-moi-nhat-2026-cong-ty-xay-dung-uy-tin": "/du-an/bao-gia-xay-nha-tron-goi-tai-ninh-binh-nam-2026",
+  "/xay-nha-tron-goi-tai-dong-anh-don-vi-thi-cong-chuyen-nghiep-ha-thanh-home": "/du-an/xay-nha-tron-goi-dong-anh-don-vi-thi-cong-chuyen-nghiep",
+  "/xat-nha-tron-goi-tai-phuc-tho-cap-nhap-bao-gia-moi-nhat-hien-nay": "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026",
+  "/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026": "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc",
+  "/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home": "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026",
 };
 
 /** Return a destination only for an explicitly approved historical pathname. */
