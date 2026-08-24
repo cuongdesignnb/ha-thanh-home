@@ -49,7 +49,7 @@ const wave5aRedirects: Array<[string, string]> = [
   ["/xay-nha-tron-goi-cau-giay-chuan-tien-do-hathanhhome", "/du-an/xay-nha-tron-goi-cau-giay"],
   ["/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat", "/du-an/xay-nha-tron-goi-chuong-my-cap-nhat-bao-gia-moi-nhat"],
   ["/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome", "/du-an/xay-nha-tron-goi-tai-ha-dong"],
-  ["/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet-2026", "/du-an/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet-2026"],
+  ["/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet-2026", "/du-an/xay-nha-tron-goi-vinh-phuc-bao-gia-chi-tiet-2026"],
   ["/xay-nha-tron-goi-tai-hai-duong-cap-nhap-bao-gia-moi-nhat-2026", "/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhat-bao-gia-moi-nhat2026"],
   ["/xay-nha-tron-goi-tai-noi-bai-ha-noi", "/du-an/xay-nha-tron-goi-xa-noi-bai-ha-noi"],
   ["/xay-nha-tron-goi-tai-phuong-ba-dinh", "/du-an/xay-nha-tron-goi-ba-dinh-ha-noi-cong-ty-xay-dung-uy-tin"],

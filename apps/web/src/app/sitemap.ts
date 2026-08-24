@@ -4,11 +4,14 @@ import { apiBase, hasMeaningfulContentHtml, normalizeLegacyServiceSlug } from "@
 import { isUsableSlug } from "@/lib/content-validation";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type ApiItem = { slug?: string | null; updatedAt?: string; publishedAt?: string; contentHtml?: string | null };
 
 async function fetchSlugs(path: string): Promise<ApiItem[]> {
   try {
-    const res = await fetch(`${apiBase()}${path}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${apiBase()}${path}`, { cache: "no-store" });
     if (!res.ok) return [];
     const json = await res.json();
     return (json.data || json || []) as ApiItem[];
