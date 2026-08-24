@@ -4,7 +4,7 @@ import {
   normalizeLegacyAnchors,
   normalizeLegacyHref,
 } from "./rich-content";
-import { getLegacyRedirectTarget } from "./legacy-redirects";
+import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -35,19 +35,37 @@ const gscRedirects: Array<[string, string]> = [
   ["/xay-nha-tron-goi-ba-vi-ho-tro-24/7-cong-ty-xay-dung-uy-tin", "/du-an/xay-nha-tron-goi-ba-vi-ho-tro-20-7-cong-ty-xay-dung-uy-tin"],
   ["/70%20-mau-biet-thu-tan-co-dien-hien-dai-dep-nha-2026", "/mau-thiet-ke-kien-truc/70-mau-biet-thu-tan-co-dien-hien-dai-dep-2026"],
   ["/du-an/xay-nha-tron-goi-long-bien-ha-noi", "/du-an/xay-nha-tron-goi-long-bien-ha-noi-hathanhhome"],
-  ["/du-an/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome", "/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome"],
+  ["/du-an/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome", "/du-an/xay-nha-tron-goi-tai-ha-dong"],
   ["/du-an/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026", "/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026"],
   ["/du-an/xay-nha-tron-goi-hai-ba-trung", "/du-an/xay-nha-tron-goi-hai-ba-trung-hathanhhome"],
   ["/90%20-mau-biet-thu-hien-dai-dep-2026", "/mau-thiet-ke-kien-truc/90-mau-biet-thu-hien-dai-dep-2026"],
-  ["/du-an/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat", "/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat"],
+  ["/du-an/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat", "/du-an/xay-nha-tron-goi-chuong-my-cap-nhat-bao-gia-moi-nhat"],
   ["/99-%20-mau-nha-mai-nhat-dep-2026", "/mau-thiet-ke-kien-truc/99-mau-nha-mai-nhat-dep-2026"],
 ];
 for (const [rawPath, target] of gscRedirects) {
   assert.equal(getLegacyRedirectTarget(decodeURIComponent(rawPath)), target);
 }
+const wave5aRedirects: Array<[string, string]> = [
+  ["/xay-nha-tron-goi-cau-giay-chuan-tien-do-hathanhhome", "/du-an/xay-nha-tron-goi-cau-giay"],
+  ["/xay-nha-tron-goi-chuong-my-cap-nhap-bao-gia-moi-nhat", "/du-an/xay-nha-tron-goi-chuong-my-cap-nhat-bao-gia-moi-nhat"],
+  ["/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi-hathanhhome", "/du-an/xay-nha-tron-goi-tai-ha-dong"],
+  ["/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet-2026", "/du-an/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet-2026"],
+  ["/xay-nha-tron-goi-tai-hai-duong-cap-nhap-bao-gia-moi-nhat-2026", "/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhat-bao-gia-moi-nhat2026"],
+  ["/xay-nha-tron-goi-tai-noi-bai-ha-noi", "/du-an/xay-nha-tron-goi-xa-noi-bai-ha-noi"],
+  ["/xay-nha-tron-goi-tai-phuong-ba-dinh", "/du-an/xay-nha-tron-goi-ba-dinh-ha-noi-cong-ty-xay-dung-uy-tin"],
+  ["/cong-trinh-biet-thu-nha-vuon-ninh-binh", "/du-an/cong-trinh-biet-thu-nha-vuon-nha-anh-tran-cao-cuong-ninh-binh"],
+  ["/Cong-trinh-biet-thu-nha-vuon-ninh-binh", "/du-an/cong-trinh-biet-thu-nha-vuon-nha-anh-tran-cao-cuong-ninh-binh"],
+];
+for (const [source, target] of wave5aRedirects) assert.equal(getLegacyRedirectTarget(source), target);
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/du-an/xay-nha-tron-goi-long-bien-ha-noi-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/70-other-page"), undefined);
+assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home"), undefined);
+assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome"), undefined);
+assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-dong-da-bao-hanh-dai-han-hathanhhome"), undefined);
+assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026"), undefined);
+assert.equal(isLegacyRedirectSource("/cong-trinh-biet-thu-nha-vuon-ninh-binh"), true);
+assert.equal(isLegacyRedirectSource("/Cong-trinh-biet-thu-nha-vuon-ninh-binh"), true);
 for (const path of [
   "/bao-gia-sua-chua-nha-ha-noi",
   "/sua-chua-cua-hang-tai-ha-noi-chuyen-nghiep",

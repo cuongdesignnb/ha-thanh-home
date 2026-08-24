@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo/site";
 import { apiBase, hasMeaningfulContentHtml, normalizeLegacyServiceSlug } from "@/lib/api";
 import { isUsableSlug } from "@/lib/content-validation";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 type ApiItem = { slug?: string | null; updatedAt?: string; publishedAt?: string; contentHtml?: string | null };
 
@@ -91,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const legacyCanonicalRoutes = Array.from(
     new Map(
       legacyServices
-        .filter((service) => isUsableSlug(service.slug) && hasMeaningfulContentHtml(service.contentHtml))
+        .filter((service) => isUsableSlug(service.slug) && !isLegacyRedirectSource(`/${service.slug}`) && hasMeaningfulContentHtml(service.contentHtml))
         .map((service) => [normalizeLegacyServiceSlug(service.slug!), service]),
     ).entries(),
   )
