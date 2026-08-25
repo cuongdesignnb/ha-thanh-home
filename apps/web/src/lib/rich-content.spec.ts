@@ -7,6 +7,7 @@ import {
 import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 import { getMalformedLegacyTarget } from "../proxy";
 import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
+import { internalCanonicalHrefTargets } from "./internal-href-targets";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -43,6 +44,72 @@ assert.deepEqual(normalizeMenuItems([
 assert.equal(legacySlugComparisonKey("Cong-trinh-nha-o-phong-cach-dai-trung-hai-hien-dai"), legacySlugComparisonKey("cong-trinh-nha-o-phong-cach-dai-trung-hai-hien-dai"));
 assert.equal(legacySlugComparisonKey("xay-nha-tron-goi-tai-lương-son-phu-tho"), legacySlugComparisonKey("xay-nha-tron-goi-tai-luong-son-phu-tho"));
 assert.equal(legacySlugComparisonKey("xay-nha-tron-goi-ba-vi-ho-tro-24/7"), legacySlugComparisonKey("xay-nha-tron-goi-ba-vi-ho-tro-24-7"));
+
+const wave6bInternalMappings: Array<[string, string]> = [
+  ["/xin-cap-nuoc-sach-tai-dau", "/tin-tuc/xin-cap-nuoc-sach-tai-dau"],
+  ["/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi", "/tin-tuc/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi"],
+  ["/co-nen-cung-dong-tho-xay-nha", "/tin-tuc/co-nen-cung-dong-tho-xay-nha"],
+  ["/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an", "/tin-tuc/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an"],
+  ["/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay", "/tin-tuc/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay"],
+  ["/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man", "/tin-tuc/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man"],
+  ["/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man", "/tin-tuc/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man"],
+  ["/nen-xay-nha-tron-goi-hay-tu-thue-tho", "/tin-tuc/nen-xay-nha-tron-goi-hay-tu-thue-tho"],
+  ["/bang-gia-vat-lieu-xay-dung-cap-nhat-moi-nhat", "/tin-tuc/bang-gia-vat-lieu-xay-dung-cap-nhat-moi-nhat"],
+  ["/nam-binh-ngo-2026-tuoi-nao-xay-nha-tot-nhat", "/tin-tuc/nam-binh-ngo-2026-tuoi-nao-xay-nha-tot-nhat"],
+  ["/tuoi-han-thai-tue-co-nen-xay-nha", "/tin-tuc/tuoi-han-thai-tue-co-nen-xay-nha"],
+  ["/nhung-dieu-can-biet-chuan-bi-le-vat-cung-dong-tho-day-du", "/tin-tuc/nhung-dieu-can-biet-chuan-bi-le-vat-cung-dong-tho-day-du"],
+  ["/muon-nguoi-tren-70-tuoi-dong-tho-xay-nha-co-tot-khong", "/tin-tuc/muon-nguoi-tren-70-tuoi-dong-tho-xay-nha-co-tot-khong"],
+  ["/van-khan-dong-tho-xay-nha-chuan", "/tin-tuc/van-khan-dong-tho-xay-nha-chuan"],
+  ["/cach-tinh-tuoi-lam-nha-chuan-phong-thuy", "/tin-tuc/cach-tinh-tuoi-lam-nha-chuan-phong-thuy"],
+  ["/cach-lua-chon-nha-thau-xay-dung-uy-tin", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
+  ["/chi-phi-xay-nha-2-tang-100m2-moi-nhat-nam-2026", "/tin-tuc/chi-phi-xay-nha-2-tang-100m2-moi-nhat-nam-2026"],
+  ["/don-gia-xay-dung-nha-tron-goi-moi-nhat", "/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat"],
+  ["/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh", "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh"],
+  ["/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc", "/tin-tuc/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc"],
+  ["/muon-nguoi-tren-60-tuoi-dong-tho-xay-nha-co-tot-khong", "/tin-tuc/muon-nguoi-tren-60-tuoi-dong-tho-xay-nha-co-tot-khong"],
+  ["/lam-nha-xem-tuoi-vo-co-duoc-khong", "/tin-tuc/lam-nha-xem-tuoi-vo-co-duoc-khong"],
+  ["/cach-dong-tho-cuoc-dat-tranh-hoa-ruoc-loc", "/tin-tuc/cach-dong-tho-cuoc-dat-tranh-hoa-ruoc-loc"],
+  ["/han-lam-nha-va-nhung-dieu-can-biet", "/tin-tuc/han-lam-nha-va-nhung-dieu-can-biet"],
+  ["/van-khan-chuoc-nha-khi-muon-tuoi-xay-nha", "/tin-tuc/van-khan-chuoc-nha-khi-muon-tuoi-xay-nha"],
+  ["/nhung-dieu-can-biet-truoc-khi-xay-nha-lan-dau", "/tin-tuc/nhung-dieu-can-biet-truoc-khi-xay-nha-lan-dau"],
+  ["/mau-nha-3-tang-hien-dai-cho-gia-dinh-tre", "/tin-tuc/mau-nha-3-tang-hien-dai-cho-gia-dinh-tre"],
+  ["/du-doan-ve-gia-vat-lieu-xay-dung-nua-cuoi-nam-2026", "/tin-tuc/du-doan-ve-gia-vat-lieu-xay-dung-nua-cuoi-nam-2026"],
+  ["/nhung-dieu-can-biet-khi-xay-nha-tai-nam-dinh-khi-hau-tho-nhuong-dia-chat-khu-vuc", "/du-an/nhung-dieu-can-biet-khi-xay-nha-tai-nam-dinh-khi-hau-tho-nhuong-dia-chat-khu-vuc"],
+  ["/cach-len-du-toan-chi-phi-xay-nha-tiet-kiem-3", "/tin-tuc/cach-len-du-toan-chi-phi-xay-nha-tiet-kiem"],
+  ["/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh-8", "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh"],
+  ["/cap-nhap-luat-xay-dung-nha-o-dan-dung-va-nhung-dieu-can-biet-5", "/tin-tuc/cap-nhap-luat-xay-dung-nha-o-dan-dung-va-nhung-dieu-can-biet"],
+  ["/go-cong-nghiep-la-gi-nhung-uu-diem-khi-lam-noi-that-go-cong-nghiep-5", "/tin-tuc/go-cong-nghiep-la-gi-nhung-uu-diem-khi-lam-noi-that-go-cong-nghiep"],
+  ["/mau-phong-khach-chung-cu-dep-chuan-phong-thuy-5", "/tin-tuc/mau-phong-khach-chung-cu-dep-chuan-phong-thuy"],
+  ["/uu-diem-khi-dong-tran-thach-cao-0", "/tin-tuc/uu-diem-khi-dong-tran-thach-cao"],
+  ["/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc-4", "/tin-tuc/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc"],
+];
+assert.equal(wave6bInternalMappings.length, 36);
+for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
+assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
+assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 77);
+
+const wave6bUnresolved = [
+  "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",
+  "/phong-ngu-hien-dai-khep-kin-cho-nha-pho",
+  "/hathanhhouse-xay-nha-tron-goi-dam-bao-chat-luong-uy-tin-8",
+  "/xay-nha-tron-goi-tai-tay-ho",
+  "/phong-ngu-nha-pho--phong-cach-hien-dai",
+  "/xay-nha-tron-goi-tai-ha-long",
+  "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
+  "/xay-nha-tron-goi-tai-thuong-tin-ha-noi",
+  "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
+  "/xay-nha-tron-goi-tai-bac-giang",
+  "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
+  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
+  "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
+  "/xay-nha-tron-goi-tai-phuc-tho-ha-noi",
+  "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
+  "/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio",
+  "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",
+];
+assert.equal(wave6bUnresolved.length, 17);
+for (const url of wave6bUnresolved) assert.equal(normalizeLegacyHref(url), url);
 
 for (const invalid of [null, undefined, "", "  ", "null", "undefined", "NULL", "Undefined"]) assert.equal(isUsableSlug(invalid), false);
 assert.equal(isUsableSlug("bai-viet-hop-le"), true);
