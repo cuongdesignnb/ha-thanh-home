@@ -345,6 +345,15 @@ export function normalizeLegacyServiceSlug(slug: string) {
     .replace(/\/24\/7$/, "-24-7");
 }
 
+/** Comparison-only key for sitemap occupancy; never use this to emit URLs. */
+export function legacySlugComparisonKey(slug: string) {
+  return normalizeLegacyServiceSlug(slug)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/đ/g, "d");
+}
+
 export type Post = {
   id: number;
   title: string;
@@ -720,6 +729,21 @@ function cleanMetadataTitle(title: string) {
     .trim() || "Hà Thành Home";
 }
 
+export function normalizeMenuUrl(url: string): string {
+  const aliases: Readonly<Record<string, string>> = {
+    "/dich-vu/cong-trinh": "/dich-vu",
+    "/dich-vu/noi-that": "/dich-vu",
+  };
+  return aliases[url] || url;
+}
+
+export function normalizeMenuItems(items: MenuItem[]): MenuItem[] {
+  return items.map((item) => ({
+    ...item,
+    url: normalizeMenuUrl(item.url),
+    children: item.children?.length ? normalizeMenuItems(item.children) : item.children,
+  }));
+}
 
 export function getConstructionEstimatorConfig() {
   return fetchJsonNoStore<EstimatorPublicConfig>("/construction-estimator/config", {});
@@ -728,7 +752,8 @@ export function getConstructionEstimatorConfig() {
 export async function getMenu(location: "header" | "footer") {
   const fallback = location === "header" ? fallbackHeaderMenu : fallbackFooterMenu;
   const payload = await fetchJson<MenuPayload>(`/menus/${location}`, fallback);
-  return payload.items?.length ? payload : fallback;
+  const menu = payload.items?.length ? payload : fallback;
+  return { ...menu, items: normalizeMenuItems(menu.items) };
 }
 
 export async function getList<T>(path: string): Promise<T[]> {

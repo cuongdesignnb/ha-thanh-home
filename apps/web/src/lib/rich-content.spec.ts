@@ -6,17 +6,43 @@ import {
 } from "./rich-content";
 import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 import { getMalformedLegacyTarget } from "../proxy";
+import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("&quot;../gia-vat-lieu-xay-dung/&quot;"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22tel:0898502333/%22"), "tel:0898502333");
 assert.equal(normalizeLegacyHref("tel:+84898502333"), "tel:+84898502333");
+assert.equal(normalizeLegacyHref("\\&quot;../abc\\&quot;"), "/abc");
+assert.equal(normalizeLegacyHref("\\&quot;tel:0898502333\\&quot;"), "tel:0898502333");
+assert.equal(normalizeLegacyHref("\\&#34;../abc\\&#34;"), "/abc");
+assert.equal(normalizeLegacyHref("\\%22../abc\\%22"), "/abc");
 assert.equal(normalizeLegacyHref("https://example.com/a"), "https://example.com/a");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/tin-tuc?x=1#top"), "https://hathanhhome.vn/tin-tuc?x=1#top");
+assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome"), "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet");
+assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome?utm_source=internal#section"), "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet?utm_source=internal#section");
+assert.equal(normalizeLegacyHref("/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh"), "/du-an/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh");
+assert.equal(normalizeLegacyHref("/contact"), "/lien-he");
+assert.equal(normalizeLegacyHref("/100+-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026"), "/mau-thiet-ke-kien-truc/100-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026");
+for (const unresolved of [
+  "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
+  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
+  "/xay-nha-tron-goi-tai-ha-long",
+]) assert.equal(normalizeLegacyHref(unresolved), unresolved);
 assert.equal(normalizeLegacyAnchors('<img src="../image.jpg"><p>"../not-a-link/"</p>'), '<img src="../image.jpg"><p>"../not-a-link/"</p>');
 assert.equal(normalizeLegacyAnchors('<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>'), '<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>');
 assert.equal(normalizeLegacyAnchors('<a class="related" href="%27../old-post/%27">Xem</a>'), '<a class="related" href="/old-post/">Xem</a>');
+
+assert.equal(normalizeMenuUrl("/dich-vu/cong-trinh"), "/dich-vu");
+assert.equal(normalizeMenuUrl("/dich-vu/noi-that"), "/dich-vu");
+assert.equal(normalizeMenuUrl("/gioi-thieu"), "/gioi-thieu");
+assert.deepEqual(normalizeMenuItems([
+  { id: 1, label: "Dịch vụ", url: "/dich-vu/cong-trinh", children: [{ id: 2, label: "Nội thất", url: "/dich-vu/noi-that" }] },
+]), [{ id: 1, label: "Dịch vụ", url: "/dich-vu", children: [{ id: 2, label: "Nội thất", url: "/dich-vu", children: undefined }] }]);
+
+assert.equal(legacySlugComparisonKey("Cong-trinh-nha-o-phong-cach-dai-trung-hai-hien-dai"), legacySlugComparisonKey("cong-trinh-nha-o-phong-cach-dai-trung-hai-hien-dai"));
+assert.equal(legacySlugComparisonKey("xay-nha-tron-goi-tai-lương-son-phu-tho"), legacySlugComparisonKey("xay-nha-tron-goi-tai-luong-son-phu-tho"));
+assert.equal(legacySlugComparisonKey("xay-nha-tron-goi-ba-vi-ho-tro-24/7"), legacySlugComparisonKey("xay-nha-tron-goi-ba-vi-ho-tro-24-7"));
 
 for (const invalid of [null, undefined, "", "  ", "null", "undefined", "NULL", "Undefined"]) assert.equal(isUsableSlug(invalid), false);
 assert.equal(isUsableSlug("bai-viet-hop-le"), true);
