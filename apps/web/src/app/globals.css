@@ -2109,6 +2109,64 @@ h3 {
   gap: 42px 36px;
 }
 
+.project-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 48px auto 8px;
+}
+
+.project-pagination > a,
+.project-pagination-pages a,
+.project-pagination-pages span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #e8ddca;
+  border-radius: 999px;
+  color: var(--green);
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.project-pagination > a:hover,
+.project-pagination > a:focus-visible,
+.project-pagination-pages a:hover,
+.project-pagination-pages a:focus-visible {
+  border-color: var(--green);
+  color: #fff;
+  background: var(--green);
+}
+
+.project-pagination-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-pagination-pages a[aria-current="page"] {
+  border-color: var(--green);
+  color: #fff;
+  background: var(--green);
+}
+
+.project-pagination-pages span {
+  min-width: 24px;
+  padding: 0 4px;
+  border-color: transparent;
+  background: transparent;
+}
+
 .project-catalog-card {
   display: block;
 }
