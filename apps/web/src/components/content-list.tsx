@@ -4,6 +4,7 @@ import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCatego
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
 import { buildPaginationItems, buildProjectCatalogPageHref, parseCatalogPage } from "@/lib/project-catalog-pagination";
+import { buildPostCatalogPageHref, buildPostPaginationItems, parsePostCatalogPage } from "@/lib/post-catalog-pagination";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -269,7 +270,7 @@ export function ServiceList({ title, services }: { title: string; services: Serv
   );
 }
 
-export function PostList({ activeCategory, categories, posts }: { activeCategory?: string; categories?: PostCategory[]; posts: Post[] }) {
+export function PostList({ activeCategory, categories, meta, posts, searchParams }: { activeCategory?: string; categories?: PostCategory[]; meta: Meta; posts: Post[]; searchParams: Record<string, string | undefined> }) {
   return (
     <>
       <PageHero title="Tin tức & cảm hứng" />
@@ -282,9 +283,25 @@ export function PostList({ activeCategory, categories, posts }: { activeCategory
             </nav>
           ) : null}
           <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
+          <PostPagination meta={meta} searchParams={searchParams} />
         </div>
       </section>
     </>
+  );
+}
+
+function PostPagination({ meta, searchParams }: { meta: Meta; searchParams: Record<string, string | undefined> }) {
+  if (meta.totalPages <= 1) return null;
+  const currentPage = parsePostCatalogPage(searchParams.page || meta.page, meta.totalPages);
+  const items = buildPostPaginationItems(currentPage, meta.totalPages);
+  return (
+    <nav className="project-pagination post-pagination" aria-label="Phân trang tin tức">
+      {currentPage > 1 ? <a href={buildPostCatalogPageHref("/tin-tuc", searchParams, currentPage - 1)} rel="prev" aria-label="Trang trước">Trước</a> : null}
+      <div className="project-pagination-pages">
+        {items.map((item, index) => item === "ellipsis" ? <span aria-hidden="true" key={`ellipsis-${index}`}>…</span> : <a href={buildPostCatalogPageHref("/tin-tuc", searchParams, item)} aria-current={item === currentPage ? "page" : undefined} key={item}>{item}</a>)}
+      </div>
+      {currentPage < meta.totalPages ? <a href={buildPostCatalogPageHref("/tin-tuc", searchParams, currentPage + 1)} rel="next" aria-label="Trang sau">Sau</a> : null}
+    </nav>
   );
 }
 

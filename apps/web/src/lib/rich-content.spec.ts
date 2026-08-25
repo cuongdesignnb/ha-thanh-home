@@ -10,6 +10,7 @@ import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from ".
 import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
 import { buildPaginationItems, buildProjectCatalogCanonical, buildProjectCatalogPageHref, isCatalogPageOutOfRange } from "./project-catalog-pagination";
+import { buildPostCatalogCanonical, buildPostCatalogPageHref, buildPostPaginationItems, isPostCatalogPageOutOfRange } from "./post-catalog-pagination";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -147,6 +148,23 @@ assert.equal(isCatalogPageOutOfRange(7, 6), true);
 assert.equal(isCatalogPageOutOfRange(999, 6), true);
 assert.equal(isCatalogPageOutOfRange(1, 0), false);
 assert.equal(isCatalogPageOutOfRange(2, 0), true);
+assert.equal(buildPostCatalogPageHref("/tin-tuc", {}, 1), "/tin-tuc");
+assert.equal(buildPostCatalogPageHref("/tin-tuc", {}, 2), "/tin-tuc?page=2");
+assert.equal(buildPostCatalogPageHref("/tin-tuc", { category: "cam-nang-xay-dung" }, 2), "/tin-tuc?category=cam-nang-xay-dung&page=2");
+assert.equal(buildPostCatalogPageHref("/tin-tuc", { category: "cam-nang-xay-dung", limit: "500", group: "bad", utm_source: "bad" }, 2), "/tin-tuc?category=cam-nang-xay-dung&page=2");
+assert.equal(buildPostCatalogCanonical("/tin-tuc", {}, 1), "/tin-tuc");
+assert.equal(buildPostCatalogCanonical("/tin-tuc", {}, 2), "/tin-tuc?page=2");
+assert.equal(buildPostCatalogCanonical("/tin-tuc", { category: "abc" }, 1), "/tin-tuc");
+assert.equal(buildPostCatalogCanonical("/tin-tuc", { category: "abc", page: "3" }, 3), "/tin-tuc");
+assert.equal(isPostCatalogPageOutOfRange(16, 16), false);
+assert.equal(isPostCatalogPageOutOfRange(17, 16), true);
+assert.equal(isPostCatalogPageOutOfRange(999, 16), true);
+assert.equal(isPostCatalogPageOutOfRange(1, 0), false);
+assert.equal(isPostCatalogPageOutOfRange(2, 0), true);
+assert.deepEqual(buildPostPaginationItems(1, 6), [1, 2, 3, 4, 5, 6]);
+assert.deepEqual(buildPostPaginationItems(8, 30), [1, "ellipsis", 7, 8, 9, "ellipsis", 30]);
+assert.equal(buildPostPaginationItems(0, 6).includes(0), false);
+assert.equal(buildPostPaginationItems(31, 30).includes(31), false);
 
 const wave6bUnresolved = [
   "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",
