@@ -37,6 +37,13 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xat-nha-tron-goi-tai-phuc-tho-cap-nhap-bao-gia-moi-nhat-hien-nay": "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026",
   "/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026": "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc",
   "/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home": "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026",
+  "/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong": "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong",
+  "/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
+  "/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep": "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep",
+  "/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home": "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi",
+  "/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome": "/du-an/xay-nha-tron-goi-tai-phu-xuyen",
+  "/cap-nhap-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc": "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc",
+  "/bao-gia-nha-lien-ke-nam-2026": "/du-an/bao-gia-xay-nha-tron-goi-lien-ke-nam-2026",
 };
 
 /** Return a destination only for an explicitly approved historical pathname. */
