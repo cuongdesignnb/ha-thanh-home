@@ -1,4 +1,6 @@
 import { isUsableSlug } from "./content-validation";
+import { internalCanonicalHrefTargets } from "./internal-href-targets";
+import { getLegacyRedirectTarget } from "./legacy-redirects";
 
 const TABLE_SCROLL_CLASS = "content-table-scroll";
 
@@ -8,12 +10,14 @@ export function normalizeLegacyHref(rawHref: string): string {
 
   // Some old editor exports persisted quote characters around the value.
   // Remove wrappers only (never decode arbitrary URL components).
+  const wrapperStart = /^(?:\\)?(?:%22|%27|&quot;|&#34;|["'])/i;
+  const wrapperEnd = /(?:\\)?(?:%22|%27|&quot;|&#34;|["'])$/i;
   let previous = "";
   while (href !== previous) {
     previous = href;
     href = href
-      .replace(/^(?:%22|%27|&quot;|["'])/i, "")
-      .replace(/(?:%22|%27|&quot;|["'])$/i, "")
+      .replace(wrapperStart, "")
+      .replace(wrapperEnd, "")
       .trim();
   }
 
@@ -22,10 +26,25 @@ export function normalizeLegacyHref(rawHref: string): string {
 
   if (/^tel:/i.test(href)) href = href.replace(/\/+$/, "");
 
+  let internalHostPrefix = "";
   const internalHost = href.match(/^https?:\/\/(?:www\.)?hathanhhome\.vn([\s\S]*)$/i);
-  if (internalHost) href = `https://hathanhhome.vn${internalHost[1] || ""}`;
+  if (internalHost) {
+    internalHostPrefix = "https://hathanhhome.vn";
+    href = internalHost[1] || "/";
+  }
 
-  return href;
+  // External and non-navigation schemes are deliberately left untouched.
+  if (/^(?:https?:\/\/|mailto:|javascript:|data:)/i.test(href) || href.startsWith("//") || href.startsWith("#")) {
+    return `${internalHostPrefix}${href}`;
+  }
+
+  const suffixIndex = href.search(/[?#]/);
+  const pathname = suffixIndex >= 0 ? href.slice(0, suffixIndex) : href;
+  const suffix = suffixIndex >= 0 ? href.slice(suffixIndex) : "";
+  if (!pathname.startsWith("/")) return `${internalHostPrefix}${href}`;
+
+  const target = getLegacyRedirectTarget(pathname) || internalCanonicalHrefTargets[pathname];
+  return `${internalHostPrefix}${target || pathname}${suffix}`;
 }
 
 /** Normalize href attributes without touching text, images, scripts, or styles. */

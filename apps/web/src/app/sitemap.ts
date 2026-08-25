@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo/site";
-import { apiBase, hasMeaningfulContentHtml, normalizeLegacyServiceSlug } from "@/lib/api";
+import { apiBase, hasMeaningfulContentHtml, legacySlugComparisonKey, normalizeLegacyServiceSlug } from "@/lib/api";
 import { isUsableSlug } from "@/lib/content-validation";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
@@ -85,12 +85,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  const occupiedSlugs = new Set([
-    ...projects.filter((item) => isUsableSlug(item.slug)).map((item) => normalizeLegacyServiceSlug(item.slug!)),
-    ...archDesigns.filter((item) => isUsableSlug(item.slug)).map((item) => normalizeLegacyServiceSlug(item.slug!)),
-    ...intDesigns.filter((item) => isUsableSlug(item.slug)).map((item) => normalizeLegacyServiceSlug(item.slug!)),
-    ...posts.filter((item) => isUsableSlug(item.slug)).map((item) => normalizeLegacyServiceSlug(item.slug!)),
-    ...customPages.filter((item) => isUsableSlug(item.slug)).map((item) => normalizeLegacyServiceSlug(item.slug!)),
+  const occupiedSlugKeys = new Set([
+    ...projects.filter((item) => isUsableSlug(item.slug)).map((item) => legacySlugComparisonKey(item.slug!)),
+    ...archDesigns.filter((item) => isUsableSlug(item.slug)).map((item) => legacySlugComparisonKey(item.slug!)),
+    ...intDesigns.filter((item) => isUsableSlug(item.slug)).map((item) => legacySlugComparisonKey(item.slug!)),
+    ...posts.filter((item) => isUsableSlug(item.slug)).map((item) => legacySlugComparisonKey(item.slug!)),
+    ...customPages.filter((item) => isUsableSlug(item.slug)).map((item) => legacySlugComparisonKey(item.slug!)),
   ]);
   const legacyCanonicalRoutes = Array.from(
     new Map(
@@ -99,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .map((service) => [normalizeLegacyServiceSlug(service.slug!), service]),
     ).entries(),
   )
-    .filter(([slug]) => !occupiedSlugs.has(slug))
+    .filter(([slug]) => !occupiedSlugKeys.has(legacySlugComparisonKey(slug)))
     .map(([slug, service]) => ({
       url: `${base}/${slug}`,
       lastModified: service.updatedAt || service.publishedAt ? new Date(service.updatedAt || service.publishedAt!) : undefined,
