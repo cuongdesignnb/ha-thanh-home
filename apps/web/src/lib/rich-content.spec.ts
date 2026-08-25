@@ -9,6 +9,7 @@ import { getMalformedLegacyTarget } from "../proxy";
 import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
 import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
+import { buildPaginationItems, buildProjectCatalogCanonical, buildProjectCatalogPageHref, isCatalogPageOutOfRange } from "./project-catalog-pagination";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -127,6 +128,25 @@ assert.equal(normalizeLegacyAnchors('<a href="/xay-nha-tron-goi-tai-ha-long?utm_
 assert.equal(normalizeLegacyAnchors('<a href="https://www.hathanhhome.vn/xay-nha-tron-goi-tai-ha-long">Hạ Long</a>'), "Hạ Long");
 assert.equal(normalizeLegacyAnchors('<a href="https://example.com/xay-nha-tron-goi-tai-ha-long">Example</a>'), '<a href="https://example.com/xay-nha-tron-goi-tai-ha-long">Example</a>');
 assert.equal(normalizeLegacyAnchors('<a href="/xay-nha-tron-goi-tai-bac-giang">Bắc Giang</a>'), '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin">Bắc Giang</a>');
+
+assert.equal(buildProjectCatalogPageHref("/du-an", {}, 1), "/du-an");
+assert.equal(buildProjectCatalogPageHref("/du-an", {}, 2), "/du-an?page=2");
+assert.equal(buildProjectCatalogPageHref("/du-an", { category: "nha-xuong" }, 2), "/du-an?category=nha-xuong&page=2");
+assert.equal(buildProjectCatalogPageHref("/du-an/cong-trinh", { category: "biet-thu", group: "SHOULD_NOT_PRESERVE", limit: "500" }, 3), "/du-an/cong-trinh?category=biet-thu&page=3");
+assert.equal(buildProjectCatalogCanonical("/du-an", {}, 1), "/du-an");
+assert.equal(buildProjectCatalogCanonical("/du-an", {}, 2), "/du-an?page=2");
+assert.equal(buildProjectCatalogCanonical("/du-an", { category: "nha-pho" }, 2), "/du-an");
+assert.equal(buildProjectCatalogCanonical("/du-an/cong-trinh", {}, 4), "/du-an/cong-trinh?page=4");
+assert.equal(buildProjectCatalogCanonical("/du-an/noi-that", {}, 1), "/du-an/noi-that");
+assert.deepEqual(buildPaginationItems(1, 6), [1, 2, 3, 4, 5, 6]);
+assert.deepEqual(buildPaginationItems(8, 30), [1, "ellipsis", 7, 8, 9, "ellipsis", 30]);
+assert.equal(buildPaginationItems(0, 6).includes(0), false);
+assert.equal(buildPaginationItems(31, 30).includes(31), false);
+assert.equal(isCatalogPageOutOfRange(6, 6), false);
+assert.equal(isCatalogPageOutOfRange(7, 6), true);
+assert.equal(isCatalogPageOutOfRange(999, 6), true);
+assert.equal(isCatalogPageOutOfRange(1, 0), false);
+assert.equal(isCatalogPageOutOfRange(2, 0), true);
 
 const wave6bUnresolved = [
   "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",

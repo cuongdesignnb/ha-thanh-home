@@ -3,6 +3,7 @@ import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
+import { buildPaginationItems, buildProjectCatalogPageHref, parseCatalogPage } from "@/lib/project-catalog-pagination";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -41,9 +42,25 @@ export function ProjectCatalog({ filters, group, meta, projects, searchParams }:
           <div className="project-catalog-grid">
             {projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
           </div>
+          <ProjectPagination basePath={basePath} meta={meta} searchParams={searchParams} />
         </div>
       </section>
     </main>
+  );
+}
+
+function ProjectPagination({ basePath, meta, searchParams }: { basePath: string; meta: Meta; searchParams: Record<string, string | undefined> }) {
+  if (meta.totalPages <= 1) return null;
+  const currentPage = parseCatalogPage(searchParams.page || meta.page, meta.totalPages);
+  const items = buildPaginationItems(currentPage, meta.totalPages);
+  return (
+    <nav className="project-pagination" aria-label="Phân trang dự án">
+      {currentPage > 1 ? <a href={buildProjectCatalogPageHref(basePath, searchParams, currentPage - 1)} rel="prev" aria-label="Trang trước">Trước</a> : null}
+      <div className="project-pagination-pages">
+        {items.map((item, index) => item === "ellipsis" ? <span aria-hidden="true" key={`ellipsis-${index}`}>…</span> : <a href={buildProjectCatalogPageHref(basePath, searchParams, item)} aria-current={item === currentPage ? "page" : undefined} key={item}>{item}</a>)}
+      </div>
+      {currentPage < meta.totalPages ? <a href={buildProjectCatalogPageHref(basePath, searchParams, currentPage + 1)} rel="next" aria-label="Trang sau">Sau</a> : null}
+    </nav>
   );
 }
 
