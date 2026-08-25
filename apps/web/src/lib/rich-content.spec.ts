@@ -255,6 +255,27 @@ for (const [source, target] of wave7cRedirects) {
   assert.equal(getLegacyRedirectTarget(source), target);
   assert.equal(isLegacyRedirectSource(source), true);
 }
+const wave8aGscProvenRedirects: Array<[string, string]> = [
+  ["/bao-gia-xay-nha-tai-phuong-hoanh-bo-quang-ninh", "/du-an/bao-gia-xay-nha-tron-goi-tai-phuong-hoanh-bo-quang-ninh"],
+  ["/bao-gia-xay-nha-tron-goi-hathanhhome", "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong"],
+  ["/bao-gia-xay-nha-tron-goi-nam-2026", "/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu"],
+  ["/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan", "/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu"],
+  ["/bao-gia-xay-nha-tron-goi-tai-phuong-ngo-quyen-hai-phong", "/du-an/bao-gia-xay-nha-tron-goi-2026-phuong-ngo-quyen-hai-phong"],
+  ["/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi", "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi"],
+  ["/contact", "/lien-he"],
+  ["/mau-nha-biet-thu-dep-nhat-2026", "/mau-thiet-ke-kien-truc/mau-nha-biet-thu-dep-2026"],
+  ["/xay-nha-tron-goi-ba-vi-ho-tro-20/7-cong-ty-xay-dung-uy-tin", "/du-an/xay-nha-tron-goi-ba-vi-ho-tro-20-7-cong-ty-xay-dung-uy-tin"],
+  ["/xay-nha-tron-goi-tai-bac-giang", "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin"],
+  ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
+  ["/xay-nha-tron-goi-tai-thai-binh-bao-gia-quy-trinh-tu-a-z", "/du-an/xay-nha-tron-goi-tai-thai-binh-bao-gia-nam-2026-quy-trinh-tu-a-z"],
+  ["/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio", "/tin-tuc/xem-ngay-dong-tho-giup-chu-nha-phat-len-nhu-dieu-gap-gio"],
+];
+assert.equal(wave8aGscProvenRedirects.length, 13);
+for (const [source, target] of wave8aGscProvenRedirects) {
+  assert.equal(getLegacyRedirectTarget(source), target);
+  assert.equal(isLegacyRedirectSource(source), true);
+  assert.equal(internalCanonicalHrefTargets[source], target);
+}
 const workflowPath = "/quy-trinh-lam-viec-tai-ha-thanh-home-tu-khao-sat-den-ban-giao";
 assert.equal(getLegacyRedirectTarget(workflowPath), undefined);
 assert.equal(isLegacyRedirectSource(workflowPath), false);
