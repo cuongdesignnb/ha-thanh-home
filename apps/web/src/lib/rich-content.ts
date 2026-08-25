@@ -1,4 +1,5 @@
 import { isUsableSlug } from "./content-validation";
+import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
 import { getLegacyRedirectTarget } from "./legacy-redirects";
 
@@ -59,7 +60,20 @@ export function normalizeLegacyAnchors(html: string): string {
   const normalized = protectedHtml.replace(/<a\b([^>]*?\bhref\s*=\s*)(["'])([\s\S]*?)\2([^>]*)>/gi, (_match, before: string, quote: string, value: string, after: string) => {
     return `<a${before}${quote}${normalizeLegacyHref(value)}${quote}${after}>`;
   });
-  return normalized.replace(/\u0000rich-content-protected-(\d+)\u0000/g, (_token, index: string) => protectedBlocks[Number(index)] || "");
+  const unlinked = normalized.replace(/<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi, (match, attrs: string, innerHtml: string) => {
+    const hrefMatch = attrs.match(/\bhref\s*=\s*(["'])([\s\S]*?)\1/i);
+    if (!hrefMatch) return match;
+    const normalizedHref = normalizeLegacyHref(hrefMatch[2]);
+    const pathname = getInternalPathname(normalizedHref);
+    return pathname && deadInternalHrefPaths.has(pathname) ? innerHtml : match;
+  });
+  return unlinked.replace(/\u0000rich-content-protected-(\d+)\u0000/g, (_token, index: string) => protectedBlocks[Number(index)] || "");
+}
+
+function getInternalPathname(href: string): string | undefined {
+  if (href.startsWith("/")) return href.split(/[?#]/, 1)[0];
+  const internalHost = href.match(/^https:\/\/hathanhhome\.vn([\s\S]*)$/i);
+  return internalHost ? (internalHost[1] || "/").split(/[?#]/, 1)[0] : undefined;
 }
 
 export function prepareDetailHtml(html?: string | null) {
