@@ -79,4 +79,9 @@ export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/mau-phong-khach-chung-cu-dep-chuan-phong-thuy-5": "/tin-tuc/mau-phong-khach-chung-cu-dep-chuan-phong-thuy",
   "/uu-diem-khi-dong-tran-thach-cao-0": "/tin-tuc/uu-diem-khi-dong-tran-thach-cao",
   "/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc-4": "/tin-tuc/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc",
+  "/xay-nha-tron-goi-tai-tay-ho": "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach",
+  "/xay-nha-tron-goi-tai-thuong-tin-ha-noi": "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi",
+  "/xay-nha-tron-goi-tai-bac-giang": "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin",
+  "/xay-nha-tron-goi-tai-phuc-tho-ha-noi": "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026",
+  "/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio": "/tin-tuc/xem-ngay-dong-tho-giup-chu-nha-phat-len-nhu-dieu-gap-gio",
 };

@@ -7,6 +7,7 @@ import {
 import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 import { getMalformedLegacyTarget } from "../proxy";
 import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
+import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
@@ -87,28 +88,61 @@ assert.equal(wave6bInternalMappings.length, 36);
 for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 77);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 82);
+
+const wave6cMappedLinks: Array<[string, string]> = [
+  ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
+  ["/xay-nha-tron-goi-tai-thuong-tin-ha-noi", "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi"],
+  ["/xay-nha-tron-goi-tai-bac-giang", "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin"],
+  ["/xay-nha-tron-goi-tai-phuc-tho-ha-noi", "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026"],
+  ["/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio", "/tin-tuc/xem-ngay-dong-tho-giup-chu-nha-phat-len-nhu-dieu-gap-gio"],
+];
+assert.equal(wave6cMappedLinks.length, 5);
+for (const [source, target] of wave6cMappedLinks) assert.equal(normalizeLegacyHref(source), target);
+assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia"), "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia");
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 82);
+
+const wave6cDeadLinks = [
+  "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",
+  "/phong-ngu-hien-dai-khep-kin-cho-nha-pho",
+  "/hathanhhouse-xay-nha-tron-goi-dam-bao-chat-luong-uy-tin-8",
+  "/phong-ngu-nha-pho--phong-cach-hien-dai",
+  "/xay-nha-tron-goi-tai-ha-long",
+  "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
+  "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
+  "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
+  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
+  "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
+  "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
+  "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",
+];
+assert.equal(deadInternalHrefPaths.size, 12);
+for (const path of wave6cDeadLinks) {
+  assert.equal(deadInternalHrefPaths.has(path), true);
+  assert.equal(normalizeLegacyHref(path), path);
+}
+assert.equal(normalizeLegacyAnchors('<a href="/xay-nha-tron-goi-tai-ha-long">Hạ Long</a>'), "Hạ Long");
+assert.equal(normalizeLegacyAnchors('<a class="related" href="/xay-nha-tron-goi-tai-ha-long"><strong>Hạ Long</strong></a>'), "<strong>Hạ Long</strong>");
+assert.equal(normalizeLegacyAnchors('<a href="/xay-nha-tron-goi-tai-ha-long?utm_source=test">Hạ Long</a>'), "Hạ Long");
+assert.equal(normalizeLegacyAnchors('<a href="https://www.hathanhhome.vn/xay-nha-tron-goi-tai-ha-long">Hạ Long</a>'), "Hạ Long");
+assert.equal(normalizeLegacyAnchors('<a href="https://example.com/xay-nha-tron-goi-tai-ha-long">Example</a>'), '<a href="https://example.com/xay-nha-tron-goi-tai-ha-long">Example</a>');
+assert.equal(normalizeLegacyAnchors('<a href="/xay-nha-tron-goi-tai-bac-giang">Bắc Giang</a>'), '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin">Bắc Giang</a>');
 
 const wave6bUnresolved = [
   "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",
   "/phong-ngu-hien-dai-khep-kin-cho-nha-pho",
   "/hathanhhouse-xay-nha-tron-goi-dam-bao-chat-luong-uy-tin-8",
-  "/xay-nha-tron-goi-tai-tay-ho",
   "/phong-ngu-nha-pho--phong-cach-hien-dai",
   "/xay-nha-tron-goi-tai-ha-long",
   "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
-  "/xay-nha-tron-goi-tai-thuong-tin-ha-noi",
   "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
-  "/xay-nha-tron-goi-tai-bac-giang",
   "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
   "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
   "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
-  "/xay-nha-tron-goi-tai-phuc-tho-ha-noi",
   "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
-  "/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio",
   "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",
 ];
-assert.equal(wave6bUnresolved.length, 17);
+assert.equal(wave6bUnresolved.length, 12);
 for (const url of wave6bUnresolved) assert.equal(normalizeLegacyHref(url), url);
 
 for (const invalid of [null, undefined, "", "  ", "null", "undefined", "NULL", "Undefined"]) assert.equal(isUsableSlug(invalid), false);
