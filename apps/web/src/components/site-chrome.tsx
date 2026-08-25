@@ -1,6 +1,7 @@
 import { Building2, Facebook, Mail, MapPin, Phone, PhoneCall } from "lucide-react";
 import { MobileMenu } from "@/components/mobile-menu";
 import { getMenu, getSiteSettings, type MenuItem } from "@/lib/api";
+import { footerUtilityLinks } from "@/lib/footer-utility-links";
 
 const defaultIdentity = {
   name: "Hà Thành Home",
@@ -62,6 +63,9 @@ function HeaderMenuItem({ item }: { item: MenuItem }) {
 export async function SiteFooter() {
   const [footerMenu, settings] = await Promise.all([getMenu("footer"), getSiteSettings()]);
   const identity = { ...defaultIdentity, ...(settings["site.identity"] || {}) };
+  const existingFooterUrls = new Set<string>();
+  collectMenuUrls(footerMenu.items, existingFooterUrls);
+  const missingUtilityLinks = footerUtilityLinks.filter((item) => !existingFooterUrls.has(normalizeFooterUrl(item.href)));
   return (
     <footer className="footer" id="lead">
       <div className="container footer-top">
@@ -98,9 +102,28 @@ export async function SiteFooter() {
           ))}
         </div>
       </div>
+      {missingUtilityLinks.length ? (
+        <div className="container footer-utility-row">
+          <nav className="footer-utility-links" aria-label="Thông tin và chính sách">
+            {missingUtilityLinks.map((item) => <a href={item.href} key={item.href}>{item.label}</a>)}
+          </nav>
+        </div>
+      ) : null}
       <div className="container copyright">© 2026 {identity.name}. All rights reserved.</div>
     </footer>
   );
+}
+
+function normalizeFooterUrl(url: string) {
+  const pathname = url.split(/[?#]/, 1)[0];
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
+function collectMenuUrls(items: MenuItem[], urls: Set<string>) {
+  for (const item of items) {
+    urls.add(normalizeFooterUrl(item.url));
+    if (item.children?.length) collectMenuUrls(item.children, urls);
+  }
 }
 
 function FooterLinks({ items }: { items: MenuItem[] }) {

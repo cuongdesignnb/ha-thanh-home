@@ -11,6 +11,7 @@ import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
 import { buildPaginationItems, buildProjectCatalogCanonical, buildProjectCatalogPageHref, isCatalogPageOutOfRange } from "./project-catalog-pagination";
 import { buildPostCatalogCanonical, buildPostCatalogPageHref, buildPostPaginationItems, isPostCatalogPageOutOfRange } from "./post-catalog-pagination";
+import { footerUtilityLinks } from "./footer-utility-links";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -237,10 +238,35 @@ for (const [source, target] of wave5bRedirects) assert.equal(getLegacyRedirectTa
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/du-an/xay-nha-tron-goi-long-bien-ha-noi-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/70-other-page"), undefined);
-assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home"), undefined);
 assert.equal(getLegacyRedirectTarget("/bao-gia-xay-nha-tai-tien-du-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-dong-da-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-nam-dinh-random"), undefined);
+const wave7cRedirects: Array<[string, string]> = [
+  ["/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong"],
+  ["/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do", "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do"],
+  ["/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep", "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep"],
+  ["/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home", "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi"],
+  ["/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome", "/du-an/xay-nha-tron-goi-tai-phu-xuyen"],
+  ["/cap-nhap-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc", "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc"],
+  ["/bao-gia-nha-lien-ke-nam-2026", "/du-an/bao-gia-xay-nha-tron-goi-lien-ke-nam-2026"],
+];
+assert.equal(wave7cRedirects.length, 7);
+for (const [source, target] of wave7cRedirects) {
+  assert.equal(getLegacyRedirectTarget(source), target);
+  assert.equal(isLegacyRedirectSource(source), true);
+}
+const workflowPath = "/quy-trinh-lam-viec-tai-ha-thanh-home-tu-khao-sat-den-ban-giao";
+assert.equal(getLegacyRedirectTarget(workflowPath), undefined);
+assert.equal(isLegacyRedirectSource(workflowPath), false);
+assert.equal(footerUtilityLinks.length, 5);
+assert.deepEqual(footerUtilityLinks.map((item) => item.href), [
+  workflowPath,
+  "/chinh-sach-bao-gia",
+  "/chinh-sach-thanh-toan",
+  "/chinh-sach-khieu-nai-tranh-chap",
+  "/dieu-khoan-su-dung",
+]);
+for (const item of footerUtilityLinks) assert.equal(isLegacyRedirectSource(item.href), false);
 assert.equal(isLegacyRedirectSource("/cong-trinh-biet-thu-nha-vuon-ninh-binh"), true);
 assert.equal(isLegacyRedirectSource("/Cong-trinh-biet-thu-nha-vuon-ninh-binh"), true);
 assert.equal(getMalformedLegacyTarget("/xay-nha-tron-goi-tai-ha-nam-ho-tro-tu-van-khao-sat-24/7"), "/du-an/xay-nha-tron-goi-tai-ha-nam-ho-tro-tu-van-khao-sat-24-7");
