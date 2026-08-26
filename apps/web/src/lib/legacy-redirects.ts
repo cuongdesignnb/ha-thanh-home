@@ -57,6 +57,7 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi-tai-tay-ho": "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach",
   "/xay-nha-tron-goi-tai-thai-binh-bao-gia-quy-trinh-tu-a-z": "/du-an/xay-nha-tron-goi-tai-thai-binh-bao-gia-nam-2026-quy-trinh-tu-a-z",
   "/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio": "/tin-tuc/xem-ngay-dong-tho-giup-chu-nha-phat-len-nhu-dieu-gap-gio",
+  "/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that-3": "/tin-tuc/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that",
 };
 
 /** Return a destination only for an explicitly approved historical pathname. */

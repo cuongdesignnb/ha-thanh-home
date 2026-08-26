@@ -276,6 +276,14 @@ for (const [source, target] of wave8aGscProvenRedirects) {
   assert.equal(isLegacyRedirectSource(source), true);
   assert.equal(internalCanonicalHrefTargets[source], target);
 }
+assert.equal(
+  getLegacyRedirectTarget("/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that-3"),
+  "/tin-tuc/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that",
+);
+assert.equal(
+  isLegacyRedirectSource("/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that-3"),
+  true,
+);
 const workflowPath = "/quy-trinh-lam-viec-tai-ha-thanh-home-tu-khao-sat-den-ban-giao";
 assert.equal(getLegacyRedirectTarget(workflowPath), undefined);
 assert.equal(isLegacyRedirectSource(workflowPath), false);
