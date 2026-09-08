@@ -38,6 +38,81 @@ assert.equal(normalizeLegacyAnchors('<img src="../image.jpg"><p>"../not-a-link/"
 assert.equal(normalizeLegacyAnchors('<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>'), '<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>');
 assert.equal(normalizeLegacyAnchors('<a class="related" href="%27../old-post/%27">Xem</a>'), '<a class="related" href="/old-post/">Xem</a>');
 
+const escapedQuoteRelative = String.raw`<a href=\"../xay-nha-tron-goi-tai-bac-giang\">Bắc Giang</a>`;
+const escapedEntityRelative = String.raw`<a href=\&quot;../xay-nha-tron-goi-tai-bac-giang\&quot;>Bắc Giang</a>`;
+const escapedEntityRelativeWithOuterQuotes = String.raw`<a href="\&quot;../xay-nha-tron-goi-tai-bac-giang\&quot;">Bắc Giang</a>`;
+const mappedRelativeTarget = '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin">Bắc Giang</a>';
+assert.equal(normalizeLegacyAnchors(escapedQuoteRelative), mappedRelativeTarget);
+assert.equal(normalizeLegacyAnchors(escapedEntityRelative), mappedRelativeTarget);
+assert.equal(normalizeLegacyAnchors(escapedEntityRelativeWithOuterQuotes), mappedRelativeTarget);
+
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"../xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia\">Xem dự án</a>`),
+  '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia">Xem dự án</a>',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"../xay-nha-tron-goi-tai-bac-giang?utm_source=internal\">Xem dự án</a>`),
+  '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal">Xem dự án</a>',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"../xay-nha-tron-goi-tai-bac-giang#bao-gia\">Xem dự án</a>`),
+  '<a href="/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin#bao-gia">Xem dự án</a>',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"/xay-nha-tron-goi-tai-ha-long\">Hạ Long</a>`),
+  'Hạ Long',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\&quot;/xay-nha-tron-goi-tai-ha-long\&quot;>Hạ Long</a>`),
+  'Hạ Long',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"../some-article\">Bài viết</a>`),
+  '<a href="/some-article">Bài viết</a>',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\"tel:0898502333\">Gọi ngay</a>`),
+  '<a href="tel:0898502333">Gọi ngay</a>',
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\&quot;tel:0898502333\&quot;>Gọi ngay</a>`),
+  '<a href="tel:0898502333">Gọi ngay</a>',
+);
+assert.equal(normalizeLegacyAnchors('<a href="https://external.example/path?x=1#section">External</a>'), '<a href="https://external.example/path?x=1#section">External</a>');
+assert.equal(normalizeLegacyAnchors(String.raw`<a href=\"https://external.example/path?x=1#section\">External</a>`), '<a href="https://external.example/path?x=1#section">External</a>');
+assert.equal(normalizeLegacyAnchors('<a href="mailto:test@example.com">Email</a>'), '<a href="mailto:test@example.com">Email</a>');
+assert.equal(normalizeLegacyAnchors(String.raw`<a href=\"mailto:test@example.com\">Email</a>`), '<a href="mailto:test@example.com">Email</a>');
+assert.equal(normalizeLegacyAnchors('<a href="//cdn.example.com/path">CDN</a>'), '<a href="//cdn.example.com/path">CDN</a>');
+assert.equal(normalizeLegacyAnchors('<a href="tel:0898502333">Gọi ngay</a>'), '<a href="tel:0898502333">Gọi ngay</a>');
+assert.equal(normalizeLegacyAnchors('<a href="../valid-path">Liên kết</a>'), '<a href="/valid-path">Liên kết</a>');
+assert.equal(normalizeLegacyAnchors('<a href="/valid-path">Liên kết</a>'), '<a href="/valid-path">Liên kết</a>');
+
+const attributePreservationFixture = String.raw`<a target="_blank"
+   rel="noopener noreferrer nofollow"
+   class="related"
+   href=\"../some-article\">
+  <strong>Nội dung liên kết</strong>
+</a>`;
+const normalizedAttributePreservationFixture = `<a target="_blank"
+   rel="noopener noreferrer nofollow"
+   class="related"
+   href="/some-article">
+  <strong>Nội dung liên kết</strong>
+</a>`;
+assert.equal(normalizeLegacyAnchors(attributePreservationFixture), normalizedAttributePreservationFixture);
+
+for (const fixture of [
+  escapedQuoteRelative,
+  escapedEntityRelative,
+  escapedEntityRelativeWithOuterQuotes,
+  String.raw`<a href=\"../xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia\">Xem dự án</a>`,
+  String.raw`<a href=\"tel:0898502333\">Gọi ngay</a>`,
+  String.raw`<a href=\&quot;tel:0898502333\&quot;>Gọi ngay</a>`,
+  attributePreservationFixture,
+]) {
+  assert.equal(normalizeLegacyAnchors(normalizeLegacyAnchors(fixture)), normalizeLegacyAnchors(fixture));
+}
+
 assert.equal(normalizeMenuUrl("/dich-vu/cong-trinh"), "/dich-vu");
 assert.equal(normalizeMenuUrl("/dich-vu/noi-that"), "/dich-vu");
 assert.equal(normalizeMenuUrl("/gioi-thieu"), "/gioi-thieu");

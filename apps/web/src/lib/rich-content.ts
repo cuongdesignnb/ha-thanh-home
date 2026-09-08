@@ -5,6 +5,42 @@ import { getLegacyRedirectTarget } from "./legacy-redirects";
 
 const TABLE_SCROLL_CLASS = "content-table-scroll";
 
+const HREF_ATTRIBUTE_PATTERN = /(^|\s)(href\s*=\s*)(?:(['"])([\s\S]*?)\3|\\(['"])([\s\S]*?)\\\5|\\(?:&quot;|&#34;)([\s\S]*?)\\(?:&quot;|&#34;))/i;
+
+type HrefAttribute = {
+  index: number;
+  rawMatch: string;
+  prefix: string;
+  quote: string;
+  value: string;
+};
+
+function getHrefAttribute(tag: string): HrefAttribute | undefined {
+  const match = tag.match(HREF_ATTRIBUTE_PATTERN);
+  if (!match || match.index === undefined) return undefined;
+
+  const quote = match[3] || match[5] || '"';
+  const value = match[4] ?? match[6] ?? match[7] ?? "";
+  const rawMatch = match[0];
+
+  return {
+    index: match.index,
+    rawMatch,
+    prefix: `${match[1]}${match[2]}`,
+    quote,
+    value,
+  };
+}
+
+function normalizeAnchorTag(tag: string): string {
+  const href = getHrefAttribute(tag);
+  if (!href) return tag;
+
+  const normalizedHref = normalizeLegacyHref(href.value);
+  const replacement = `${href.prefix}${href.quote}${normalizedHref}${href.quote}`;
+  return `${tag.slice(0, href.index)}${replacement}${tag.slice(href.index + href.rawMatch.length)}`;
+}
+
 /** Repair only legacy href attribute values; all other HTML is left untouched. */
 export function normalizeLegacyHref(rawHref: string): string {
   let href = rawHref.trim();
@@ -57,13 +93,11 @@ export function normalizeLegacyAnchors(html: string): string {
     protectedBlocks.push(block);
     return token;
   });
-  const normalized = protectedHtml.replace(/<a\b([^>]*?\bhref\s*=\s*)(["'])([\s\S]*?)\2([^>]*)>/gi, (_match, before: string, quote: string, value: string, after: string) => {
-    return `<a${before}${quote}${normalizeLegacyHref(value)}${quote}${after}>`;
-  });
+  const normalized = protectedHtml.replace(/<a\b[^>]*>/gi, (tag) => normalizeAnchorTag(tag));
   const unlinked = normalized.replace(/<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi, (match, attrs: string, innerHtml: string) => {
-    const hrefMatch = attrs.match(/\bhref\s*=\s*(["'])([\s\S]*?)\1/i);
-    if (!hrefMatch) return match;
-    const normalizedHref = normalizeLegacyHref(hrefMatch[2]);
+    const href = getHrefAttribute(attrs);
+    if (!href) return match;
+    const normalizedHref = normalizeLegacyHref(href.value);
     const pathname = getInternalPathname(normalizedHref);
     return pathname && deadInternalHrefPaths.has(pathname) ? innerHtml : match;
   });
