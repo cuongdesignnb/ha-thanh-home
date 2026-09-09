@@ -250,7 +250,7 @@ for (const [source, target] of wave9BatchInternalMappings) {
   assert.equal(normalizeLegacyAnchors(anchor), normalizedAnchor);
   assert.equal(normalizeLegacyAnchors(normalizedAnchor), normalizedAnchor);
 
-  const escapedQuoteAnchor = String.raw`<a target="_blank" rel="noopener noreferrer" href="../${source.slice(1)}?utm_source=wave9batch#section"><strong>Liên kết</strong></a>`;
+  const escapedQuoteAnchor = String.raw`<a target="_blank" rel="noopener noreferrer" href=\"../${source.slice(1)}?utm_source=wave9batch#section\"><strong>Liên kết</strong></a>`;
   assert.equal(
     normalizeLegacyAnchors(escapedQuoteAnchor),
     `<a target="_blank" rel="noopener noreferrer" href="${target}?utm_source=wave9batch#section"><strong>Liên kết</strong></a>`,
