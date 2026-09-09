@@ -166,7 +166,7 @@ assert.equal(wave6bInternalMappings.length, 36);
 for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 87);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 88);
 
 const wave6cMappedLinks: Array<[string, string]> = [
   ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
@@ -178,7 +178,7 @@ const wave6cMappedLinks: Array<[string, string]> = [
 assert.equal(wave6cMappedLinks.length, 5);
 for (const [source, target] of wave6cMappedLinks) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia"), "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 87);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 88);
 
 const wave9b1InternalMappings: Array<[string, string]> = [
   ["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
@@ -225,13 +225,51 @@ for (const [source, target] of wave9b1InternalMappings) {
   );
 }
 
-const deferredHoaLacPath = "/xay-nha-tron-goi-tai-hoa-lac";
-assert.equal(internalCanonicalHrefTargets[deferredHoaLacPath], undefined);
-assert.equal(normalizeLegacyHref(deferredHoaLacPath), deferredHoaLacPath);
+const wave9b2HoaLacSource = "/xay-nha-tron-goi-tai-hoa-lac";
+const wave9b2HoaLacTarget = "/du-an/xay-nha-tron-goi-o-hoa-lac-khao-sat-mien-phi";
+assert.equal(internalCanonicalHrefTargets[wave9b2HoaLacSource], wave9b2HoaLacTarget);
+assert.equal(getLegacyRedirectTarget(wave9b2HoaLacSource), undefined);
+assert.equal(isLegacyRedirectSource(wave9b2HoaLacSource), false);
+assert.equal(getLegacyRedirectTarget(wave9b2HoaLacTarget), undefined);
+assert.equal(isLegacyRedirectSource(wave9b2HoaLacTarget), false);
+assert.equal(deadInternalHrefPaths.has(wave9b2HoaLacSource), false);
+assert.equal(deadInternalHrefPaths.has(wave9b2HoaLacTarget), false);
+assert.equal(normalizeLegacyHref(wave9b2HoaLacSource), wave9b2HoaLacTarget);
 assert.equal(
-  normalizeLegacyAnchors(`<a href="${deferredHoaLacPath}">Hòa Lạc</a>`),
-  `<a href="${deferredHoaLacPath}">Hòa Lạc</a>`,
+  normalizeLegacyHref(`${wave9b2HoaLacSource}?utm_source=wave9b2#album`),
+  `${wave9b2HoaLacTarget}?utm_source=wave9b2#album`,
 );
+assert.equal(
+  normalizeLegacyHref(`https://www.hathanhhome.vn${wave9b2HoaLacSource}?utm_source=wave9b2#album`),
+  `https://hathanhhome.vn${wave9b2HoaLacTarget}?utm_source=wave9b2#album`,
+);
+
+const hoaLacAnchor = `<a target="_blank" rel="noopener noreferrer" class="related" data-source="legacy" href="${wave9b2HoaLacSource}?utm_source=wave9b2#album"><strong><em>Xây Nhà Trọn Gói Tại Hòa Lạc</em></strong></a>`;
+const normalizedHoaLacAnchor = `<a target="_blank" rel="noopener noreferrer" class="related" data-source="legacy" href="${wave9b2HoaLacTarget}?utm_source=wave9b2#album"><strong><em>Xây Nhà Trọn Gói Tại Hòa Lạc</em></strong></a>`;
+assert.equal(normalizeLegacyAnchors(hoaLacAnchor), normalizedHoaLacAnchor);
+assert.equal(normalizeLegacyAnchors(normalizedHoaLacAnchor), normalizedHoaLacAnchor);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a target="_blank" rel="noopener noreferrer" href=\"../xay-nha-tron-goi-tai-hoa-lac?utm_source=wave9b2#album\"><strong><em>Xây Nhà Trọn Gói Tại Hòa Lạc</em></strong></a>`),
+  `<a target="_blank" rel="noopener noreferrer" href="${wave9b2HoaLacTarget}?utm_source=wave9b2#album"><strong><em>Xây Nhà Trọn Gói Tại Hòa Lạc</em></strong></a>`,
+);
+assert.equal(
+  normalizeLegacyAnchors(String.raw`<a href=\&quot;../xay-nha-tron-goi-tai-hoa-lac\&quot;>Hòa Lạc</a>`),
+  `<a href="${wave9b2HoaLacTarget}">Hòa Lạc</a>`,
+);
+assert.equal(
+  normalizeLegacyAnchors(`<a href="https://www.hathanhhome.vn${wave9b2HoaLacSource}"><span>Hòa Lạc</span></a>`),
+  `<a href="https://hathanhhome.vn${wave9b2HoaLacTarget}"><span>Hòa Lạc</span></a>`,
+);
+assert.equal(
+  normalizeLegacyHref(`https://external.example${wave9b2HoaLacSource}?utm_source=wave9b2#album`),
+  `https://external.example${wave9b2HoaLacSource}?utm_source=wave9b2#album`,
+);
+assert.equal(
+  normalizeLegacyAnchors(`<a href="https://external.example${wave9b2HoaLacSource}">External Hòa Lạc</a>`),
+  `<a href="https://external.example${wave9b2HoaLacSource}">External Hòa Lạc</a>`,
+);
+assert.equal(normalizeLegacyHref(`${wave9b2HoaLacSource}-variant`), `${wave9b2HoaLacSource}-variant`);
+assert.equal(internalCanonicalHrefTargets[`${wave9b2HoaLacSource}-variant`], undefined);
 
 const wave6cDeadLinks = [
   "/phong-ngu-hien-dai-rong-rai-mang-den-su-thoai-mai",

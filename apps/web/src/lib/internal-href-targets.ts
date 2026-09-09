@@ -82,6 +82,7 @@ export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc-4": "/tin-tuc/huong-dan-de-be-ca-trong-nha-dung-phong-thuy-hut-tai-loc",
   "/xay-nha-tron-goi-tai-tay-ho": "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach",
   "/xay-nha-tron-go-tai-tay-ho": "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach",
+  "/xay-nha-tron-goi-tai-hoa-lac": "/du-an/xay-nha-tron-goi-o-hoa-lac-khao-sat-mien-phi",
   "/xay-nha-tron-goi-tai-chuong-my-ha-noi": "/du-an/xay-nha-tron-goi-chuong-my-cap-nhat-bao-gia-moi-nhat",
   "/xay-nha-tron-goi-tai-thuong-tin-ha-noi": "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi",
   "/xay-nha-tron-goi-tai-bac-giang": "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin",
