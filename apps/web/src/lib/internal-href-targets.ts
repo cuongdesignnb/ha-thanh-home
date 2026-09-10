@@ -94,4 +94,13 @@ export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/xem-ngay-dong-tho-dup-chu-nha-phan-len-nhu-dieu-gap-gio": "/tin-tuc/xem-ngay-dong-tho-giup-chu-nha-phat-len-nhu-dieu-gap-gio",
   "/uu-diem-khi-lam-tay-vin-cau-thang-bang-go-6": "/tin-tuc/uu-diem-khi-lam-tay-vin-cau-thang-bang-go",
   "/gia-vat-lieu-xay-dung-thang-5-nam-2026-tai-ha-noi": "/tin-tuc/gia-vat-lieu-xay-dung-thang-5-nam-2026-tai-ha-noi",
+  "/cach-tinh-trach-tuoi-xay-nha-chuan-nhat": "/tin-tuc/cach-tinh-trach-tuoi-xay-nha-chuan-nhat",
+  "/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026": "/tin-tuc/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026",
+  "/du-bao-gia-vat-lieu-xay-dung-giua-nam-2026-khu-vuc-mien-bac": "/tin-tuc/du-bao-gia-vat-lieu-xay-dung-giua-nam-2026-khu-vuc-mien-bac",
+  "/gia-vat-lieu-xay-dung-nam-2026-khi-nao-giam-nhiet": "/tin-tuc/gia-vat-lieu-xay-dung-nam-2026-khi-nao-giam-nhiet",
+  "/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe": "/tin-tuc/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe",
+  "/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao": "/tin-tuc/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao",
+  "/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao": "/tin-tuc/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao",
+  "/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung": "/tin-tuc/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung",
+  "/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu": "/tin-tuc/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu",
 };
