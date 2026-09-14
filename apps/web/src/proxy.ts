@@ -23,7 +23,9 @@ export function proxy(request: NextRequest) {
   const targetPath = getLegacyRedirectTarget(pathname) || getMalformedLegacyTarget(pathname);
   if (!targetPath) return NextResponse.next();
 
-  const url = request.nextUrl.clone();
+  // Build the redirect from a standard URL so a trailing-slash request does
+  // not leak NextURL's slash preference into the canonical destination.
+  const url = new URL(request.url);
   url.pathname = targetPath;
   return NextResponse.redirect(url, 308);
 }
