@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
+import { NextRequest } from "next/server";
 import {
   isUsableSlug,
   normalizeLegacyAnchors,
   normalizeLegacyHref,
 } from "./rich-content";
 import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
-import { getMalformedLegacyTarget } from "../proxy";
+import { getMalformedLegacyTarget, proxy } from "../proxy";
 import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
 import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
@@ -437,6 +438,33 @@ const wave5aRedirects: Array<[string, string]> = [
   ["/Cong-trinh-biet-thu-nha-vuon-ninh-binh", "/du-an/cong-trinh-biet-thu-nha-vuon-nha-anh-tran-cao-cuong-ninh-binh"],
 ];
 for (const [source, target] of wave5aRedirects) assert.equal(getLegacyRedirectTarget(source), target);
+const wave20VerifiedRedirects: Array<[string, string]> = [
+  ["/du-an/xay-nha-tron-goi-cau-giay-chuan-tien-do-hathanhhome", "/du-an/xay-nha-tron-goi-cau-giay"],
+  ["/99-+-mau-nha-mai-nhat-dep-2026", "/mau-thiet-ke-kien-truc/99-mau-nha-mai-nhat-dep-2026"],
+  ["/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhap-bao-gia-moi-nhat2026", "/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhat-bao-gia-moi-nhat2026"],
+];
+assert.equal(wave20VerifiedRedirects.length, 3);
+for (const [source, target] of wave20VerifiedRedirects) {
+  assert.equal(getLegacyRedirectTarget(source), target);
+  assert.equal(isLegacyRedirectSource(source), true);
+  assert.equal(getLegacyRedirectTarget(target), undefined);
+  const response = proxy(new NextRequest(`https://hathanhhome.vn${source}?utm_source=wave20&ref=verified`));
+  assert.equal(response.status, 308);
+  assert.equal(
+    response.headers.get("location"),
+    `https://hathanhhome.vn${target}?utm_source=wave20&ref=verified`,
+  );
+  const targetResponse = proxy(new NextRequest(`https://hathanhhome.vn${target}`));
+  assert.equal(targetResponse.status, 200);
+  assert.equal(targetResponse.headers.get("location"), null);
+}
+for (const unapproved of [
+  "/du-an/xay-nha-tron-goi-cau-giay-chuan-tien-do-hathanhhome-extra",
+  "/99-mau-nha-mai-nhat-dep-2026",
+  "/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhap-bao-gia-moi-nhat-2026",
+]) {
+  assert.equal(getLegacyRedirectTarget(unapproved), undefined);
+}
 const wave5bRedirects: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tai-tien-du-bac-ninh-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-tai-tien-du-bac-ninh-uy-tin-chat-luong"],
   ["/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome", "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet"],
