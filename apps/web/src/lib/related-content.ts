@@ -9,6 +9,7 @@ import {
 } from "@/lib/api";
 import type { RelatedContentItem } from "@/components/related-content";
 import { isUsableSlug } from "@/lib/content-validation";
+import { selectVerifiedRelatedProjects } from "@/lib/project-portfolio-selection";
 
 function query(path: string, params: Record<string, string | number | null | undefined>) {
   const search = new URLSearchParams();
@@ -28,11 +29,11 @@ function uniqueRelated<T extends { id: number }>(currentId: number, ...groups: T
 export async function getRelatedProjects(item: Project): Promise<RelatedContentItem[]> {
   const category = item.categoryRef?.slug;
   const [sameCategory, sameGroup, latest] = await Promise.all([
-    category ? getList<Project>(query("/projects", { category, limit: 8 })) : Promise.resolve([]),
-    getList<Project>(query("/projects", { group: item.group, limit: 8 })),
-    getList<Project>(query("/projects", { limit: 8 })),
+    category ? getList<Project>(query("/projects", { category, isPortfolioVerified: "true", limit: 8 })) : Promise.resolve([]),
+    getList<Project>(query("/projects", { group: item.group, isPortfolioVerified: "true", limit: 8 })),
+    getList<Project>(query("/projects", { isPortfolioVerified: "true", limit: 8 })),
   ]);
-  return uniqueRelated(item.id, sameCategory, sameGroup, latest).filter((project) => isUsableSlug(project.slug)).map((project) => ({
+  return selectVerifiedRelatedProjects(item.id, sameCategory, sameGroup, latest).map((project) => ({
     id: project.id, title: project.title, href: `/du-an/${project.slug}`, imageUrl: thumbnailUrl(project, ""),
     label: project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình"), description: project.description,
   }));

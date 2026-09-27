@@ -73,6 +73,7 @@ import { ServicePagesPanel } from "@/components/service-pages-panel";
 import { ServicePageEditor } from "@/components/service-page-editor";
 import { SERVICE_PAGE_REGISTRY } from "@/lib/service-page-registry";
 import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
+import { newProjectPortfolioVerificationDefault, normalizePortfolioVerification, portfolioVerificationHelpText } from "@/lib/portfolio-verification";
 
 
 const apiFetch = adminApiFetch;
@@ -194,6 +195,7 @@ type CmsItem = Record<string, unknown> & {
   ogTitle?: string;
   ogDescription?: string;
   isFeatured?: boolean;
+  isPortfolioVerified?: boolean;
   thumbnailMediaId?: number | null;
   thumbnailMedia?: CmsItem | null;
   altText?: string;
@@ -284,6 +286,7 @@ const contentSchema = z.object({
   ogDescription: z.string().nullish(),
   thumbnailMediaId: z.number().nullable().optional(),
   isFeatured: z.boolean().nullish(),
+  isPortfolioVerified: z.boolean().nullish(),
   isActive: z.boolean().nullish(),
   note: z.string().nullish(),
 });
@@ -3433,6 +3436,15 @@ function ProjectFields({ filterOptions, form, projectCategories, onTaxonomyCreat
       <TaxonomySelect form={form} name="scale" label="Quy mô" module="project" group={group} type="scale" options={filterOptions} onCreated={onTaxonomyCreated} />
       <label>Chủ đầu tư / khách hàng<input {...form.register("clientName")} placeholder="Gia đình tư nhân, doanh nghiệp..." /></label>
       <TaxonomySelect form={form} name="budgetRange" label="Khoảng ngân sách" module="project" group={group} type="budget_range" options={filterOptions} onCreated={onTaxonomyCreated} />
+      <div className="check-row-container wide">
+        <label className="check-row" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+          <input type="checkbox" {...form.register("isPortfolioVerified")} />
+          <span>Portfolio verified / Công trình đã xác minh</span>
+        </label>
+        <p className="editor-hint" style={{ marginTop: "6px", padding: 0, color: "var(--admin-muted)", fontSize: "12px", lineHeight: "1.4" }}>
+          {portfolioVerificationHelpText}
+        </p>
+      </div>
     </>
   );
 }
@@ -4374,6 +4386,7 @@ function defaultValues(entity: Entity) {
     publishedAt: "",
     sortOrder: 0,
     isFeatured: false,
+    isPortfolioVerified: newProjectPortfolioVerificationDefault(),
     isActive: true,
   };
   if (usesNameAsPrimaryField(entity)) delete values.title;
@@ -4445,6 +4458,7 @@ function normalizePayload(entity: Entity, values: Record<string, unknown>, origi
     delete payload.focusKeyword;
     delete payload.scheduledAt;
     delete payload.publishedAt;
+    payload.isPortfolioVerified = normalizePortfolioVerification(payload.isPortfolioVerified);
   }
   if (entity === "services") {
     delete payload.category;

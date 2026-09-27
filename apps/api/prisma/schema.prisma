@@ -178,6 +178,7 @@ model Project {
   ogDescription String? @db.Text
   status      ContentStatus @default(draft)
   isFeatured  Boolean       @default(false)
+  isPortfolioVerified Boolean @default(false)
   sortOrder   Int           @default(0)
   publishedAt DateTime?
   createdAt   DateTime      @default(now())
