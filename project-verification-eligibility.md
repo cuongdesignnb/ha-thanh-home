@@ -78,7 +78,7 @@ PROJECT65_HARDCODED=NO (no ID-based eligibility rule; ID 65 is named only in the
 TEST_PASS=YES
 BUILD_PASS=YES
 
-PR_URL=PENDING
+PR_URL=https://github.com/cuongdesignnb/ha-thanh-home/pull/24
 READY_FOR_DEPLOY=AFTER_PR_REVIEW_AND_MIGRATION_APPROVAL
 
 DEPLOYED=NO
