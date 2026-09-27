@@ -3,6 +3,7 @@ import { ContentStatus } from "@prisma/client";
 import { repairPublicText } from "./cms-utils";
 import { PrismaService } from "./prisma.service";
 import { MailService } from "./mail.service";
+import { verifiedPortfolioWhere } from "./project-portfolio-eligibility";
 
 @Injectable()
 export class AppService {
@@ -14,13 +15,13 @@ export class AppService {
   async getHome() {
     const [constructionProjects, interiorProjects, posts, architectureDesigns, interiorDesigns] = await Promise.all([
       this.prisma.project.findMany({
-        where: { group: { in: ["construction", "xay_nha_tron_goi"] }, status: ContentStatus.published, isFeatured: true },
+        where: { group: { in: ["construction", "xay_nha_tron_goi"] }, status: ContentStatus.published, isFeatured: true, ...verifiedPortfolioWhere() },
         include: { thumbnailMedia: true },
         take: 6,
         orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],
       }),
       this.prisma.project.findMany({
-        where: { group: "interior", status: ContentStatus.published, isFeatured: true },
+        where: { group: "interior", status: ContentStatus.published, isFeatured: true, ...verifiedPortfolioWhere() },
         include: { thumbnailMedia: true },
         take: 6,
         orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],

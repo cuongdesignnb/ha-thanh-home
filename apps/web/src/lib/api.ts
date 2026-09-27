@@ -18,6 +18,8 @@ export type Project = {
   title: string;
   slug: string;
   group: ProjectGroup;
+  status?: string;
+  isPortfolioVerified?: boolean;
   categoryId?: number | null;
   categoryRef?: ProjectCategory | null;
   category?: string | null;
@@ -788,6 +790,7 @@ export async function fetchLandingProjects(
   if (entity === "project") {
     const group = source?.group || fallback?.group;
     if (group) params.set("group", group);
+    params.set("isPortfolioVerified", "true");
     url = "/projects";
   } else if (entity === "architecture-design") {
     url = "/architecture-designs";

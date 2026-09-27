@@ -2,6 +2,7 @@ import { Controller, Get, NotFoundException, Param, Query } from "@nestjs/common
 import { ContentStatus, MenuLocation, Prisma, ProjectFilterModule, ProjectGroup } from "@prisma/client";
 import { listMeta, parsePagination, repairPublicText } from "./cms-utils";
 import { PrismaService } from "./prisma.service";
+import { verifiedPortfolioFilter } from "./project-portfolio-eligibility";
 import { FIXED_SERVICE_PAGE_SLUGS, fixedServicePageWhere, legacyServiceSlugCandidates } from "./public-content-rules";
 
 @Controller("api")
@@ -87,6 +88,7 @@ export class PublicController {
     if (query.search) and.push({ OR: [{ title: { contains: query.search } }, { clientName: { contains: query.search } }, { location: { contains: query.search } }] });
     const where: Prisma.ProjectWhereInput = {
       status: ContentStatus.published,
+      ...verifiedPortfolioFilter(query),
       ...(query.featured === "true" ? { isFeatured: true } : {}),
       ...(query.group ? { group: { in: query.group.split(",").map((g) => g.trim() as ProjectGroup).filter(Boolean) } } : {}),
       ...(query.projectType ? { projectType: query.projectType } : {}),

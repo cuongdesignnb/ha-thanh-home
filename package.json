@@ -29,7 +29,11 @@
     "docker:prod:seed": "docker compose --env-file .env.docker -f docker-compose.prod.yml exec api npm run seed -w @hathanh/api",
     "check:encoding": "node scripts/check-vietnamese-encoding.mjs",
     "test:published-at": "tsx apps/api/src/modules/publication-date.spec.ts && tsx apps/admin/src/lib/published-at-payload.spec.ts",
-    "test:seo": "tsx apps/web/src/lib/rich-content.spec.ts"
+    "test:seo": "tsx apps/web/src/lib/rich-content.spec.ts",
+    "test:portfolio:api": "tsx apps/api/src/modules/project-portfolio-eligibility.spec.ts",
+    "test:portfolio:web": "tsx apps/web/src/lib/project-portfolio-selection.spec.ts",
+    "test:portfolio:admin": "tsx apps/admin/src/lib/portfolio-verification.spec.ts",
+    "test:portfolio": "npm run test:portfolio:api && npm run test:portfolio:web && npm run test:portfolio:admin"
   },
   "engines": {
     "node": ">=20.9.0"

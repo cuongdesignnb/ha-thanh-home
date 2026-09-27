@@ -145,6 +145,10 @@ class ProjectDto {
   isFeatured?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  isPortfolioVerified?: boolean;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)
@@ -1177,6 +1181,7 @@ export class AdminController {
     return this.prisma.project.create({
       data: {
         ...dto,
+        isPortfolioVerified: dto.isPortfolioVerified ?? false,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,

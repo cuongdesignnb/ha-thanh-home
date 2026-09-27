@@ -56,7 +56,7 @@ export function buildProjectCatalogApiQuery(
   searchParams: ProjectCatalogSearchParams,
   group?: string,
 ) {
-  const params = new URLSearchParams({ limit: "24" });
+  const params = new URLSearchParams({ limit: "24", isPortfolioVerified: "true" });
   if (group) params.set("group", group);
   appendAllowedParams(params, searchParams);
   const page = parseCatalogPage(searchParams.page);
