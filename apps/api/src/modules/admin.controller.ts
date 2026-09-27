@@ -17,6 +17,7 @@ import { Request } from "express";
 import { ContentStatus, LeadStatus, MenuLocation, MenuTarget, Prisma, ProjectFilterModule, ProjectFilterType, ProjectGroup } from "@prisma/client";
 import {
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
   IsArray,
@@ -31,6 +32,7 @@ import { cleanHtml, createSlug, listMeta, parsePagination, uniqueSlug, safeStrin
 import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { fixedServicePageWhere } from "./public-content-rules";
+import { decidePublishedAtUpdate, publishedAtPrismaValue } from "./publication-date";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./roles.guard";
 
@@ -133,6 +135,10 @@ class ProjectDto {
   @IsOptional()
   @IsEnum(ContentStatus)
   status?: ContentStatus;
+
+  @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
 
   @IsOptional()
   @IsBoolean()
@@ -354,6 +360,10 @@ class ServiceDto {
   status?: ContentStatus;
 
   @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
+
+  @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
 
@@ -409,6 +419,10 @@ class PageDto {
   @IsOptional()
   @IsEnum(ContentStatus)
   status?: ContentStatus;
+
+  @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -491,7 +505,7 @@ class PostDto {
   scheduledAt?: string;
 
   @IsOptional()
-  @IsString()
+  @IsDateString()
   publishedAt?: string;
 }
 
@@ -605,6 +619,10 @@ class ArchitectureDesignDto {
   status?: ContentStatus;
 
   @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
+
+  @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
 
@@ -711,6 +729,10 @@ class InteriorDesignDto {
   @IsOptional()
   @IsEnum(ContentStatus)
   status?: ContentStatus;
+
+  @IsOptional()
+  @IsDateString()
+  publishedAt?: string;
 
   @IsOptional()
   @IsBoolean()
@@ -1172,6 +1194,9 @@ export class AdminController {
   @Roles("Admin")
   async updateProject(@Param("id") id: string, @Body() dto: ProjectDto) {
     const currentId = Number(id);
+    const current = await this.prisma.project.findUnique({ where: { id: currentId }, select: { status: true } });
+    if (!current) throw new NotFoundException("Project not found");
+    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
           const match = await this.prisma.project.findUnique({ where: { slug: candidate } });
@@ -1188,7 +1213,7 @@ export class AdminController {
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt,
       },
       include: { thumbnailMedia: true, categoryRef: true },
     });
@@ -1242,6 +1267,9 @@ export class AdminController {
   @Roles("Admin")
   async updateArchitectureDesign(@Param("id") id: string, @Body() dto: ArchitectureDesignDto) {
     const currentId = Number(id);
+    const current = await this.prisma.architectureDesignTemplate.findUnique({ where: { id: currentId }, select: { status: true } });
+    if (!current) throw new NotFoundException("Architecture design not found");
+    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
           const match = await this.prisma.architectureDesignTemplate.findUnique({ where: { slug: candidate } });
@@ -1256,7 +1284,7 @@ export class AdminController {
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt,
       },
       include: { thumbnailMedia: true },
     });
@@ -1310,6 +1338,9 @@ export class AdminController {
   @Roles("Admin")
   async updateInteriorDesign(@Param("id") id: string, @Body() dto: InteriorDesignDto) {
     const currentId = Number(id);
+    const current = await this.prisma.interiorDesignTemplate.findUnique({ where: { id: currentId }, select: { status: true } });
+    if (!current) throw new NotFoundException("Interior design not found");
+    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
           const match = await this.prisma.interiorDesignTemplate.findUnique({ where: { slug: candidate } });
@@ -1324,7 +1355,7 @@ export class AdminController {
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
         galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt,
       },
       include: { thumbnailMedia: true },
     });
@@ -1374,6 +1405,9 @@ export class AdminController {
   @Roles("Admin")
   async updateService(@Param("id") id: string, @Body() dto: ServiceDto) {
     const currentId = Number(id);
+    const current = await this.prisma.service.findUnique({ where: { id: currentId }, select: { status: true } });
+    if (!current) throw new NotFoundException("Service not found");
+    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
           const match = await this.prisma.service.findUnique({ where: { slug: candidate } });
@@ -1387,7 +1421,7 @@ export class AdminController {
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt,
       },
     });
   }
@@ -1472,16 +1506,12 @@ export class AdminController {
     const currentPost = await this.prisma.post.findUnique({ where: { id: currentId } });
     if (!currentPost) throw new NotFoundException("Post not found");
 
-    let finalPublishedAt: Date | null | undefined = undefined;
-    if (dto.status === ContentStatus.published) {
-      if (publishedAt) {
-        finalPublishedAt = publishedAt;
-      } else if (currentPost.status !== ContentStatus.published) {
-        finalPublishedAt = new Date();
-      }
-    } else {
-      finalPublishedAt = null;
-    }
+    const finalPublishedAt = publicationDateForUpdate(
+      currentPost.status,
+      dto.status,
+      publishedAt,
+      true,
+    );
 
     const slug = dto.slug
       ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
@@ -1731,6 +1761,9 @@ export class AdminController {
   @Roles("Admin")
   async updatePage(@Param("id") id: string, @Body() dto: PageDto) {
     const currentId = Number(id);
+    const current = await this.prisma.page.findUnique({ where: { id: currentId }, select: { status: true } });
+    if (!current) throw new NotFoundException("Page not found");
+    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
     const slug = dto.slug
       ? await uniqueSlug(dto.title || "", dto.slug, async (candidate) => {
           const match = await this.prisma.page.findUnique({ where: { slug: candidate } });
@@ -1743,7 +1776,7 @@ export class AdminController {
         ...dto,
         ...(slug ? { slug } : {}),
         contentHtml: cleanHtml(dto.contentHtml),
-        publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
+        publishedAt,
       },
     });
   }
@@ -1774,6 +1807,24 @@ function parseScheduleDate(value: string) {
     throw new BadRequestException("Invalid scheduledAt");
   }
   return scheduledAt;
+}
+
+function publicationDateForUpdate(
+  currentStatus: ContentStatus,
+  incomingStatus?: ContentStatus,
+  incomingPublishedAt?: string | Date,
+  clearWhenUnpublished = false,
+) {
+  try {
+    return publishedAtPrismaValue(decidePublishedAtUpdate({
+      currentStatus,
+      incomingStatus,
+      incomingPublishedAt,
+      clearWhenUnpublished,
+    }));
+  } catch {
+    throw new BadRequestException("Invalid publishedAt date");
+  }
 }
 
 type FlattenedMenuTreeItem = {

@@ -6,6 +6,7 @@ import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { stripImplicitPublishedAt } from "@/lib/published-at-payload";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { Mark, mergeAttributes, Node } from "@tiptap/core";
@@ -2870,7 +2871,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       response = await apiFetch(editing ? `/api/cms/${entity}/${editing.id}` : `/api/cms/${entity}`, {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(normalizePayload(entity, submitValues)),
+        body: JSON.stringify(normalizePayload(entity, submitValues, toDateTimeLocal(editing?.publishedAt))),
       });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được dữ liệu", description: describeClientError(error, "Không kết nối được API.") });
@@ -4379,8 +4380,8 @@ function defaultValues(entity: Entity) {
   return values;
 }
 
-function normalizePayload(entity: Entity, values: Record<string, unknown>) {
-  const payload = { ...values };
+function normalizePayload(entity: Entity, values: Record<string, unknown>, originalPublishedAtLocal = "") {
+  const payload = stripImplicitPublishedAt(entity, values, originalPublishedAtLocal);
   delete payload.thumbnailMedia;
   if (usesNameAsPrimaryField(entity)) delete payload.title;
   if ("canonicalUrl" in payload) payload.canonicalUrl = normalizeCanonicalUrl(entity, payload.canonicalUrl);
