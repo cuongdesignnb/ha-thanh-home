@@ -189,10 +189,14 @@ const wave9b1InternalMappings: Array<[string, string]> = [
   ["/gia-vat-lieu-xay-dung-thang-5-nam-2026-tai-ha-noi", "/tin-tuc/gia-vat-lieu-xay-dung-thang-5-nam-2026-tai-ha-noi"],
 ];
 assert.equal(wave9b1InternalMappings.length, 5);
+const wave9b1PromotedPublicSources = new Set([
+  "/cach-lua-chon-nha-thau-xay-dung-uy-tin-4",
+]);
 for (const [source, target] of wave9b1InternalMappings) {
   assert.equal(internalCanonicalHrefTargets[source], target);
-  assert.equal(getLegacyRedirectTarget(source), undefined);
-  assert.equal(isLegacyRedirectSource(source), false);
+  const isPromotedPublicSource = wave9b1PromotedPublicSources.has(source);
+  assert.equal(getLegacyRedirectTarget(source), isPromotedPublicSource ? target : undefined);
+  assert.equal(isLegacyRedirectSource(source), isPromotedPublicSource);
   assert.equal(getLegacyRedirectTarget(target), undefined);
   assert.equal(isLegacyRedirectSource(target), false);
   assert.equal(normalizeLegacyHref(source), target);
@@ -465,6 +469,70 @@ for (const unapproved of [
 ]) {
   assert.equal(getLegacyRedirectTarget(unapproved), undefined);
 }
+
+const migrationCleanupRedirects: Array<[string, string]> = [
+  ["/dich-vu/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep", "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep"],
+  ["/dich-vu/bao-gia-xay-nha-tai-tien-du-bac-ninh-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-tai-tien-du-bac-ninh-uy-tin-chat-luong"],
+  ["/dich-vu/bao-gia-xay-nha-tron-goi-tai-ninh-binh-moi-nhat-2026-cong-ty-xay-dung-uy-tin", "/du-an/bao-gia-xay-nha-tron-goi-tai-ninh-binh-nam-2026"],
+  ["/thiet-ke-thi-cong-nha-pho-tron-goi-ha-noi-quy-trinh-chi-phi-va-cam-ket-tien-do/", "/tin-tuc/thiet-ke-thi-cong-nha-pho-tron-goi-ha-noi-quy-trinh-chi-phi-va-cam-ket-tien-do"],
+  ["/thi-cong-nha-xuong-cong-nghiep/", "/tin-tuc/thi-cong-nha-xuong-cong-nghiep"],
+  ["/dich-vu/xay-nha-tron-goi-tai-hai-duong-cap-nhap-bao-gia-moi-nhat-2026", "/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhat-bao-gia-moi-nhat2026"],
+  ["/dich-vu/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome", "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet"],
+  ["/dich-vu/xat-nha-tron-goi-tai-phuc-tho-cap-nhap-bao-gia-moi-nhat-hien-nay", "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026"],
+  ["/dich-vu/xay-nha-tron-goi-tai-dong-anh-don-vi-thi-cong-chuyen-nghiep-ha-thanh-home", "/du-an/xay-nha-tron-goi-dong-anh-don-vi-thi-cong-chuyen-nghiep"],
+  ["/cong-ty-xay-dung-nha-o-uy-tin-ha-noi/", "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi"],
+  ["/dich-vu/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home", "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
+  ["/dich-vu/xay-nha-tron-goi-tai-noi-bai-ha-noi", "/du-an/xay-nha-tron-goi-xa-noi-bai-ha-noi"],
+  ["/thiet-ke-thi-cong-nha-o-ket-hop-kinh-doanh-toi-uu-mat-tien-va-cong-nang/", "/tin-tuc/thiet-ke-thi-cong-nha-o-ket-hop-kinh-doanh-toi-uu-mat-tien-va-cong-nang"],
+  ["/dich-vu/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do", "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do"],
+  ["/xay-nha-cho-nguoi-ban-ron-vi-sao-nen-chon-dich-vu-thiet-ke-thi-cong-tron-goi/", "/tin-tuc/xay-nha-cho-nguoi-ban-ron-vi-sao-nen-chon-dich-vu-thiet-ke-thi-cong-tron-goi"],
+  ["/thi-cong-fit-out-van-phong-ha-noi-hoan-thien-mat-bang-tho-thanh-van-phong-chuyen-nghiep/", "/tin-tuc/thi-cong-fit-out-van-phong-ha-noi-hoan-thien-mat-bang-tho-thanh-van-phong-chuyen-nghiep"],
+  ["/thi-cong-nha-theo-ban-ve-co-san-ha-noi/", "/tin-tuc/thi-cong-nha-theo-ban-ve-co-san-ha-noi"],
+  ["/xay-biet-thu-san-vuon-ven-do-ha-noi-chi-phi-thiet-ke-va-thi-cong-tron-goi/", "/tin-tuc/xay-biet-thu-san-vuon-ven-do-ha-noi-chi-phi-thiet-ke-va-thi-cong-tron-goi"],
+  ["/xay-nha-tron-goi-tai-nam-dinh/", "/du-an/xay-nha-tron-goi-tai-nam-dinh"],
+  ["/thi-cong-nha-xuong-cho-doanh-nghiep-fdi-tieu-chuan-ho-so-va-tien-do-ban-giao/", "/tin-tuc/thi-cong-nha-xuong-cho-doanh-nghiep-fdi-tieu-chuan-ho-so-va-tien-do-ban-giao"],
+  ["/thiet-ke-va-thi-cong-noi-that-nha-pho/", "/tin-tuc/thiet-ke-va-thi-cong-noi-that-nha-pho"],
+  ["/xay-nha-khong-can-xin-phep-co-can-thong-bao-khoi-cong-khong/", "/tin-tuc/xay-nha-khong-can-xin-phep-co-can-thong-bao-khoi-cong-khong"],
+  ["/xay-nha-sau-1-7-2026-chu-nha-can-biet-gi-de-khong-sai-quy-dinh/", "/tin-tuc/xay-nha-sau-1-7-2026-chu-nha-can-biet-gi-de-khong-sai-quy-dinh"],
+  ["/du-toan-xay-nha-tron-goi-cach-doc-bang-du-toan-de-tranh-thieu-hang-muc/", "/tin-tuc/du-toan-xay-nha-tron-goi-cach-doc-bang-du-toan-de-tranh-thieu-hang-muc"],
+  ["/xay-nha-tron-goi-uy-tin-tai-ha-noi/", "/du-an/xay-nha-tron-goi-uy-tin-tai-ha-noi"],
+  ["/thiet-ke-thi-cong-van-phong-hang-a-tieu-chuan-hoan-thien-cho-doanh-nghiep-chuyen-nghiep/", "/tin-tuc/thiet-ke-thi-cong-van-phong-hang-a-tieu-chuan-hoan-thien-cho-doanh-nghiep-chuyen-nghiep"],
+  ["/xay-biet-thu-tron-goi/", "/tin-tuc/xay-biet-thu-tron-goi"],
+  ["/dich-vu/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026", "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc"],
+  ["/dich-vu/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home", "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi"],
+  ["/nha-duoi-500m2-co-can-xin-phep-xay-dung-khong-gia-chu-can-hieu-dung/", "/tin-tuc/nha-duoi-500m2-co-can-xin-phep-xay-dung-khong-gia-chu-can-hieu-dung"],
+  ["/nang-cap-nha-xuong-dat-chuan-pccc-hang-muc-can-lam-truoc-khi-nghiem-thu/", "/tin-tuc/nang-cap-nha-xuong-dat-chuan-pccc-hang-muc-can-lam-truoc-khi-nghiem-thu"],
+  ["/gia-xay-tho-biet-thu/", "/tin-tuc/gia-xay-tho-biet-thu"],
+  ["/thi-cong-van-phong-cho-cong-ty-fdi-tieu-chuan-tien-do-va-quy-trinh-lam-viec/", "/tin-tuc/thi-cong-van-phong-cho-cong-ty-fdi-tieu-chuan-tien-do-va-quy-trinh-lam-viec"],
+  ["/du-toan-xay-nha-va-bao-gia-xay-nha-khac-nhau-the-nao-gia-chu-can-hieu-dung/", "/tin-tuc/du-toan-xay-nha-va-bao-gia-xay-nha-khac-nhau-the-nao-gia-chu-can-hieu-dung"],
+  ["/thiet-ke-thi-cong-biet-thu-tron-goi/", "/tin-tuc/thiet-ke-thi-cong-biet-thu-tron-goi"],
+  ["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
+];
+assert.equal(migrationCleanupRedirects.length, 36);
+for (const [source, target] of migrationCleanupRedirects) {
+  assert.equal(getLegacyRedirectTarget(source), target);
+  assert.equal(isLegacyRedirectSource(source), true);
+  assert.equal(getLegacyRedirectTarget(target), undefined);
+  const response = proxy(new NextRequest(`https://hathanhhome.vn${source}?utm_source=migration-cleanup&ref=verified`));
+  assert.equal(response.status, 308);
+  assert.equal(
+    response.headers.get("location"),
+    `https://hathanhhome.vn${target}?utm_source=migration-cleanup&ref=verified`,
+  );
+  const targetResponse = proxy(new NextRequest(`https://hathanhhome.vn${target}`));
+  assert.equal(targetResponse.status, 200);
+  assert.equal(targetResponse.headers.get("location"), null);
+  assert.equal(normalizeLegacyHref(source), target);
+  assert.equal(
+    normalizeLegacyHref(`${source}?utm_source=migration-cleanup#section`),
+    `${target}?utm_source=migration-cleanup#section`,
+  );
+  assert.equal(normalizeLegacyHref(`${source}-unapproved`), `${source}-unapproved`);
+}
+assert.equal(internalCanonicalHrefTargets["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4"], "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin");
+assert.equal(deadInternalHrefPaths.has("/cach-lua-chon-nha-thau-xay-dung-uy-tin-4"), false);
+assert.equal(getLegacyRedirectTarget("/bao-gia-xay-nha-tron-goi-tai-ha-noi/"), undefined);
+assert.equal(isLegacyRedirectSource("/bao-gia-xay-nha-tron-goi-tai-ha-noi/"), false);
 const wave5bRedirects: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tai-tien-du-bac-ninh-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-tai-tien-du-bac-ninh-uy-tin-chat-luong"],
   ["/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome", "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet"],
