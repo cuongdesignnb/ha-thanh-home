@@ -5,6 +5,7 @@ import {
   ConflictException,
   Delete,
   Get,
+  HttpException,
   NotFoundException,
   Param,
   Patch,
@@ -34,6 +35,13 @@ import { PrismaService } from "./prisma.service";
 import { fixedServicePageWhere } from "./public-content-rules";
 import { decidePublishedAtUpdate, publishedAtPrismaValue } from "./publication-date";
 import { omitUndefined, updateWithExpectedVersion } from "./optimistic-update";
+import {
+  isRecord,
+  mergeSettingsJson,
+  nextSettingsUpdatedAt,
+  parseSettingsWriteInput,
+  SettingsWriteInputError,
+} from "./settings-concurrency";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./roles.guard";
 
@@ -1854,14 +1862,97 @@ export class AdminController {
     return Object.fromEntries(settings.map((setting) => [setting.key, setting.value]));
   }
 
+  @Get("settings/snapshot")
+  @Roles("Admin", "Viewer")
+  async settingsSnapshot(@Query("keys") keysQuery?: string | string[]) {
+    const rawKeys = Array.isArray(keysQuery) ? keysQuery : typeof keysQuery === "string" ? keysQuery.split(",") : [];
+    const keys = [...new Set(rawKeys.map((key) => key.trim()).filter(Boolean))];
+    if (keys.length === 0 || keys.length > 50 || keys.some((key) => key.length > 191)) {
+      throw new BadRequestException("Request one to 50 valid Settings keys.");
+    }
+
+    const rows = await this.prisma.setting.findMany({
+      where: { key: { in: keys } },
+      select: { key: true, value: true, updatedAt: true },
+    });
+    const byKey = new Map(rows.map((row) => [row.key, row]));
+    return {
+      settings: Object.fromEntries(keys.map((key) => {
+        const row = byKey.get(key);
+        return [key, {
+          exists: Boolean(row),
+          value: row?.value ?? null,
+          updatedAt: row?.updatedAt.toISOString() ?? null,
+        }];
+      })),
+    };
+  }
+
   @Patch("settings")
   @Roles("Admin")
-  async updateSetting(@Body() body: { key: string; value: unknown }) {
-    return this.prisma.setting.upsert({
-      where: { key: body.key },
-      update: { value: body.value as Prisma.InputJsonValue },
-      create: { key: body.key, value: body.value as Prisma.InputJsonValue },
-    });
+  async updateSetting(@Body() body: unknown) {
+    let updates;
+    try {
+      updates = parseSettingsWriteInput(body);
+    } catch (error) {
+      if (error instanceof SettingsWriteInputError) {
+        throw new HttpException({ message: error.message, code: error.status === 428 ? "SETTINGS_VERSION_REQUIRED" : "INVALID_SETTINGS_UPDATE" }, error.status);
+      }
+      throw error;
+    }
+
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        for (const update of updates) {
+          if (update.expectedUpdatedAt === null) {
+            const value = mergeSettingsJson(undefined, update.value);
+            await tx.setting.create({
+              data: {
+                key: update.key,
+                value: value === null ? Prisma.JsonNull : value as Prisma.InputJsonValue,
+                updatedAt: new Date(),
+              },
+            });
+            continue;
+          }
+
+          const current = await tx.setting.findUnique({ where: { key: update.key } });
+          if (!current || current.updatedAt.getTime() !== update.expectedUpdatedAt.getTime()) {
+            throw settingsVersionConflict(update.key);
+          }
+
+          const value = mergeSettingsJson(current.value, update.value);
+          const result = await tx.setting.updateMany({
+            where: { key: update.key, updatedAt: update.expectedUpdatedAt },
+            data: {
+              value: value === null ? Prisma.JsonNull : value as Prisma.InputJsonValue,
+              updatedAt: nextSettingsUpdatedAt(update.expectedUpdatedAt),
+            },
+          });
+          if (result.count !== 1) throw settingsVersionConflict(update.key);
+        }
+
+        const keys = updates.map((update) => update.key);
+        const saved = await tx.setting.findMany({
+          where: { key: { in: keys } },
+          select: { key: true, value: true, updatedAt: true },
+        });
+        if (saved.length !== keys.length) throw new ConflictException({ code: "SETTINGS_VERSION_CONFLICT", message: "A Settings key changed during this save. Reload the latest values." });
+        return {
+          settings: Object.fromEntries(saved.map((setting) => [setting.key, {
+            exists: true,
+            value: setting.value,
+            updatedAt: setting.updatedAt.toISOString(),
+          }])),
+        };
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
+      if (error instanceof ConflictException) throw error;
+      if (isPrismaWriteConflict(error)) {
+        throw new ConflictException({ code: "SETTINGS_VERSION_CONFLICT", message: "A Settings key changed or was created during this save. Reload the latest values." });
+      }
+      throw error;
+    }
   }
 
   @Get("users")
@@ -2080,4 +2171,16 @@ function optionalNumber(value?: string) {
   if (!value) return undefined;
   const number = Number(value);
   return Number.isFinite(number) ? number : undefined;
+}
+
+function settingsVersionConflict(key: string) {
+  return new ConflictException({
+    code: "SETTINGS_VERSION_CONFLICT",
+    key,
+    message: "This Settings value changed after it was loaded. Reload and compare before saving again.",
+  });
+}
+
+function isPrismaWriteConflict(error: unknown): boolean {
+  return isRecord(error) && typeof error.code === "string" && ["P2002", "P2034"].includes(error.code);
 }

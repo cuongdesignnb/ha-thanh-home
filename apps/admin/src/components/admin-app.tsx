@@ -76,9 +76,12 @@ import { ServicePageEditor } from "@/components/service-page-editor";
 import { SERVICE_PAGE_REGISTRY } from "@/lib/service-page-registry";
 import { AboutPageSettingsPanel } from "@/components/about-page-settings-panel";
 import { newProjectPortfolioVerificationDefault, normalizePortfolioVerification, portfolioVerificationHelpText } from "@/lib/portfolio-verification";
+import { SettingsConflictBanner } from "@/components/settings-conflict-banner";
+import { buildVersionedSettingsPatch, fetchVersionedSettings, parseVersionedSettings, type VersionedSettings } from "@/lib/versioned-settings";
 
 
 const apiFetch = adminApiFetch;
+const VERSIONED_SITE_SETTING_KEYS = ["site.identity", "site.theme", "site.homepage", "site.ai", "site.smtp"] as const;
 
 const FontSize = Mark.create({
   name: "fontSize",
@@ -2108,15 +2111,15 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
     smtpEnabled: "false",
   });
   const [saving, setSaving] = useState(false);
+  const [settingsVersions, setSettingsVersions] = useState<VersionedSettings>({});
+  const [settingsConflict, setSettingsConflict] = useState<{ latest: VersionedSettings | null; message?: string } | null>(null);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
 
   useEffect(() => {
-    apiFetch("/api/cms/settings")
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await readApiError(res, "Không tải được cấu hình website."));
-        return res.json();
-      })
-      .then((payload) => {
+    fetchVersionedSettings(apiFetch, VERSIONED_SITE_SETTING_KEYS)
+      .then((snapshot) => {
+        setSettingsVersions(snapshot);
+        const payload = Object.fromEntries(VERSIONED_SITE_SETTING_KEYS.map((key) => [key, snapshot[key]?.value]));
         const identity = typeof payload["site.identity"] === "object" && payload["site.identity"] ? payload["site.identity"] as Record<string, unknown> : {};
         const theme = typeof payload["site.theme"] === "object" && payload["site.theme"] ? payload["site.theme"] as Record<string, unknown> : {};
         const homepage = typeof payload["site.homepage"] === "object" && payload["site.homepage"] ? payload["site.homepage"] as Record<string, unknown> : {};
@@ -2200,7 +2203,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canSave) return;
+    if (!canSave || settingsConflict) return;
     setSaving(true);
     const identity = {
       name: values.name,
@@ -2291,38 +2294,32 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       smtpEnabled: values.smtpEnabled === "true",
     };
     try {
-      const responses = await Promise.all([
-        apiFetch("/api/cms/settings", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "site.identity", value: identity }),
-        }),
-        apiFetch("/api/cms/settings", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "site.theme", value: theme }),
-        }),
-        apiFetch("/api/cms/settings", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "site.homepage", value: homepage }),
-        }),
-        apiFetch("/api/cms/settings", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "site.ai", value: ai }),
-        }),
-        apiFetch("/api/cms/settings", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "site.smtp", value: smtp }),
-        }),
-      ]);
-      const failed = responses.find((response) => !response.ok);
-      if (failed) {
-        notify({ tone: "error", title: "Không lưu được cấu hình", description: await readApiError(failed, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
+      const response = await apiFetch("/api/cms/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildVersionedSettingsPatch([
+          { key: "site.identity", value: identity },
+          { key: "site.theme", value: theme },
+          { key: "site.homepage", value: homepage },
+          { key: "site.ai", value: ai },
+          { key: "site.smtp", value: smtp },
+        ], settingsVersions)),
+      });
+      if (response.status === 409) {
+        try {
+          setSettingsConflict({ latest: await fetchVersionedSettings(apiFetch, VERSIONED_SITE_SETTING_KEYS) });
+        } catch (error) {
+          setSettingsConflict({ latest: null, message: error instanceof Error ? error.message : String(error) });
+        }
+        notify({ tone: "error", title: "Một hoặc nhiều cấu hình đã thay đổi ở phiên khác", description: "Toàn bộ Save đã bị hủy; bản nháp được giữ và không tự lưu lại." });
         return;
       }
+      if (!response.ok) {
+        notify({ tone: "error", title: "Không lưu được cấu hình", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
+        return;
+      }
+      setSettingsVersions(parseVersionedSettings(await response.json(), VERSIONED_SITE_SETTING_KEYS));
+      setSettingsConflict(null);
       notify({ tone: "success", title: "Đã lưu cấu hình website", description: "Màu sắc, font chữ và độ rộng frontend sẽ tự đồng bộ khi mở lại tab hoặc tải lại trang." });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được cấu hình", description: describeClientError(error, "Không kết nối được API.") });
@@ -2340,6 +2337,10 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
             <p>Dữ liệu này dùng cho header, footer, form tư vấn và các trang public.</p>
           </div>
         </div>
+        <SettingsConflictBanner
+          conflict={settingsConflict}
+          onDiscardDraftAndReload={() => window.location.reload()}
+        />
         <form className="cms-form two-columns" onSubmit={submit}>
           <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
           <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
@@ -2542,7 +2543,7 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
           </div>
 
           <div className="form-actions wide">
-            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
+            <button className="primary-button" disabled={!canSave || saving || Boolean(settingsConflict)} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
           </div>
         </form>
       </article>
@@ -2627,16 +2628,16 @@ function SettingsPanel({ roles }: { roles: string[] }) {
     faviconUrl: "",
   });
   const [saving, setSaving] = useState(false);
+  const [versions, setVersions] = useState<VersionedSettings>({});
+  const [settingsConflict, setSettingsConflict] = useState<{ latest: VersionedSettings | null; message?: string } | null>(null);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
 
   useEffect(() => {
-    apiFetch("/api/cms/settings")
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await readApiError(res, "Không tải được cấu hình website."));
-        return res.json();
-      })
-      .then((payload) => {
-        const identity = typeof payload["site.identity"] === "object" && payload["site.identity"] ? payload["site.identity"] as Record<string, unknown> : {};
+    fetchVersionedSettings(apiFetch, ["site.identity"])
+      .then((snapshot) => {
+        setVersions(snapshot);
+        const raw = snapshot["site.identity"]?.value;
+        const identity = typeof raw === "object" && raw ? raw as Record<string, unknown> : {};
         setValues((current) => ({
           ...current,
           name: String(identity.name || current.name),
@@ -2656,18 +2657,28 @@ function SettingsPanel({ roles }: { roles: string[] }) {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canSave) return;
+    if (!canSave || settingsConflict) return;
     setSaving(true);
     let response: Response;
     try {
       response = await apiFetch("/api/cms/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "site.identity", value: values }),
+        body: JSON.stringify(buildVersionedSettingsPatch([{ key: "site.identity", value: values }], versions)),
       });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được cấu hình", description: describeClientError(error, "Không kết nối được API.") });
       setSaving(false);
+      return;
+    }
+    if (response.status === 409) {
+      try {
+        setSettingsConflict({ latest: await fetchVersionedSettings(apiFetch, ["site.identity"]) });
+      } catch (error) {
+        setSettingsConflict({ latest: null, message: error instanceof Error ? error.message : String(error) });
+      }
+      setSaving(false);
+      notify({ tone: "error", title: "Cấu hình đã thay đổi ở phiên khác", description: "Bản nháp vẫn được giữ; không tự lưu lại." });
       return;
     }
     if (!response.ok) {
@@ -2675,6 +2686,8 @@ function SettingsPanel({ roles }: { roles: string[] }) {
       setSaving(false);
       return;
     }
+    setVersions(parseVersionedSettings(await response.json(), ["site.identity"]));
+    setSettingsConflict(null);
     setSaving(false);
     notify({ tone: "success", title: "Đã lưu cấu hình website" });
   }
@@ -2688,6 +2701,10 @@ function SettingsPanel({ roles }: { roles: string[] }) {
             <p>Dữ liệu này dùng cho footer, form tư vấn và các trang public.</p>
           </div>
         </div>
+        <SettingsConflictBanner
+          conflict={settingsConflict}
+          onDiscardDraftAndReload={() => window.location.reload()}
+        />
         <form className="cms-form two-columns" onSubmit={submit}>
           <label>Tên thương hiệu<input value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} placeholder="Hà Thành Home" /></label>
           <label>Tagline<input value={values.tagline} onChange={(event) => setValues({ ...values, tagline: event.target.value })} placeholder="Thiết kế - Thi công - Nội thất" /></label>
@@ -2700,7 +2717,7 @@ function SettingsPanel({ roles }: { roles: string[] }) {
           <label>Zalo<input value={values.zalo} onChange={(event) => setValues({ ...values, zalo: event.target.value })} placeholder="https://zalo.me/..." /></label>
           <label className="wide">Giờ làm việc<input value={values.workingHours} onChange={(event) => setValues({ ...values, workingHours: event.target.value })} placeholder="08:00 - 18:00, Thứ 2 - Thứ 7" /></label>
           <div className="form-actions wide">
-            <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
+            <button className="primary-button" disabled={!canSave || saving || Boolean(settingsConflict)} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
           </div>
         </form>
       </article>

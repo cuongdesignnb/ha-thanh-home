@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { adminApiFetch, adminUrl } from "@/lib/client-path";
 import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
 import type { AboutPageConfig } from "@/lib/about-page-config";
+import { SettingsConflictBanner } from "@/components/settings-conflict-banner";
+import { buildVersionedSettingsPatch, fetchVersionedSettings, parseVersionedSettings, type VersionedSettings } from "@/lib/versioned-settings";
 import { Plus, Trash2, Save, ExternalLink } from "lucide-react";
 
 const apiFetch = adminApiFetch;
+const ABOUT_SETTING_KEY = "site.pages.about";
 
 const defaultAboutSettings: AboutPageConfig = {
   slug: "gioi-thieu",
@@ -139,16 +142,15 @@ export function AboutPageSettingsPanel({ roles }: { roles: string[] }) {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<SettingsTab>("overview");
+  const [versions, setVersions] = useState<VersionedSettings>({});
+  const [conflict, setConflict] = useState<{ latest: VersionedSettings | null; message?: string } | null>(null);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
 
   useEffect(() => {
-    apiFetch("/api/cms/settings")
-      .then(async (res) => {
-        if (!res.ok) throw new Error("Không tải được cấu hình website.");
-        return res.json();
-      })
-      .then((payload) => {
-        const raw = payload["site.pages.about"];
+    fetchVersionedSettings(apiFetch, [ABOUT_SETTING_KEY])
+      .then((snapshot) => {
+        setVersions(snapshot);
+        const raw = snapshot[ABOUT_SETTING_KEY]?.value;
         if (raw && typeof raw === "object") {
           const config = raw as AboutPageConfig;
           setValues({
@@ -176,15 +178,26 @@ export function AboutPageSettingsPanel({ roles }: { roles: string[] }) {
   }, []);
 
   const save = async () => {
-    if (!canSave) return;
+    if (!canSave || conflict) return;
     setSaving(true);
     try {
       const response = await apiFetch("/api/cms/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "site.pages.about", value: values }),
+        body: JSON.stringify(buildVersionedSettingsPatch([{ key: ABOUT_SETTING_KEY, value: values }], versions)),
       });
+      if (response.status === 409) {
+        try {
+          setConflict({ latest: await fetchVersionedSettings(apiFetch, [ABOUT_SETTING_KEY]) });
+        } catch (error) {
+          setConflict({ latest: null, message: error instanceof Error ? error.message : String(error) });
+        }
+        notify({ tone: "error", title: "Cấu hình đã thay đổi ở phiên khác", description: "Bản nháp vẫn được giữ; không tự lưu lại." });
+        return;
+      }
       if (!response.ok) throw new Error(await response.text());
+      setVersions(parseVersionedSettings(await response.json(), [ABOUT_SETTING_KEY]));
+      setConflict(null);
       notify({ tone: "success", title: "Lưu cấu hình thành công", description: "Đã cập nhật trang giới thiệu." });
     } catch (err) {
       notify({ tone: "error", title: "Không lưu được cấu hình", description: err instanceof Error ? err.message : String(err) });
@@ -224,7 +237,7 @@ export function AboutPageSettingsPanel({ roles }: { roles: string[] }) {
             </a>
             <button
               className="primary-button"
-              disabled={!canSave || saving}
+              disabled={!canSave || saving || Boolean(conflict)}
               onClick={save}
               type="button"
             >
@@ -232,6 +245,8 @@ export function AboutPageSettingsPanel({ roles }: { roles: string[] }) {
             </button>
           </div>
         </div>
+
+        <SettingsConflictBanner conflict={conflict} onDiscardDraftAndReload={() => window.location.reload()} />
 
         <div className="tabs-container" style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
           {/* Vertical Tabs navigation */}
