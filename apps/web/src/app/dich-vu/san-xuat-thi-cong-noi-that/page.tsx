@@ -41,7 +41,7 @@ import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib
 
 export const metadata: Metadata = {
   title: "Sản xuất thi công nội thất",
-  description: "Dịch vụ sản xuất và thi công nội thất trọn gói tại Hà Thành Home — xưởng sản xuất riêng, thi công chuẩn thiết kế, bảo hành dài hạn.",
+  description: "Trao đổi nhu cầu sản xuất và thi công nội thất: danh mục, kích thước, vật liệu, phạm vi lắp đặt và báo giá theo hồ sơ.",
   alternates: { canonical: "/dich-vu/san-xuat-thi-cong-noi-that" },
 };
 

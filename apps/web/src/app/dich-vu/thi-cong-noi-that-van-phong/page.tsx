@@ -41,7 +41,7 @@ import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib
 
 export const metadata: Metadata = {
   title: "Thi công nội thất văn phòng",
-  description: "Dịch vụ thi công nội thất văn phòng trọn gói — chuẩn công năng, đúng tiến độ, nâng tầm thương hiệu cho doanh nghiệp.",
+  description: "Trao đổi nhu cầu thi công nội thất văn phòng: mặt bằng, công năng, phạm vi công việc, điều kiện triển khai và báo giá theo hồ sơ.",
   alternates: { canonical: "/dich-vu/thi-cong-noi-that-van-phong" },
 };
 
