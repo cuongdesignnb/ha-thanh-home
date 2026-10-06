@@ -36,6 +36,7 @@ import {
 } from "@/lib/api";
 import type { AboutPageConfig } from "@/lib/about-page-config";
 import { isUsableSlug } from "@/lib/content-validation";
+import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
 
 export default async function HomePage() {
   const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
@@ -76,11 +77,6 @@ function HeroSection({ slide }: { slide: HomeHeroSlide }) {
             <a className="cta" href={slide.primaryUrl || "#projects"}>{slide.primaryLabel || "Xem dự án nổi bật"} <ArrowRight size={18} /></a>
             <a className="cta secondary" href={slide.secondaryUrl || "/lien-he"}><Phone size={18} /> {slide.secondaryLabel || "Tư vấn miễn phí"}</a>
             <a className="cta estimator" href="#du-toan" data-estimator-open>Dự toán nhanh <ArrowRight size={18} /></a>
-          </div>
-          <div className="hero-trust">
-            <span><strong>10+</strong> năm kinh nghiệm</span>
-            <span><strong>500+</strong> dự án hoàn thiện</span>
-            <span><strong>98%</strong> khách hàng hài lòng</span>
           </div>
         </div>
       </div>
@@ -231,26 +227,27 @@ function ServicesSection({ services, homepage }: { services: Service[]; homepage
 }
 
 function ProcessAndStats({ homepage }: { homepage: SiteHomepage }) {
+  const stats = homepage.stats || [];
   return (
     <>
       <section className="section cream"><div className="container"><div className="section-title"><h2>{homepage.processTitle || defaultHomepage.processTitle}</h2></div><div className="timeline">{["Khảo sát & tư vấn", "Lên ý tưởng", "Thiết kế chi tiết", "Báo giá & ký hợp đồng", "Thi công hoàn thiện", "Bàn giao & bảo hành"].map((step, index) => <div className="step" key={step}><span className="step-number">{String(index + 1).padStart(2, "0")}</span><strong>{step}</strong></div>)}</div></div></section>
-      <section className="stats"><div className="container stats-grid">{(homepage.stats || defaultHomepage.stats).slice(0, 5).map((stat) => <div className="stat" key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div></section>
+      {shouldRenderCmsList(stats) ? <section className="stats"><div className="container stats-grid">{stats.slice(0, 5).map((stat) => <div className="stat" key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div></section> : null}
     </>
   );
 }
 
 function Testimonials({ homepage, aboutPage }: { homepage: SiteHomepage; aboutPage: AboutPageConfig }) {
   const items = aboutPage.testimonials.items || [];
-  if (!items.length) return null;
+  if (!shouldRenderCmsList(items)) return null;
   return (
     <section className="section"><div className="container"><div className="section-title"><h2>{aboutPage.testimonials.title || homepage.testimonialsTitle || defaultHomepage.testimonialsTitle}</h2></div><div className="testimonials">{items.slice(0, 6).map((item, itemIndex) => {
-      const rating = Math.max(1, Math.min(5, Number(item.rating) || 5));
+      const rating = resolveTestimonialRating(item.rating);
       const initials = item.name.split(/\s+/).filter(Boolean).slice(-2).map((part) => part[0]).join("").toUpperCase();
       return <article className="testimonial" key={`${item.name}-${itemIndex}`}>
         {item.avatarUrl ? <img className="avatar" alt={item.name} src={item.avatarUrl} /> : <div className="avatar avatar-fallback" aria-hidden="true">{initials || "HT"}</div>}
         <strong>{item.name}</strong>
         {item.location ? <span className="testimonial-location">{item.location}</span> : null}
-        <div className="stars" aria-label={`${rating} trên 5 sao`}>{Array.from({ length: rating }).map((_, index) => <Star key={index} size={16} fill="currentColor" />)}</div>
+        {rating ? <div className="stars" aria-label={`${rating} trên 5 sao`}>{Array.from({ length: rating }).map((_, index) => <Star key={index} size={16} fill="currentColor" />)}</div> : null}
         <p>“{item.quote}”</p>
       </article>;
     })}</div></div></section>

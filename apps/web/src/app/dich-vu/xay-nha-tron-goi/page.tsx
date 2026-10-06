@@ -25,15 +25,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
+import { resolveTestimonialRating } from "@/lib/testimonial-data";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { RelatedContent } from "@/components/related-content";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
   fetchLandingProjects,
-  getConstructionEstimatorConfig,
   getSiteSettings,
-  projectImages,
-  type EstimatorPublicConfig,
   type LandingFaq,
   type LandingListItem,
   type LandingProjectCard,
@@ -43,7 +41,7 @@ import {
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 import { getConstructionGuidePosts } from "@/lib/related-content";
 import { prepareDetailHtml } from "@/lib/rich-content";
-import { formatEstimatorOptionLabel } from "@/lib/construction-estimator";
+import { resolveServiceDisplayPricing, SERVICE_DISPLAY_REFERENCE_NOTE } from "@/lib/service-display-pricing";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -58,9 +56,8 @@ const whyIcons = [Medal, ClipboardCheck, Banknote, ShieldCheck, Headphones, Badg
 const statIcons = [TimerReset, Building2, Sparkles, Headphones];
 
 export default async function XayNhaTronGoiPage() {
-  const [settings, estimatorConfig, guidePosts] = await Promise.all([
+  const [settings, guidePosts] = await Promise.all([
     getSiteSettings(),
-    getConstructionEstimatorConfig(),
     getConstructionGuidePosts(),
   ]);
   const landing = xayNhaLandingWithDefaults(settings["site.landing.xayNhaTronGoi"]);
@@ -93,7 +90,7 @@ export default async function XayNhaTronGoiPage() {
         <ScopeSection landing={landing} />
         <ProcessTimeline landing={landing} />
         <ProjectShowcase projects={projects} landing={landing} />
-        <EstimateSection config={estimatorConfig} landing={landing} />
+        <EstimateSection landing={landing} />
         <WhyChooseSection landing={landing} />
         <StatsStrip items={landing.stats} />
         <Testimonials items={landing.testimonials} landing={landing} />
@@ -222,36 +219,23 @@ function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]
   );
 }
 
-function EstimateSection({ config, landing }: { config: EstimatorPublicConfig; landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
-  const scopeField = config.inputSchema?.find((field) => field.name === "scope");
-  const scopeOptions = scopeField?.options?.length ? scopeField.options : [];
-  const prices = scopeOptions
-    .map((option) => Number(option.variables?.unit_price))
-    .filter((price) => Number.isFinite(price));
-  const min = prices.length ? Math.min(...prices) : 0;
-  const max = prices.length ? Math.max(...prices) : 0;
-
+function EstimateSection({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
   return (
     <section className="section" id="du-toan-chi-phi">
       <div className="container xay-nha-estimate">
         <div className="xay-nha-cost-card">
           <span className="eyebrow">{landing.estimateEyebrow}</span>
           <h2>{landing.estimateTitle}</h2>
-          <div className="xay-nha-tabs" role="list" aria-label={scopeField?.label || "Gói thi công"}>
-            {(scopeOptions.length ? scopeOptions : [{ label: "Mở dự toán", value: "du-toan" }]).slice(0, 4).map((option, index) => <span className={index === 0 ? "active" : ""} key={option.value}>{formatEstimatorOptionLabel(scopeField || { name: "scope" }, option)}</span>)}
+          <div className="xay-nha-reference-prices">
+            {resolveServiceDisplayPricing().map((item) => (
+              <article className="xay-nha-reference-price" key={item.packageName}>
+                <small>{item.packageName}</small>
+                <strong>{item.price}</strong>
+              </article>
+            ))}
           </div>
-          <div className="xay-nha-price-box">
-            <div className="xay-nha-price-image" style={{ backgroundImage: `url(${projectImages[0]})` }} />
-            <div>
-              <small>{config.name || "Cấu hình dự toán công trình"}</small>
-              <strong>{min && max ? `${moneyPerM2(min)} - ${moneyPerM2(max)}` : "Mở dự toán để tính chi tiết"}</strong>
-              <ul className="xay-nha-checklist">
-                {scopeOptions.slice(0, 4).map((option) => <li key={option.value}><CheckCircle2 size={17} /> {formatEstimatorOptionLabel(scopeField || { name: "scope" }, option)}</li>)}
-              </ul>
-              <a className="cta" href="#du-toan-chi-phi" data-estimator-open>Mở dự toán nhanh <ArrowRight size={17} /></a>
-            </div>
-          </div>
-          <p className="xay-nha-note">{config.disclaimer || "* Chi phí phụ thuộc diện tích, phong cách, vật tư và điều kiện thi công thực tế."}</p>
+          <p className="xay-nha-note">{SERVICE_DISPLAY_REFERENCE_NOTE.vat} {SERVICE_DISPLAY_REFERENCE_NOTE.effectivePeriod} Chi phí cuối cùng phụ thuộc hồ sơ, vật tư và điều kiện thi công thực tế.</p>
+          <a className="cta" href="#du-toan-chi-phi" data-estimator-open>Mở dự toán nhanh <ArrowRight size={17} /></a>
         </div>
         <XayNhaQuoteForm title={landing.quoteTitle} description={landing.quoteDescription} />
       </div>
@@ -273,6 +257,7 @@ function WhyChooseSection({ landing }: { landing: ReturnType<typeof xayNhaLandin
 }
 
 function StatsStrip({ items }: { items: LandingListItem[] }) {
+  if (!items.length) return null;
   return (
     <section className="xay-nha-stats-section">
       <div className="container">
@@ -285,6 +270,7 @@ function StatsStrip({ items }: { items: LandingListItem[] }) {
 }
 
 function Testimonials({ items, landing }: { items: LandingTestimonial[]; landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
+  if (!items.length) return null;
   return (
     <section className="section">
       <div className="container">
@@ -295,7 +281,7 @@ function Testimonials({ items, landing }: { items: LandingTestimonial[]; landing
               <div className="xay-nha-avatar">{index + 1}</div>
               <strong>{item.name}</strong>
               <span>{item.project}</span>
-              <div className="xay-nha-stars">{Array.from({ length: 5 }, (_, star) => <Star fill="currentColor" size={16} key={star} />)}</div>
+              {resolveTestimonialRating(item.rating) ? <div className="xay-nha-stars" aria-label={`${item.rating} trên 5 sao`}>{Array.from({ length: resolveTestimonialRating(item.rating) || 0 }, (_, star) => <Star fill="currentColor" size={16} key={star} />)}</div> : null}
               <p>“{item.quote}”</p>
             </article>
           ))}
@@ -351,10 +337,6 @@ function IconText({ icon: Icon, item }: { icon: LucideIcon; item: LandingListIte
       </div>
     </article>
   );
-}
-
-function moneyPerM2(value: number) {
-  return `${value.toLocaleString("vi-VN")}đ/m2`;
 }
 
 function DetailedIntroSection({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {

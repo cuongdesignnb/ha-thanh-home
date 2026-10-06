@@ -1,5 +1,6 @@
 import { AboutPageConfig } from "./about-page-config";
 import { aboutPageDefaultConfig } from "./about-page-defaults";
+import { resolveCmsList } from "./testimonial-data";
 
 export type ProjectGroup = "construction" | "interior" | "xay_nha_tron_goi";
 
@@ -169,6 +170,7 @@ export type LandingTestimonial = {
   name?: string;
   project?: string;
   quote?: string;
+  rating?: number;
 };
 
 export type LandingFaq = {
@@ -492,13 +494,7 @@ export const defaultHomepage: Required<Pick<SiteHomepage, "heroSlides" | "aboutB
   servicesEyebrow: "Dịch vụ",
   servicesTitle: "Dịch vụ của chúng tôi",
   processTitle: "Quy trình làm việc",
-  stats: [
-    { value: "10+", label: "Năm kinh nghiệm" },
-    { value: "500+", label: "Dự án hoàn thiện" },
-    { value: "98%", label: "Khách hàng hài lòng" },
-    { value: "24/7", label: "Hỗ trợ tư vấn" },
-    { value: "50+", label: "Nhân sự chuyên môn" },
-  ],
+  stats: [],
   testimonialsTitle: "Khách hàng nói gì về chúng tôi",
   newsTitle: "Tin tức & cảm hứng",
 };
@@ -573,17 +569,8 @@ export const defaultXayNhaLanding: LandingWithDefaults<XayNhaLanding> = {
     { title: "Tận tâm đồng hành", description: "Hỗ trợ trước, trong và sau thi công" },
     { title: "Bảo hành uy tín", description: "Chính sách rõ ràng, hỗ trợ dài hạn" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "500+", description: "Dự án hoàn thiện" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Anh Minh Tuấn", project: "Biệt thự Hà Nội", quote: "Hà Thành Home làm việc rất chuyên nghiệp, tiến độ đúng cam kết. Ngôi nhà hoàn thiện đẹp hơn mong đợi!" },
-    { name: "Chị Thu Hằng", project: "Nhà phố Hải Phòng", quote: "Từ thiết kế đến thi công đều rất chỉn chu, đội ngũ tận tâm, hỗ trợ nhiệt tình." },
-    { name: "Anh Quốc Huy", project: "Nhà phố Vĩnh Phúc", quote: "Chi phí hợp lý, chất lượng vượt mong đợi. Tôi rất hài lòng với dịch vụ trọn gói." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Xây nhà trọn gói bao gồm những gì?", answer: "Bao gồm khảo sát, tư vấn, thiết kế, dự toán, thi công phần thô, hoàn thiện, nghiệm thu, bàn giao và bảo hành theo hợp đồng." },
     { question: "Thời gian thi công mất bao lâu?", answer: "Tùy quy mô và mức hoàn thiện, nhà phố thường từ 4-7 tháng, biệt thự có thể từ 7-12 tháng hoặc hơn." },
@@ -663,7 +650,10 @@ export async function getSiteSettings() {
 
 export async function getAboutPageConfig(): Promise<AboutPageConfig> {
   const settings = await getSiteSettings();
-  const landing = settings["site.pages.about"];
+  return aboutPageWithDefaults(settings["site.pages.about"]);
+}
+
+export function aboutPageWithDefaults(landing?: Partial<AboutPageConfig>): AboutPageConfig {
   if (!landing) return aboutPageDefaultConfig;
   return {
     ...aboutPageDefaultConfig,
@@ -699,9 +689,9 @@ export async function getAboutPageConfig(): Promise<AboutPageConfig> {
     people: {
       ...aboutPageDefaultConfig.people,
       ...(landing.people || {}),
-      highlights: Array.isArray(landing.people?.highlights) && landing.people.highlights.length ? landing.people.highlights : aboutPageDefaultConfig.people.highlights,
+      highlights: resolveCmsList(landing.people?.highlights),
     },
-    stats: Array.isArray(landing.stats) && landing.stats.length ? landing.stats : aboutPageDefaultConfig.stats,
+    stats: resolveCmsList(landing.stats),
     strengths: {
       ...aboutPageDefaultConfig.strengths,
       ...(landing.strengths || {}),
@@ -715,7 +705,7 @@ export async function getAboutPageConfig(): Promise<AboutPageConfig> {
     testimonials: {
       ...aboutPageDefaultConfig.testimonials,
       ...(landing.testimonials || {}),
-      items: Array.isArray(landing.testimonials?.items) && landing.testimonials.items.length ? landing.testimonials.items : aboutPageDefaultConfig.testimonials.items,
+      items: resolveCmsList(landing.testimonials?.items),
     },
     finalCta: {
       ...aboutPageDefaultConfig.finalCta,
@@ -868,7 +858,7 @@ export function homepageWithDefaults(homepage?: SiteHomepage): SiteHomepage {
     ...(homepage || {}),
     heroSlides: homepage?.heroSlides?.length ? homepage.heroSlides : defaultHomepage.heroSlides,
     aboutBenefits: homepage?.aboutBenefits?.length ? homepage.aboutBenefits : defaultHomepage.aboutBenefits,
-    stats: homepage?.stats?.length ? homepage.stats : defaultHomepage.stats,
+    stats: resolveCmsList(homepage?.stats),
   };
 }
 
@@ -885,8 +875,8 @@ export function xayNhaLandingWithDefaults(landing?: XayNhaLanding): LandingWithD
     scopeItems: mergeList(landing?.scopeItems, defaultXayNhaLanding.scopeItems),
     processSteps: mergeList(landing?.processSteps, defaultXayNhaLanding.processSteps),
     whyChooseItems: mergeList(landing?.whyChooseItems, defaultXayNhaLanding.whyChooseItems),
-    stats: mergeList(landing?.stats, defaultXayNhaLanding.stats),
-    testimonials: mergeList(landing?.testimonials, defaultXayNhaLanding.testimonials),
+    stats: resolveCmsList(landing?.stats),
+    testimonials: resolveCmsList(landing?.testimonials),
     faqs: mergeList(landing?.faqs, defaultXayNhaLanding.faqs),
   };
 }
@@ -961,17 +951,8 @@ export const defaultNoiThatLanding: LandingWithDefaults<NoiThatLanding> = {
     { title: "Bảo hành dài hạn", description: "Bảo hành 12 – 24 tháng, bảo trì trọn đời" },
     { title: "Đội ngũ lành nghề", description: "Kỹ sư, thợ tay nghề cao và tận tâm" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "500+", description: "Dự án hoàn thiện" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Anh Minh Tuấn", project: "Căn hộ Cầu Giấy – Hà Nội", quote: "Nội thất đẹp, thi công chuẩn từng chi tiết. Đội ngũ làm việc chuyên nghiệp, hỗ trợ tận tâm." },
-    { name: "Chị Thu Hằng", project: "Biệt thự Long Biên – Hà Nội", quote: "Thiết kế tinh tế, tối ưu không gian rất tốt. Sản xuất tại xưởng nên chất lượng rất đồng đều." },
-    { name: "Anh Quốc Huy", project: "Nhà phố Bắc Từ Liêm – Hà Nội", quote: "Đúng tiến độ, đúng cam kết và bảo hành rõ ràng. Rất hài lòng khi chọn Hà Thành Home." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian sản xuất nội thất mất bao lâu?", answer: "Tùy khối lượng và mức hoàn thiện, thông thường 30-60 ngày cho căn hộ và 60-90 ngày cho biệt thự, văn phòng." },
     { question: "Hà Thành Home có xưởng sản xuất riêng không?", answer: "Có. Hà Thành Home sở hữu xưởng sản xuất riêng tại Hà Nội với máy móc CNC hiện đại và đội ngũ thợ tay nghề cao." },
@@ -991,8 +972,8 @@ export function noiThatLandingWithDefaults(landing?: NoiThatLanding): LandingWit
     scopeItems: mergeList(landing?.scopeItems, defaultNoiThatLanding.scopeItems),
     processSteps: mergeList(landing?.processSteps, defaultNoiThatLanding.processSteps),
     whyChooseItems: mergeList(landing?.whyChooseItems, defaultNoiThatLanding.whyChooseItems),
-    stats: mergeList(landing?.stats, defaultNoiThatLanding.stats),
-    testimonials: mergeList(landing?.testimonials, defaultNoiThatLanding.testimonials),
+    stats: resolveCmsList(landing?.stats),
+    testimonials: resolveCmsList(landing?.testimonials),
     faqs: mergeList(landing?.faqs, defaultNoiThatLanding.faqs),
   };
 }
@@ -1069,17 +1050,8 @@ export const defaultNhaXuongLanding: LandingWithDefaults<NhaXuongLanding> = {
     { title: "An toàn là ưu tiên", description: "Thi công an toàn, tuân thủ quy trình nghiêm ngặt" },
     { title: "Bảo hành dài hạn", description: "Đồng hành sau bàn giao công trình" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "300+", description: "Dự án nhà xưởng" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Ông Nguyễn Văn Hùng", project: "Giám đốc – Công ty ABC", quote: "Hà Thành Home thi công đúng tiến độ, chất lượng vượt mong đợi. Đội ngũ chuyên nghiệp, hỗ trợ rất tận tâm." },
-    { name: "Bà Trần Thị Mai", project: "Giám đốc – Công ty HTech", quote: "Nhà xưởng được thiết kế đúng công năng, chi phí hợp lý. Rất hài lòng với sự hợp tác." },
-    { name: "Ông Phạm Quốc Tuấn", project: "CEO – Công ty VinaFoods", quote: "Dịch vụ trọn gói chuyên nghiệp từ tư vấn đến bàn giao. Hà Thành Home là đối tác tin cậy của chúng tôi." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian thi công nhà xưởng mất bao lâu?", answer: "Tùy quy mô và yêu cầu kỹ thuật, thời gian thi công thường từ 2 – 6 tháng hoặc hơn đối với dự án lớn." },
     { question: "Chi phí thi công nhà xưởng được tính thế nào?", answer: "Chi phí phụ thuộc diện tích, kết cấu, vật liệu, hệ thống MEP, PCCC và mức độ hoàn thiện." },
@@ -1099,8 +1071,8 @@ export function nhaXuongLandingWithDefaults(landing?: NhaXuongLanding): LandingW
     scopeItems: mergeList(landing?.scopeItems, defaultNhaXuongLanding.scopeItems),
     processSteps: mergeList(landing?.processSteps, defaultNhaXuongLanding.processSteps),
     whyChooseItems: mergeList(landing?.whyChooseItems, defaultNhaXuongLanding.whyChooseItems),
-    stats: mergeList(landing?.stats, defaultNhaXuongLanding.stats),
-    testimonials: mergeList(landing?.testimonials, defaultNhaXuongLanding.testimonials),
+    stats: resolveCmsList(landing?.stats),
+    testimonials: resolveCmsList(landing?.testimonials),
     faqs: mergeList(landing?.faqs, defaultNhaXuongLanding.faqs),
   };
 }
@@ -1176,17 +1148,8 @@ export const defaultVanPhongLanding: LandingWithDefaults<VanPhongLanding> = {
     { title: "Bảo hành dài hạn", description: "Hỗ trợ doanh nghiệp lâu dài" },
     { title: "Đội ngũ chuyên môn", description: "Đội thi công nhiều kinh nghiệm" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "500+", description: "Dự án văn phòng" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Anh Nguyễn Quốc Bảo", project: "Giám đốc – FPT Software", quote: "Hà Thành Home làm việc chuyên nghiệp, đúng tiến độ và chất lượng. Không gian văn phòng sau thi công rất hiện đại, tối ưu công năng." },
-    { name: "Chị Trần Minh Hằng", project: "HR Director – Unilever Việt Nam", quote: "Đội ngũ thi công tỉ mỉ, phối hợp nhịp nhàng, đảm bảo tiêu chuẩn cao của chúng tôi. Rất hài lòng!" },
-    { name: "Anh Lê Hoàng Nam", project: "CEO – StartupX", quote: "Chi phí hợp lý, thiết kế sáng tạo và thi công rất chỉn chu. Văn phòng của chúng tôi giờ đây truyền cảm hứng hơn rất nhiều." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian thi công nội thất văn phòng là bao lâu?", answer: "Tùy quy mô, thường 30 – 60 ngày cho văn phòng nhỏ, 60 – 90 ngày cho văn phòng lớn." },
     { question: "Hà Thành Home có thiết kế 2D/3D trước khi thi công không?", answer: "Có. Toàn bộ phương án được thiết kế chi tiết và duyệt trước khi triển khai thi công." },
@@ -1206,8 +1169,8 @@ export function vanPhongLandingWithDefaults(landing?: VanPhongLanding): LandingW
     scopeItems: mergeList(landing?.scopeItems, defaultVanPhongLanding.scopeItems),
     processSteps: mergeList(landing?.processSteps, defaultVanPhongLanding.processSteps),
     whyChooseItems: mergeList(landing?.whyChooseItems, defaultVanPhongLanding.whyChooseItems),
-    stats: mergeList(landing?.stats, defaultVanPhongLanding.stats),
-    testimonials: mergeList(landing?.testimonials, defaultVanPhongLanding.testimonials),
+    stats: resolveCmsList(landing?.stats),
+    testimonials: resolveCmsList(landing?.testimonials),
     faqs: mergeList(landing?.faqs, defaultVanPhongLanding.faqs),
   };
 }

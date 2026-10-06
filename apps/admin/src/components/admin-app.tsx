@@ -7,6 +7,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { stripImplicitPublishedAt } from "@/lib/published-at-payload";
+import { isVersionedContentEntity, withExpectedUpdatedAt } from "@/lib/expected-version";
+import { omitUntouchedFormFields } from "@/lib/preserve-untouched-fields";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { Mark, mergeAttributes, Node } from "@tiptap/core";
@@ -2258,13 +2260,6 @@ function ThemeSettingsPanel({ roles }: { roles: string[] }) {
       servicesEyebrow: "Dịch vụ",
       servicesTitle: values.servicesTitle,
       processTitle: values.processTitle,
-      stats: [
-        { value: "10+", label: "Năm kinh nghiệm" },
-        { value: "500+", label: "Dự án hoàn thiện" },
-        { value: "98%", label: "Khách hàng hài lòng" },
-        { value: "24/7", label: "Hỗ trợ tư vấn" },
-        { value: "50+", label: "Nhân sự chuyên môn" },
-      ],
       testimonialsTitle: values.testimonialsTitle,
       newsTitle: values.newsTitle,
     };
@@ -2737,6 +2732,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   const [filterOne, setFilterOne] = useState("");
   const [filterTwo, setFilterTwo] = useState("");
   const [editing, setEditing] = useState<CmsItem | null>(null);
+  const [conflictRecord, setConflictRecord] = useState<CmsItem | null>(null);
   const [mode, setMode] = useState<"list" | "form">("list");
   const [view, setView] = useState<"table" | "calendar">("table");
   const [scheduledRows, setScheduledRows] = useState<CmsItem[]>([]);
@@ -2827,6 +2823,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
     setFilterOne("");
     setFilterTwo("");
     setEditing(null);
+    setConflictRecord(null);
     form.reset(defaultValues(entity));
     load(1);
     if (["projects", "project-categories"].includes(entity)) loadProjectCategories();
@@ -2840,12 +2837,14 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
 
   function startCreate() {
     setEditing(null);
+    setConflictRecord(null);
     form.reset(defaultValues(entity));
     setMode("form");
   }
 
   function startEdit(row: CmsItem) {
     setEditing(row);
+    setConflictRecord(null);
     form.reset({
       ...defaultValues(entity),
       ...row,
@@ -2859,6 +2858,7 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
   function backToList() {
     setMode("list");
     setEditing(null);
+    setConflictRecord(null);
     form.reset(defaultValues(entity));
   }
 
@@ -2869,18 +2869,49 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
       notify({ tone: "error", title: "Dữ liệu không hợp lệ", description: parsed.error.issues[0]?.message || "Kiểm tra lại các trường bắt buộc." });
       return;
     }
+    let savePayload: Record<string, unknown>;
+    try {
+      const normalizedPayload = normalizePayload(entity, submitValues, toDateTimeLocal(editing?.publishedAt));
+      savePayload = editing
+        ? withExpectedUpdatedAt(
+            entity,
+            omitUntouchedFormFields(normalizedPayload, submitValues, editing),
+            editing.updatedAt,
+          )
+        : normalizedPayload;
+    } catch (error) {
+      notify({ tone: "error", title: "Cần tải lại bản ghi", description: describeClientError(error, "Bản ghi không có phiên bản cập nhật hợp lệ.") });
+      return;
+    }
     let response: Response;
     try {
       response = await apiFetch(editing ? `/api/cms/${entity}/${editing.id}` : `/api/cms/${entity}`, {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(normalizePayload(entity, submitValues, toDateTimeLocal(editing?.publishedAt))),
+        body: JSON.stringify(savePayload),
       });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được dữ liệu", description: describeClientError(error, "Không kết nối được API.") });
       return;
     }
     if (!response.ok) {
+      if (editing && isVersionedContentEntity(entity) && response.status === 409) {
+        try {
+          const latestResponse = await apiFetch(`/api/cms/${entity}/${editing.id}`);
+          if (!latestResponse.ok) throw new Error(await readApiError(latestResponse, "Không tải được phiên bản mới nhất."));
+          const latest: CmsItem = await latestResponse.json();
+          setConflictRecord(latest);
+          setRows((current) => current.map((row) => row.id === latest.id ? latest : row));
+          notify({
+            tone: "error",
+            title: "Bản ghi đã được cập nhật ở nơi khác",
+            description: "Lần lưu này bị từ chối và không ghi đè dữ liệu. Đã tải phiên bản mới nhất; không tự lưu lại.",
+          });
+        } catch (error) {
+          notify({ tone: "error", title: "Xung đột phiên bản", description: `Lần lưu này không được áp dụng. Không thể tải lại bản ghi mới nhất: ${describeClientError(error, "lỗi API")}` });
+        }
+        return;
+      }
       notify({ tone: "error", title: "Không lưu được dữ liệu", description: await readApiError(response, "Kiểm tra quyền tài khoản hoặc dữ liệu nhập.") });
       return;
     }
@@ -2997,10 +3028,21 @@ function EntityPanel({ entity, roles }: { entity: Entity; roles: string[] }) {
           </div>
           {canWrite ? (
             <form className="cms-form editor-form" onSubmit={form.handleSubmit(submit)}>
+              {conflictRecord ? (
+                <div className="form-conflict-banner" role="alert">
+                  <div>
+                    <strong>Dữ liệu này đã thay đổi sau khi bạn mở biểu mẫu.</strong>
+                    <p>Bản nháp của bạn chưa được lưu. Phiên bản mới nhất đã được tải lúc {String(conflictRecord.updatedAt || "không rõ thời điểm")}.</p>
+                  </div>
+                  <button className="secondary-button" type="button" onClick={() => startEdit(conflictRecord)}>
+                    Tải bản mới nhất và bỏ bản nháp
+                  </button>
+                </div>
+              ) : null}
               <EntityFields entity={entity} filterOptions={filterOptions} form={form} postCategories={postCategories} projectCategories={projectCategories} onTaxonomyCreated={loadFilterOptions} />
               <div className="form-actions sticky-actions">
                 <button className="secondary-button" type="button" onClick={editing ? () => startEdit(editing) : startCreate}>Làm mới</button>
-                <button className="primary-button" type="submit">Lưu thay đổi</button>
+                <button className="primary-button" type="submit" disabled={Boolean(conflictRecord)}>{conflictRecord ? "Cần tải phiên bản mới" : "Lưu thay đổi"}</button>
               </div>
             </form>
           ) : <p className="muted">Tài khoản hiện tại chỉ có quyền xem dữ liệu này.</p>}

@@ -86,20 +86,10 @@ const defaultAboutSettings: AboutPageConfig = {
     eyebrow: "CON NGƯỜI – NỀN TẢNG CỦA GIÁ TRỊ",
     title: "Đội ngũ tận tâm – Vận hành bền vững",
     description: "Chúng tôi tự hào quy tụ đội ngũ kiến trúc sư, kỹ sư, giám sát và chuyên viên giàu kinh nghiệm. Từng thành viên đều đặt sự tận tâm, trách nhiệm và chất lượng lên hàng đầu trong mỗi công trình.",
-    highlights: [
-      { icon: "users", value: "50+", title: "Kiến trúc sư, kỹ sư, chuyên viên" },
-      { icon: "experience", value: "10+", title: "Năm kinh nghiệm trong ngành" },
-      { icon: "quality", value: "100%", title: "Tận tâm, trách nhiệm với từng dự án" },
-      { icon: "culture", title: "Văn hóa", description: "Hợp tác – Chia sẻ – Hướng tới khách hàng" }
-    ],
+    highlights: [],
   },
 
-  stats: [
-    { icon: "experience", value: "10+", label: "Năm kinh nghiệm" },
-    { icon: "project", value: "500+", label: "Dự án đã hoàn thành" },
-    { icon: "satisfaction", value: "98%", label: "Khách hàng hài lòng" },
-    { icon: "support", value: "24/7", label: "Hỗ trợ khách hàng" }
-  ],
+  stats: [],
 
   strengths: {
     title: "NĂNG LỰC & THẾ MẠNH",
@@ -127,11 +117,7 @@ const defaultAboutSettings: AboutPageConfig = {
 
   testimonials: {
     title: "KHÁCH HÀNG NÓI GÌ VỀ CHÚNG TÔI?",
-    items: [
-      { name: "Anh Minh Tuấn", location: "Biệt thự – Hà Nội", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80", rating: 5, quote: "Hà Thành Home làm việc rất chuyên nghiệp, thiết kế đẹp và thi công đúng tiến độ. Rất hài lòng với chất lượng và sự tận tâm của đội ngũ." },
-      { name: "Chị Thu Hằng", location: "Nhà phố – Hải Phòng", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80", rating: 5, quote: "Không gian sống của gia đình tôi hoàn thiện hơn cả mong đợi. Cảm ơn Hà Thành Home đã kiến tạo nên tổ ấm mơ ước." },
-      { name: "Anh Quốc Huy", location: "Căn hộ – Hà Nội", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80", rating: 5, quote: "Quá trình làm việc rõ ràng, vật liệu minh bạch và hậu mãi tận tâm. Tôi rất tin tưởng khi lựa chọn Hà Thành Home." }
-    ],
+    items: [],
   },
 
   finalCta: {

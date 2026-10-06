@@ -53,17 +53,8 @@ const advancedDefaults = {
     { title: "An toàn là ưu tiên", description: "Thi công an toàn, tuân thủ quy trình nghiêm ngặt" },
     { title: "Bảo hành dài hạn", description: "Đồng hành sau bàn giao công trình" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "300+", description: "Dự án nhà xưởng" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Ông Nguyễn Văn Hùng", project: "Giám đốc – Công ty ABC", quote: "Hà Thành Home thi công đúng tiến độ, chất lượng vượt mong đợi." },
-    { name: "Bà Trần Thị Mai", project: "Giám đốc – Công ty HTech", quote: "Nhà xưởng được thiết kế đúng công năng, chi phí hợp lý." },
-    { name: "Ông Phạm Quốc Tuấn", project: "CEO – Công ty VinaFoods", quote: "Dịch vụ trọn gói chuyên nghiệp từ tư vấn đến bàn giao." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian thi công nhà xưởng mất bao lâu?", answer: "Tùy quy mô, thường từ 2 – 6 tháng hoặc hơn đối với dự án lớn." },
     { question: "Chi phí thi công nhà xưởng được tính thế nào?", answer: "Phụ thuộc diện tích, kết cấu, vật liệu, hệ thống MEP, PCCC và mức độ hoàn thiện." },
