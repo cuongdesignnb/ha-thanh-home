@@ -25,7 +25,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
-import { resolveTestimonialRating } from "@/lib/testimonial-data";
+import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { RelatedContent } from "@/components/related-content";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
@@ -92,8 +92,8 @@ export default async function XayNhaTronGoiPage() {
         <ProjectShowcase projects={projects} landing={landing} />
         <EstimateSection landing={landing} />
         <WhyChooseSection landing={landing} />
-        <StatsStrip items={landing.stats} />
-        <Testimonials items={landing.testimonials} landing={landing} />
+        {shouldRenderCmsList(landing.stats) ? <StatsStrip items={landing.stats} /> : null}
+        {shouldRenderCmsList(landing.testimonials) ? <Testimonials items={landing.testimonials} landing={landing} /> : null}
         <RelatedContent items={guidePosts} title="Cẩm nang xây dựng hữu ích" />
         <FAQSection items={landing.faqs} landing={landing} />
         <FinalCTA landing={landing} />

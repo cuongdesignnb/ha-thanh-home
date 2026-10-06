@@ -5,6 +5,8 @@ import { adminApiFetch } from "@/lib/client-path";
 import { ImageUrlPicker, useAdminFeedback } from "@/components/admin-app";
 import { LandingAdvancedEditor, type LandingAdvancedData } from "@/components/landing-advanced-editor";
 import { ProjectsSourcePicker, type ProjectsSourceValue } from "@/components/projects-source-picker";
+import { SettingsConflictBanner } from "@/components/settings-conflict-banner";
+import { buildVersionedSettingsPatch, fetchVersionedSettings, parseVersionedSettings, type VersionedSettings } from "@/lib/versioned-settings";
 
 const apiFetch = adminApiFetch;
 
@@ -114,13 +116,16 @@ export function SanXuatNoiThatEditor({ roles }: { roles: string[] }) {
   const [values, setValues] = useState<Values>(defaults);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [versions, setVersions] = useState<VersionedSettings>({});
+  const [conflict, setConflict] = useState<{ latest: VersionedSettings | null; message?: string } | null>(null);
   const canSave = roles.includes("Super Admin") || roles.includes("Admin");
 
   useEffect(() => {
-    apiFetch("/api/cms/settings")
-      .then(async (res) => { if (!res.ok) throw new Error("Không tải được cấu hình."); return res.json(); })
-      .then((payload) => {
-        const landing = typeof payload[SETTING_KEY] === "object" && payload[SETTING_KEY] ? payload[SETTING_KEY] as Record<string, unknown> : {};
+    fetchVersionedSettings(apiFetch, [SETTING_KEY])
+      .then((snapshot) => {
+        setVersions(snapshot);
+        const raw = snapshot[SETTING_KEY]?.value;
+        const landing = typeof raw === "object" && raw ? raw as Record<string, unknown> : {};
         const advanced = {
           introChecklist: Array.isArray(landing.introChecklist) ? landing.introChecklist : advancedDefaults.introChecklist,
           benefits: Array.isArray(landing.benefits) ? landing.benefits : advancedDefaults.benefits,
@@ -171,7 +176,7 @@ export function SanXuatNoiThatEditor({ roles }: { roles: string[] }) {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canSave) return;
+    if (!canSave || conflict) return;
     setSaving(true);
 
     const landing = {
@@ -194,13 +199,21 @@ export function SanXuatNoiThatEditor({ roles }: { roles: string[] }) {
       const response = await apiFetch("/api/cms/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: SETTING_KEY, value: landing }),
+        body: JSON.stringify(buildVersionedSettingsPatch([{ key: SETTING_KEY, value: landing }], versions)),
       });
+      if (response.status === 409) {
+        try { setConflict({ latest: await fetchVersionedSettings(apiFetch, [SETTING_KEY]) }); }
+        catch (error) { setConflict({ latest: null, message: error instanceof Error ? error.message : String(error) }); }
+        notify({ tone: "error", title: "Cấu hình đã thay đổi ở phiên khác", description: "Bản nháp vẫn được giữ; không tự lưu lại." });
+        return;
+      }
       if (!response.ok) {
         const text = await response.text();
         notify({ tone: "error", title: "Không lưu được cấu hình", description: text.slice(0, 200) });
         return;
       }
+      setVersions(parseVersionedSettings(await response.json(), [SETTING_KEY]));
+      setConflict(null);
       notify({ tone: "success", title: "Đã lưu cấu hình Sản xuất Thi công Nội thất" });
     } catch (error) {
       notify({ tone: "error", title: "Không lưu được cấu hình", description: error instanceof Error ? error.message : String(error) });
@@ -213,6 +226,7 @@ export function SanXuatNoiThatEditor({ roles }: { roles: string[] }) {
 
   return (
     <form onSubmit={submit} id="san-xuat-thi-cong-noi-that-editor-form" className="cms-form xay-nha-form">
+      <SettingsConflictBanner conflict={conflict} onDiscardDraftAndReload={() => window.location.reload()} />
       <div className="form-grid">
         <label>Eyebrow hero<input value={values.heroEyebrow} onChange={(e) => setValues({ ...values, heroEyebrow: e.target.value })} /></label>
         <label className="wide">Tiêu đề hero<textarea value={values.heroTitle} onChange={(e) => setValues({ ...values, heroTitle: e.target.value })} rows={3} /></label>
@@ -257,7 +271,7 @@ export function SanXuatNoiThatEditor({ roles }: { roles: string[] }) {
       </div>
 
       <div className="form-actions wide">
-        <button className="primary-button" disabled={!canSave || saving} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình Sản xuất Thi công Nội thất"}</button>
+        <button className="primary-button" disabled={!canSave || saving || Boolean(conflict)} type="submit">{saving ? "Đang lưu..." : "Lưu cấu hình Sản xuất Thi công Nội thất"}</button>
       </div>
     </form>
   );
