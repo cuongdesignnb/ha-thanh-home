@@ -486,6 +486,34 @@
   font-size: clamp(22px, 2.4vw, 30px);
 }
 
+.xay-nha-reference-prices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.xay-nha-reference-price {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.xay-nha-reference-price small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.xay-nha-reference-price strong {
+  color: var(--green);
+  font-size: clamp(18px, 2vw, 24px);
+}
+
 .xay-nha-note {
   margin: 18px 0 0;
   font-size: 13px;
@@ -868,6 +896,10 @@
   .xay-nha-price-box,
   .xay-nha-form-grid,
   .xay-nha-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .xay-nha-reference-prices {
     grid-template-columns: 1fr;
   }
 

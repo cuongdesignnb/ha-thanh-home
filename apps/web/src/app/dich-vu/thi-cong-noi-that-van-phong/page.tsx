@@ -25,6 +25,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
+import { resolveTestimonialRating } from "@/lib/testimonial-data";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { XayNhaQuoteForm } from "@/components/xay-nha-quote-form";
 import {
@@ -246,6 +247,7 @@ function WhyChooseSection({ landing }: { landing: LandingType }) {
 }
 
 function StatsStrip({ items }: { items: LandingListItem[] }) {
+  if (!items.length) return null;
   return (
     <section className="xay-nha-stats-section">
       <div className="container">
@@ -258,6 +260,7 @@ function StatsStrip({ items }: { items: LandingListItem[] }) {
 }
 
 function Testimonials({ items, landing }: { items: LandingTestimonial[]; landing: LandingType }) {
+  if (!items.length) return null;
   return (
     <section className="section">
       <div className="container">
@@ -268,7 +271,7 @@ function Testimonials({ items, landing }: { items: LandingTestimonial[]; landing
               <div className="xay-nha-avatar">{index + 1}</div>
               <strong>{item.name}</strong>
               <span>{item.project}</span>
-              <div className="xay-nha-stars">{Array.from({ length: 5 }, (_, star) => <Star fill="currentColor" size={16} key={star} />)}</div>
+              {resolveTestimonialRating(item.rating) ? <div className="xay-nha-stars" aria-label={`${item.rating} trên 5 sao`}>{Array.from({ length: resolveTestimonialRating(item.rating) || 0 }, (_, star) => <Star fill="currentColor" size={16} key={star} />)}</div> : null}
               <p>“{item.quote}”</p>
             </article>
           ))}

@@ -23,6 +23,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { buildBreadcrumbSchema, buildAboutPageSchema } from "@/lib/seo/jsonld";
+import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
 import type { AboutPageConfig } from "@/lib/about-page-config";
 import styles from "./about-page.module.css";
 
@@ -123,10 +124,6 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
                   alt="Hà Thành Home interior"
                   className={styles.introImage}
                 />
-                <div className={styles.introBadge}>
-                  <span className={styles.introBadgeVal}>10+ Năm</span>
-                  <span className={styles.introBadgeLabel}>Kinh nghiệm thực tế</span>
-                </div>
               </div>
               <div className={styles.introContent}>
                 <span className={styles.eyebrow}>{config.intro?.eyebrow}</span>
@@ -249,7 +246,7 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
         </section>
 
         {/* 8. Stats Strip (Dark Green Background) */}
-        <section className={styles.statsStrip}>
+        {shouldRenderCmsList(config.stats) ? <section className={styles.statsStrip}>
           <div className={styles.container}>
             <div className={styles.statsGrid}>
               {config.stats?.map((stat, idx) => (
@@ -260,7 +257,7 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
               ))}
             </div>
           </div>
-        </section>
+        </section> : null}
 
         {/* 9. Strengths & Capacities Section */}
         <section className={styles.section}>
@@ -318,7 +315,7 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
         </section>
 
         {/* 11. Testimonials Section */}
-        {config.testimonials?.items?.length ? (
+        {shouldRenderCmsList(config.testimonials?.items) ? (
           <section className={styles.section}>
             <div className={styles.container}>
               <div className={styles.sectionHead}>
@@ -342,11 +339,11 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
                           <span className={styles.clientLoc}>{item.location}</span>
                         </div>
                       </div>
-                      <div className={styles.rating}>
-                        {Array.from({ length: item.rating || 5 }).map((_, starIdx) => (
+                      {resolveTestimonialRating(item.rating) !== null ? <div className={styles.rating} aria-label={`${resolveTestimonialRating(item.rating)} trên 5 sao`}>
+                        {Array.from({ length: resolveTestimonialRating(item.rating) || 0 }).map((_, starIdx) => (
                           <Star key={starIdx} size={15} fill="currentColor" />
                         ))}
-                      </div>
+                      </div> : null}
                       <p className={styles.quote}>"{item.quote}"</p>
                     </div>
                   ))}

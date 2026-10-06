@@ -47,16 +47,8 @@ const xayNhaAdvancedDefaults = {
     { title: "Cam kết tiến độ", description: "Đền bù nếu chậm tiến độ theo hợp đồng." },
     { title: "Bảo hành dài hạn", description: "Lên đến 10 năm cho phần kết cấu chính." },
   ],
-  stats: [
-    { value: "10+", label: "Năm kinh nghiệm" },
-    { value: "200+", label: "Dự án bàn giao" },
-    { value: "98%", label: "Khách hàng hài lòng" },
-    { value: "24/7", label: "Hỗ trợ sau bàn giao" },
-  ],
-  testimonials: [
-    { name: "Anh Minh - Hà Nội", quote: "Hà Thành Home thi công đúng tiến độ, minh bạch chi phí. Gia đình rất hài lòng với ngôi nhà mới." },
-    { name: "Chị Lan - Hưng Yên", quote: "Đội ngũ tư vấn nhiệt tình, chất lượng thi công vượt mong đợi. Sẽ giới thiệu cho bạn bè." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Xây nhà trọn gói bao gồm những gì?", answer: "Bao gồm khảo sát, tư vấn, thiết kế, dự toán, thi công phần thô, hoàn thiện, nghiệm thu, bàn giao và bảo hành theo hợp đồng." },
     { question: "Chi phí xây nhà trọn gói bao nhiêu?", answer: "Tùy thuộc diện tích, phong cách, vật liệu. Hà Thành Home tư vấn báo giá miễn phí sau khi khảo sát." },

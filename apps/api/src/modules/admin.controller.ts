@@ -33,20 +33,23 @@ import { JwtGuard } from "./jwt.guard";
 import { PrismaService } from "./prisma.service";
 import { fixedServicePageWhere } from "./public-content-rules";
 import { decidePublishedAtUpdate, publishedAtPrismaValue } from "./publication-date";
+import { omitUndefined, updateWithExpectedVersion } from "./optimistic-update";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./roles.guard";
 
 class ProjectDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   slug?: string;
 
+  @IsOptional()
   @IsEnum(ProjectGroup)
-  group!: ProjectGroup;
+  group?: ProjectGroup;
 
   @IsOptional()
   @Type(() => Number)
@@ -153,6 +156,10 @@ class ProjectDto {
   @IsInt()
   @Min(0)
   sortOrder?: number;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class ProjectCategoryDto {
@@ -306,16 +313,18 @@ class MenuReorderDto {
 }
 
 class ServiceDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   slug?: string;
 
+  @IsOptional()
   @IsEnum(ProjectGroup)
-  group!: ProjectGroup;
+  group?: ProjectGroup;
 
   @IsOptional()
   @IsString()
@@ -376,12 +385,17 @@ class ServiceDto {
   @IsInt()
   @Min(0)
   sortOrder?: number;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class PageDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
@@ -433,12 +447,17 @@ class PageDto {
   @IsInt()
   @Min(0)
   sortOrder?: number;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class PostDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
@@ -511,12 +530,17 @@ class PostDto {
   @IsOptional()
   @IsDateString()
   publishedAt?: string;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class ArchitectureDesignDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
@@ -635,12 +659,17 @@ class ArchitectureDesignDto {
   @IsInt()
   @Min(0)
   sortOrder?: number;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class InteriorDesignDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  title!: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
@@ -747,6 +776,10 @@ class InteriorDesignDto {
   @IsInt()
   @Min(0)
   sortOrder?: number;
+
+  @IsOptional()
+  @IsDateString()
+  expectedUpdatedAt?: string;
 }
 
 class LeadUpdateDto {
@@ -869,6 +902,17 @@ export class AdminController {
       this.prisma.project.count({ where }),
     ]);
     return { data, meta: listMeta(total, page, limit) };
+  }
+
+  @Get("projects/:id")
+  @Roles("Admin", "Viewer")
+  async getProject(@Param("id") id: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true, categoryRef: true },
+    });
+    if (!project) throw new NotFoundException("Project not found");
+    return project;
   }
 
   @Get("project-categories")
@@ -1168,19 +1212,24 @@ export class AdminController {
   @Post("projects")
   @Roles("Admin")
   async createProject(@Body() dto: ProjectDto) {
+    const title = requireTitle(dto.title);
+    if (!dto.group) throw new BadRequestException("group is required");
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
     const contentHtml = cleanHtml(dto.contentHtml);
     if (contentHtml) {
-      const duplicate = await this.prisma.project.findFirst({ where: { title: safeString(dto.title, 191)!, contentHtml } });
+      const duplicate = await this.prisma.project.findFirst({ where: { title, contentHtml } });
       if (duplicate) {
         throw new ConflictException(`A project with the same title and content already exists (ID ${duplicate.id}). Update that record instead of creating a duplicate.`);
       }
     }
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.project.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.project.create({
       data: {
-        ...dto,
+        ...createDto,
+        title,
+        group: dto.group,
         isPortfolioVerified: dto.isPortfolioVerified ?? false,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
@@ -1199,28 +1248,39 @@ export class AdminController {
   @Roles("Admin")
   async updateProject(@Param("id") id: string, @Body() dto: ProjectDto) {
     const currentId = Number(id);
-    const current = await this.prisma.project.findUnique({ where: { id: currentId }, select: { status: true } });
-    if (!current) throw new NotFoundException("Project not found");
-    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
-          const match = await this.prisma.project.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.project.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
-        categoryId: dto.categoryId || null,
-        thumbnailMediaId: dto.thumbnailMediaId || null,
-        ...(slug ? { slug } : {}),
-        contentHtml: cleanHtml(dto.contentHtml),
-        galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.isFeatured;
+    delete patchDto.isPortfolioVerified;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Project",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.project.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.project.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(dto.isFeatured !== undefined && dto.isFeatured !== null ? { isFeatured: dto.isFeatured } : {}),
+          ...(dto.isPortfolioVerified !== undefined && dto.isPortfolioVerified !== null ? { isPortfolioVerified: dto.isPortfolioVerified } : {}),
+          ...(dto.categoryId !== undefined ? { categoryId: dto.categoryId || null } : {}),
+          ...(dto.thumbnailMediaId !== undefined ? { thumbnailMediaId: dto.thumbnailMediaId || null } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...(dto.galleryMediaIds !== undefined ? { galleryMediaIds: dto.galleryMediaIds } : {}),
+          ...(publishedAt !== undefined ? { publishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.project.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
-      include: { thumbnailMedia: true, categoryRef: true },
+      findSaved: () => this.prisma.project.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true, categoryRef: true } }),
     });
   }
 
@@ -1248,15 +1308,29 @@ export class AdminController {
     return { data, meta: listMeta(total, page, limit) };
   }
 
+  @Get("architecture-designs/:id")
+  @Roles("Admin", "Viewer")
+  async getArchitectureDesign(@Param("id") id: string) {
+    const design = await this.prisma.architectureDesignTemplate.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true },
+    });
+    if (!design) throw new NotFoundException("Architecture design not found");
+    return design;
+  }
+
   @Post("architecture-designs")
   @Roles("Admin")
   async createArchitectureDesign(@Body() dto: ArchitectureDesignDto) {
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const title = requireTitle(dto.title);
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.architectureDesignTemplate.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.architectureDesignTemplate.create({
       data: {
-        ...dto,
+        ...createDto,
+        title,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
@@ -1272,26 +1346,35 @@ export class AdminController {
   @Roles("Admin")
   async updateArchitectureDesign(@Param("id") id: string, @Body() dto: ArchitectureDesignDto) {
     const currentId = Number(id);
-    const current = await this.prisma.architectureDesignTemplate.findUnique({ where: { id: currentId }, select: { status: true } });
-    if (!current) throw new NotFoundException("Architecture design not found");
-    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
-          const match = await this.prisma.architectureDesignTemplate.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.architectureDesignTemplate.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
-        ...(slug ? { slug } : {}),
-        contentHtml: cleanHtml(dto.contentHtml),
-        galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.isFeatured;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Architecture design",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.architectureDesignTemplate.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.architectureDesignTemplate.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(dto.isFeatured !== undefined && dto.isFeatured !== null ? { isFeatured: dto.isFeatured } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...(dto.galleryMediaIds !== undefined ? { galleryMediaIds: dto.galleryMediaIds } : {}),
+          ...(publishedAt !== undefined ? { publishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.architectureDesignTemplate.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
-      include: { thumbnailMedia: true },
+      findSaved: () => this.prisma.architectureDesignTemplate.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true } }),
     });
   }
 
@@ -1319,15 +1402,29 @@ export class AdminController {
     return { data, meta: listMeta(total, page, limit) };
   }
 
+  @Get("interior-designs/:id")
+  @Roles("Admin", "Viewer")
+  async getInteriorDesign(@Param("id") id: string) {
+    const design = await this.prisma.interiorDesignTemplate.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true },
+    });
+    if (!design) throw new NotFoundException("Interior design not found");
+    return design;
+  }
+
   @Post("interior-designs")
   @Roles("Admin")
   async createInteriorDesign(@Body() dto: InteriorDesignDto) {
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const title = requireTitle(dto.title);
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.interiorDesignTemplate.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.interiorDesignTemplate.create({
       data: {
-        ...dto,
+        ...createDto,
+        title,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
@@ -1343,26 +1440,35 @@ export class AdminController {
   @Roles("Admin")
   async updateInteriorDesign(@Param("id") id: string, @Body() dto: InteriorDesignDto) {
     const currentId = Number(id);
-    const current = await this.prisma.interiorDesignTemplate.findUnique({ where: { id: currentId }, select: { status: true } });
-    if (!current) throw new NotFoundException("Interior design not found");
-    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
-          const match = await this.prisma.interiorDesignTemplate.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.interiorDesignTemplate.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
-        ...(slug ? { slug } : {}),
-        contentHtml: cleanHtml(dto.contentHtml),
-        galleryMediaIds: dto.galleryMediaIds || undefined,
-        publishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.isFeatured;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Interior design",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.interiorDesignTemplate.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.interiorDesignTemplate.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(dto.isFeatured !== undefined && dto.isFeatured !== null ? { isFeatured: dto.isFeatured } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...(dto.galleryMediaIds !== undefined ? { galleryMediaIds: dto.galleryMediaIds } : {}),
+          ...(publishedAt !== undefined ? { publishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.interiorDesignTemplate.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
-      include: { thumbnailMedia: true },
+      findSaved: () => this.prisma.interiorDesignTemplate.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true } }),
     });
   }
 
@@ -1388,15 +1494,31 @@ export class AdminController {
     return { data, meta: listMeta(total, page, limit) };
   }
 
+  @Get("services/:id")
+  @Roles("Admin", "Viewer")
+  async getService(@Param("id") id: string) {
+    const service = await this.prisma.service.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true },
+    });
+    if (!service) throw new NotFoundException("Service not found");
+    return service;
+  }
+
   @Post("services")
   @Roles("Admin")
   async createService(@Body() dto: ServiceDto) {
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const title = requireTitle(dto.title);
+    if (!dto.group) throw new BadRequestException("group is required");
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.service.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.service.create({
       data: {
-        ...dto,
+        ...createDto,
+        title,
+        group: dto.group,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
@@ -1410,24 +1532,36 @@ export class AdminController {
   @Roles("Admin")
   async updateService(@Param("id") id: string, @Body() dto: ServiceDto) {
     const currentId = Number(id);
-    const current = await this.prisma.service.findUnique({ where: { id: currentId }, select: { status: true } });
-    if (!current) throw new NotFoundException("Service not found");
-    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
-          const match = await this.prisma.service.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.service.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
-        ...(slug ? { slug } : {}),
-        contentHtml: cleanHtml(dto.contentHtml),
-        publishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.isFeatured;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Service",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.service.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.service.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(dto.isFeatured !== undefined && dto.isFeatured !== null ? { isFeatured: dto.isFeatured } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...(dto.thumbnailMediaId !== undefined ? { thumbnailMediaId: dto.thumbnailMediaId || null } : {}),
+          ...(dto.galleryMediaIds !== undefined ? { galleryMediaIds: dto.galleryMediaIds } : {}),
+          ...(publishedAt !== undefined ? { publishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.service.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
+      findSaved: () => this.prisma.service.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true } }),
     });
   }
 
@@ -1454,9 +1588,22 @@ export class AdminController {
     return { data, meta: listMeta(total, page, limit) };
   }
 
+  @Get("posts/:id")
+  @Roles("Admin", "SEO Editor", "Viewer")
+  async getPost(@Param("id") id: string) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true, categoryRef: true },
+    });
+    if (!post) throw new NotFoundException("Post not found");
+    return post;
+  }
+
   @Post("posts")
   @Roles("Admin", "SEO Editor")
   async createPost(@Body() dto: PostDto) {
+    const title = requireTitle(dto.title);
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
     const scheduledAt = dto.scheduledAt ? parseScheduleDate(dto.scheduledAt) : undefined;
     if (dto.status === ContentStatus.scheduled && !scheduledAt) {
       throw new BadRequestException("scheduledAt is required when status is scheduled");
@@ -1466,19 +1613,18 @@ export class AdminController {
       throw new BadRequestException("Invalid publishedAt date");
     }
     const contentHtml = cleanHtml(dto.contentHtml);
-    const title = safeString(dto.title, 191)!;
     if (contentHtml) {
       const duplicate = await this.prisma.post.findFirst({ where: { title, contentHtml } });
       if (duplicate) {
         throw new ConflictException(`A post with the same title and content already exists (ID ${duplicate.id}). Update that record instead of creating a duplicate.`);
       }
     }
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.post.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.post.create({
       data: {
-        ...dto,
+        ...createDto,
         isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
         categoryId: dto.categoryId || null,
         thumbnailMediaId: dto.thumbnailMediaId || null,
@@ -1508,39 +1654,48 @@ export class AdminController {
     if (publishedAt && Number.isNaN(publishedAt.getTime())) {
       throw new BadRequestException("Invalid publishedAt date");
     }
-    const currentPost = await this.prisma.post.findUnique({ where: { id: currentId } });
-    if (!currentPost) throw new NotFoundException("Post not found");
-
-    const finalPublishedAt = publicationDateForUpdate(
-      currentPost.status,
-      dto.status,
-      publishedAt,
-      true,
-    );
-
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title, dto.slug, async (candidate) => {
-          const match = await this.prisma.post.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.post.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        isFeatured: dto.isFeatured === null ? false : dto.isFeatured,
-        categoryId: dto.categoryId || null,
-        thumbnailMediaId: dto.thumbnailMediaId || null,
-        ...(slug ? { slug } : {}),
-        title: dto.title !== undefined ? safeString(dto.title, 191)! : undefined,
-        focusKeyword: dto.focusKeyword !== undefined ? safeString(dto.focusKeyword, 191) : undefined,
-        metaTitle: dto.metaTitle !== undefined ? safeString(dto.metaTitle, 191) : undefined,
-        canonicalUrl: dto.canonicalUrl !== undefined ? safeString(dto.canonicalUrl, 191) : undefined,
-        ogTitle: dto.ogTitle !== undefined ? safeString(dto.ogTitle, 191) : undefined,
-        contentHtml: cleanHtml(dto.contentHtml),
-        scheduledAt: scheduledAt || null,
-        publishedAt: finalPublishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.isFeatured;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Post",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.post.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.post.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const finalPublishedAt = publicationDateForUpdate(current.status, dto.status, publishedAt, true);
+        const schedulePatch = dto.status !== undefined
+          ? { scheduledAt: dto.status === ContentStatus.scheduled ? scheduledAt : null }
+          : dto.scheduledAt !== undefined
+            ? { scheduledAt: scheduledAt ?? null }
+            : {};
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(dto.focusKeyword !== undefined ? { focusKeyword: safeString(dto.focusKeyword, 191) } : {}),
+          ...(dto.metaTitle !== undefined ? { metaTitle: safeString(dto.metaTitle, 191) } : {}),
+          ...(dto.metaDescription !== undefined ? { metaDescription: safeString(dto.metaDescription, 191) } : {}),
+          ...(dto.canonicalUrl !== undefined ? { canonicalUrl: safeString(dto.canonicalUrl, 191) } : {}),
+          ...(dto.ogTitle !== undefined ? { ogTitle: safeString(dto.ogTitle, 191) } : {}),
+          ...(dto.ogDescription !== undefined ? { ogDescription: safeString(dto.ogDescription, 191) } : {}),
+          ...(dto.isFeatured !== undefined && dto.isFeatured !== null ? { isFeatured: dto.isFeatured } : {}),
+          ...(dto.categoryId !== undefined ? { categoryId: dto.categoryId || null } : {}),
+          ...(dto.thumbnailMediaId !== undefined ? { thumbnailMediaId: dto.thumbnailMediaId || null } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...schedulePatch,
+          ...(finalPublishedAt !== undefined ? { publishedAt: finalPublishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.post.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
+      findSaved: () => this.prisma.post.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true, categoryRef: true } }),
     });
   }
 
@@ -1746,15 +1901,29 @@ export class AdminController {
     return { data, meta: listMeta(total, page, limit) };
   }
 
+  @Get("pages/:id")
+  @Roles("Admin", "Viewer")
+  async getPage(@Param("id") id: string) {
+    const page = await this.prisma.page.findUnique({
+      where: { id: Number(id) },
+      include: { thumbnailMedia: true },
+    });
+    if (!page) throw new NotFoundException("Page not found");
+    return page;
+  }
+
   @Post("pages")
   @Roles("Admin")
   async createPage(@Body() dto: PageDto) {
-    const slug = await createSlug(dto.title, dto.slug, (candidate) =>
+    const title = requireTitle(dto.title);
+    const { expectedUpdatedAt: _expectedUpdatedAt, ...createDto } = dto;
+    const slug = await createSlug(title, dto.slug, (candidate) =>
       this.prisma.page.findUnique({ where: { slug: candidate } }).then(Boolean),
     );
     return this.prisma.page.create({
       data: {
-        ...dto,
+        ...createDto,
+        title,
         slug,
         contentHtml: cleanHtml(dto.contentHtml),
         publishedAt: dto.status === ContentStatus.published ? new Date() : undefined,
@@ -1766,23 +1935,33 @@ export class AdminController {
   @Roles("Admin")
   async updatePage(@Param("id") id: string, @Body() dto: PageDto) {
     const currentId = Number(id);
-    const current = await this.prisma.page.findUnique({ where: { id: currentId }, select: { status: true } });
-    if (!current) throw new NotFoundException("Page not found");
-    const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
-    const slug = dto.slug
-      ? await uniqueSlug(dto.title || "", dto.slug, async (candidate) => {
-          const match = await this.prisma.page.findUnique({ where: { slug: candidate } });
-          return Boolean(match && match.id !== currentId);
-        })
-      : undefined;
-    return this.prisma.page.update({
-      where: { id: currentId },
-      data: {
-        ...dto,
-        ...(slug ? { slug } : {}),
-        contentHtml: cleanHtml(dto.contentHtml),
-        publishedAt,
+    const patchDto = { ...dto };
+    delete patchDto.expectedUpdatedAt;
+    delete patchDto.publishedAt;
+    return updateWithExpectedVersion({
+      entityName: "Page",
+      expectedUpdatedAt: dto.expectedUpdatedAt,
+      findCurrent: () => this.prisma.page.findUnique({ where: { id: currentId }, select: { updatedAt: true, status: true, title: true } }),
+      updateMany: async (expectedUpdatedAt, current) => {
+        const slug = dto.slug
+          ? await uniqueSlug(dto.title ?? current.title, dto.slug, async (candidate) => {
+              const match = await this.prisma.page.findUnique({ where: { slug: candidate } });
+              return Boolean(match && match.id !== currentId);
+            })
+          : undefined;
+        const publishedAt = publicationDateForUpdate(current.status, dto.status, dto.publishedAt);
+        const data = omitUndefined({
+          ...patchDto,
+          ...(dto.title !== undefined ? { title: safeString(dto.title, 191)! } : {}),
+          ...(slug ? { slug } : {}),
+          ...(dto.contentHtml !== undefined ? { contentHtml: cleanHtml(dto.contentHtml) } : {}),
+          ...(dto.thumbnailMediaId !== undefined ? { thumbnailMediaId: dto.thumbnailMediaId || null } : {}),
+          ...(publishedAt !== undefined ? { publishedAt } : {}),
+        });
+        if (Object.keys(data).length === 0) return { count: 1 };
+        return this.prisma.page.updateMany({ where: { id: currentId, updatedAt: expectedUpdatedAt }, data });
       },
+      findSaved: () => this.prisma.page.findUnique({ where: { id: currentId }, include: { thumbnailMedia: true } }),
     });
   }
 
@@ -1812,6 +1991,12 @@ function parseScheduleDate(value: string) {
     throw new BadRequestException("Invalid scheduledAt");
   }
   return scheduledAt;
+}
+
+function requireTitle(value?: string | null) {
+  const title = safeString(value?.trim(), 191);
+  if (!title || title.length < 2) throw new BadRequestException("title is required");
+  return title;
 }
 
 function publicationDateForUpdate(

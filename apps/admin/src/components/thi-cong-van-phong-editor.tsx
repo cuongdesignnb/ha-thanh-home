@@ -52,17 +52,8 @@ const advancedDefaults = {
     { title: "Bảo hành dài hạn", description: "Hỗ trợ doanh nghiệp lâu dài" },
     { title: "Đội ngũ chuyên môn", description: "Đội thi công nhiều kinh nghiệm" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "500+", description: "Dự án văn phòng" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Anh Nguyễn Quốc Bảo", project: "Giám đốc – FPT Software", quote: "Đội ngũ làm việc chuyên nghiệp, đúng tiến độ và chất lượng." },
-    { name: "Chị Trần Minh Hằng", project: "HR Director – Unilever Việt Nam", quote: "Phối hợp nhịp nhàng, đảm bảo tiêu chuẩn cao." },
-    { name: "Anh Lê Hoàng Nam", project: "CEO – StartupX", quote: "Chi phí hợp lý, thiết kế sáng tạo và thi công rất chỉn chu." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian thi công nội thất văn phòng là bao lâu?", answer: "Tùy quy mô, thường 30 – 60 ngày cho văn phòng nhỏ, 60 – 90 ngày cho văn phòng lớn." },
     { question: "Có thiết kế 2D/3D trước khi thi công không?", answer: "Có. Toàn bộ phương án được thiết kế chi tiết và duyệt trước khi thi công." },

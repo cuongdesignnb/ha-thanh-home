@@ -51,17 +51,8 @@ const advancedDefaults = {
     { title: "Bảo hành dài hạn", description: "Bảo hành 12 – 24 tháng, bảo trì trọn đời" },
     { title: "Đội ngũ lành nghề", description: "Kỹ sư, thợ tay nghề cao và tận tâm" },
   ],
-  stats: [
-    { title: "10+", description: "Năm kinh nghiệm" },
-    { title: "500+", description: "Dự án hoàn thiện" },
-    { title: "98%", description: "Khách hàng hài lòng" },
-    { title: "24/7", description: "Hỗ trợ tư vấn" },
-  ],
-  testimonials: [
-    { name: "Anh Minh Tuấn", project: "Căn hộ Cầu Giấy – Hà Nội", quote: "Nội thất đẹp, thi công chuẩn từng chi tiết." },
-    { name: "Chị Thu Hằng", project: "Biệt thự Long Biên – Hà Nội", quote: "Thiết kế tinh tế, tối ưu không gian rất tốt." },
-    { name: "Anh Quốc Huy", project: "Nhà phố Bắc Từ Liêm – Hà Nội", quote: "Đúng tiến độ, cam kết và bảo hành rõ ràng." },
-  ],
+  stats: [],
+  testimonials: [],
   faqs: [
     { question: "Thời gian sản xuất nội thất mất bao lâu?", answer: "Tùy khối lượng và mức hoàn thiện, thông thường 30-60 ngày cho căn hộ và 60-90 ngày cho biệt thự, văn phòng." },
     { question: "Hà Thành Home có xưởng sản xuất riêng không?", answer: "Có. Hà Thành Home sở hữu xưởng sản xuất riêng tại Hà Nội với máy móc CNC hiện đại." },
