@@ -1,3 +1,16 @@
+/** Owner-approved duplicate pair; do not normalize unrelated URL casing. */
+export const approvedArchitectureCanonicalPath = "/mau-thiet-ke-kien-truc/mau-nha-mai-nhat-1-tang-xu-huong-2026";
+export const approvedHouseLegacyPath = "/xay-nha-tron-goi-uy-tin-tiet-kiem-chi-phi";
+export const approvedHouseCanonicalPath = "/du-an/xay-dung-nha-tron-goi-uy-tin-tiet-kiem-chi-phi";
+
+export function getApprovedDuplicateRedirectTarget(pathname: string): string | undefined {
+  if (pathname === approvedHouseLegacyPath) return approvedHouseCanonicalPath;
+  if (pathname !== approvedArchitectureCanonicalPath && pathname.toLowerCase() === approvedArchitectureCanonicalPath) {
+    return approvedArchitectureCanonicalPath;
+  }
+  return undefined;
+}
+
 /** Explicit historical SEO redirects. Keep this list exact and intentionally small. */
 export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi": "/dich-vu/xay-nha-tron-goi",
@@ -65,7 +78,7 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
 
 /** Return a destination only for an explicitly approved historical pathname. */
 export function getLegacyRedirectTarget(pathname: string): string | undefined {
-  return legacySeoRedirects[pathname];
+  return getApprovedDuplicateRedirectTarget(pathname) || legacySeoRedirects[pathname];
 }
 
 export function isLegacyRedirectSource(pathname: string): boolean {

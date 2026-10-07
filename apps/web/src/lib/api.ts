@@ -1,3 +1,4 @@
+import { getApprovedDuplicateRedirectTarget } from "./legacy-redirects";
 import { AboutPageConfig } from "./about-page-config";
 import { aboutPageDefaultConfig } from "./about-page-defaults";
 import { resolveCmsList } from "./testimonial-data";
@@ -726,7 +727,13 @@ export function normalizeMenuUrl(url: string): string {
     "/dich-vu/cong-trinh": "/dich-vu",
     "/dich-vu/noi-that": "/dich-vu",
   };
-  return aliases[url] || url;
+  const ownOrigin = url.match(/^https?:\/\/(?:www\.)?hathanhhome\.vn(?=\/)/i)?.[0] || "";
+  const relativeUrl = ownOrigin ? url.slice(ownOrigin.length) : url;
+  const suffixIndex = relativeUrl.search(/[?#]/);
+  const pathname = suffixIndex >= 0 ? relativeUrl.slice(0, suffixIndex) : relativeUrl;
+  const suffix = suffixIndex >= 0 ? relativeUrl.slice(suffixIndex) : "";
+  const duplicateTarget = getApprovedDuplicateRedirectTarget(pathname);
+  return duplicateTarget ? `${ownOrigin}${duplicateTarget}${suffix}` : aliases[url] || url;
 }
 
 export function normalizeMenuItems(items: MenuItem[]): MenuItem[] {
