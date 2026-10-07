@@ -5,9 +5,9 @@ import {
   normalizeLegacyAnchors,
   normalizeLegacyHref,
 } from "./rich-content";
-import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
+import { approvedArchitectureCanonicalPath, approvedHouseCanonicalPath, approvedHouseLegacyPath, getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 import { getMalformedLegacyTarget, proxy } from "../proxy";
-import { legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
+import { contentMetadata, legacySlugComparisonKey, normalizeMenuItems, normalizeMenuUrl } from "./api";
 import { deadInternalHrefPaths } from "./dead-internal-hrefs";
 import { internalCanonicalHrefTargets } from "./internal-href-targets";
 import { buildPaginationItems, buildProjectCatalogCanonical, buildProjectCatalogPageHref, isCatalogPageOutOfRange } from "./project-catalog-pagination";
@@ -549,5 +549,57 @@ for (const path of [
   "/goc-giai-dap-cua-phong-ngu-nen-mo-vao-trong-hay-ra-ngoai",
   "/doc-trat-tuong",
 ]) assert.equal(getLegacyRedirectTarget(path), undefined);
+
+// Approved duplicate consolidation: exact house source and casing of one architecture URL only.
+const architectureCaseSource = "/mau-thiet-ke-kien-truc/Mau-nha-mai-nhat-1-tang-xu-huong-2026";
+for (const [source, target] of [
+  [approvedHouseLegacyPath, approvedHouseCanonicalPath],
+  [architectureCaseSource, approvedArchitectureCanonicalPath],
+  [approvedArchitectureCanonicalPath.toUpperCase(), approvedArchitectureCanonicalPath],
+]) {
+  const response = proxy(new NextRequest(`https://hathanhhome.vn${source}?utm_source=qa&ref=a%2Fb`));
+  assert.equal(response.status, 308);
+  assert.equal(response.headers.get("location"), `https://hathanhhome.vn${target}?utm_source=qa&ref=a%2Fb`);
+  assert.equal(getLegacyRedirectTarget(target), undefined, "destination must not redirect again");
+  assert.equal(isLegacyRedirectSource(source), true, "sitemap must omit the source");
+  assert.equal(isLegacyRedirectSource(target), false);
+  assert.equal(normalizeLegacyHref(`${source}?ref=qa#details`), `${target}?ref=qa#details`);
+  assert.equal(normalizeLegacyHref(`https://hathanhhome.vn${source}`), `https://hathanhhome.vn${target}`);
+  assert.equal(normalizeMenuUrl(`${source}?ref=qa#details`), `${target}?ref=qa#details`);
+  assert.equal(normalizeMenuUrl(`https://hathanhhome.vn${source}?ref=qa#details`), `https://hathanhhome.vn${target}?ref=qa#details`);
+  assert.equal(normalizeMenuUrl(`https://example.com${source}`), `https://example.com${source}`);
+}
+assert.equal(normalizeLegacyHref("https://example.com" + approvedHouseLegacyPath), "https://example.com" + approvedHouseLegacyPath);
+for (const path of [
+  "/mau-thiet-ke-kien-truc/Mau-khac",
+  "/xay-nha-tron-goi-uy-tin-tiet-kiem-chi-phi-khac",
+  "/tin-tuc/chat-luong-be-tong-mac-350",
+  "/tin-tuc/chat-luong-be-tong-mac-250",
+  "/tin-tuc/khoang-cach-diem-noi-cua-thep-cot-dung-tieu-chuan-an-toan",
+  "/tin-tuc/cach-tinh-khoi-luong-sat-thep-don-gian-hieu-qua",
+  "/tin-tuc/xay-nha-1-ty-duoc-nha-nhu-the-nao",
+  "/tin-tuc/chi-phi-xay-nha-cap-4-tron-goi-bao-nhieu-tien",
+  "/tin-tuc/xin-cap-nuoc-sach-tai-dau",
+  "/tin-tuc/thu-tuc-xin-cap-nuoc-sach-khi-xay-nha",
+  "/tin-tuc/nut-ran-san-be-tong-va-nhung-hau-qua",
+  "/tin-tuc/cach-xu-ly-ve-sinh-thep-gi-truoc-khi-do-be-tong",
+  "/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep",
+  "/du-an/cong-ty-xay-dung-nha-uy-tin-ha-thanh-hathanhhome",
+  "/du-an/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome",
+  "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026",
+  "/tin-tuc/uu-diem-cua-thep-cb40",
+  "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi",
+  "/tin-tuc/kinh-nghiem-xay-nha-trong-ngo-nho-ha-noi",
+  "/dich-vu/xay-nha-tron-goi",
+  "/dich-vu/thi-cong-nha-xuong",
+  "/dich-vu/san-xuat-thi-cong-noi-that",
+  "/dich-vu/thi-cong-noi-that-van-phong",
+]) {
+  assert.equal(getLegacyRedirectTarget(path), undefined);
+  assert.equal(normalizeMenuUrl(path), path);
+  assert.equal(proxy(new NextRequest(`https://hathanhhome.vn${path}`)).headers.get("location"), null);
+}
+assert.equal(contentMetadata({ title: "Architecture", canonicalUrl: null }, "Fallback", approvedArchitectureCanonicalPath).alternates?.canonical, approvedArchitectureCanonicalPath);
+assert.equal(contentMetadata({ title: "Architecture", canonicalUrl: "https://hathanhhome.vn/custom-canonical" }, "Fallback", approvedArchitectureCanonicalPath).alternates?.canonical, "https://hathanhhome.vn/custom-canonical");
 
 console.log("SEO rich-content regression tests passed");
