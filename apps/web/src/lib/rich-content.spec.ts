@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import {
+  demoteContentH1,
   isUsableSlug,
   normalizeLegacyAnchors,
   normalizeLegacyHref,
+  prepareDetailHtml,
 } from "./rich-content";
 import { getLegacyRedirectTarget, isLegacyRedirectSource } from "./legacy-redirects";
 import { getMalformedLegacyTarget, proxy } from "../proxy";
@@ -549,5 +551,18 @@ for (const path of [
   "/goc-giai-dap-cua-phong-ngu-nen-mo-vao-trong-hay-ra-ngoai",
   "/doc-trat-tuong",
 ]) assert.equal(getLegacyRedirectTarget(path), undefined);
+
+// CMS content must not add a second <h1>: detail pages already render the title as <h1> in the hero.
+assert.equal(demoteContentH1("<h1>Tiêu đề</h1><p>Nội dung</p>"), "<h2>Tiêu đề</h2><p>Nội dung</p>");
+assert.equal(demoteContentH1('<H1 class="title" id="top">A</H1>'), '<h2 class="title" id="top">A</h2>');
+assert.equal(demoteContentH1('<h1\n  style="color:red">A</h1 >'), '<h2\n  style="color:red">A</h2 >');
+assert.equal(demoteContentH1("<h2>A</h2><h10>x</h10><header>y</header>"), "<h2>A</h2><h10>x</h10><header>y</header>");
+assert.equal(demoteContentH1('<script>const t = "<h1>x</h1>";</script><style>h1{color:red}</style>'), '<script>const t = "<h1>x</h1>";</script><style>h1{color:red}</style>');
+assert.equal(demoteContentH1(""), "");
+assert.equal(
+  prepareDetailHtml('<h1>Cách Lên Dự Toán</h1><p>Đọc <a href="/xay-nha-tron-goi">bài này</a></p>'),
+  '<h2>Cách Lên Dự Toán</h2><p>Đọc <a href="/dich-vu/xay-nha-tron-goi">bài này</a></p>',
+);
+assert.equal((prepareDetailHtml("<h1>A</h1><h1>B</h1><table><tr><td>1</td></tr></table>").match(/<h1/gi) || []).length, 0);
 
 console.log("SEO rich-content regression tests passed");
