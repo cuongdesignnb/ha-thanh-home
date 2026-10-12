@@ -15,6 +15,7 @@ import { internalCanonicalHrefTargets } from "./internal-href-targets";
 import { buildPaginationItems, buildProjectCatalogCanonical, buildProjectCatalogPageHref, isCatalogPageOutOfRange } from "./project-catalog-pagination";
 import { buildPostCatalogCanonical, buildPostCatalogPageHref, buildPostPaginationItems, isPostCatalogPageOutOfRange } from "./post-catalog-pagination";
 import { footerUtilityLinks } from "./footer-utility-links";
+import { normalizeDisplayTitle, withDisplayTitles } from "./display-title";
 
 assert.equal(normalizeLegacyHref("../gia-vat-lieu-xay-dung/"), "/gia-vat-lieu-xay-dung/");
 assert.equal(normalizeLegacyHref("%22../gia-vat-lieu-xay-dung/%22"), "/gia-vat-lieu-xay-dung/");
@@ -564,5 +565,32 @@ assert.equal(
   '<h2>Cách Lên Dự Toán</h2><p>Đọc <a href="/dich-vu/xay-nha-tron-goi">bài này</a></p>',
 );
 assert.equal((prepareDetailHtml("<h1>A</h1><h1>B</h1><table><tr><td>1</td></tr></table>").match(/<h1/gi) || []).length, 0);
+
+
+// CMS title display normalization: space before punctuation, edge spaces, repeated spaces.
+assert.equal(normalizeDisplayTitle("Những Lưu Ý Khi Xây Nhà Trong Ngõ ."), "Những Lưu Ý Khi Xây Nhà Trong Ngõ");
+assert.equal(normalizeDisplayTitle("Nên Đặt Bể Nước Tại Vị Trí Nào Của Ngôi Nhà  ."), "Nên Đặt Bể Nước Tại Vị Trí Nào Của Ngôi Nhà");
+assert.equal(normalizeDisplayTitle("Xây Nhà 3 Tầng Hết Bao Nhiêu Tiền ?"), "Xây Nhà 3 Tầng Hết Bao Nhiêu Tiền?");
+assert.equal(normalizeDisplayTitle("Gỗ Công Nghiệp Là Gì ? Những Ưu Điểm"), "Gỗ Công Nghiệp Là Gì? Những Ưu Điểm");
+assert.equal(normalizeDisplayTitle("Hoàn Thiện Nhà Phần Thô Hà Nội - Tư Vấn , Khảo Sát Miễn Phí"), "Hoàn Thiện Nhà Phần Thô Hà Nội - Tư Vấn, Khảo Sát Miễn Phí");
+assert.equal(normalizeDisplayTitle("Mẫu biệt thự đẹp ..."), "Mẫu biệt thự đẹp...");
+assert.equal(normalizeDisplayTitle("  Mẫu Nhà Phố 4 Tầng Hiện Đại "), "Mẫu Nhà Phố 4 Tầng Hiện Đại");
+assert.equal(normalizeDisplayTitle(" Mẫu Nhà Phố	"), "Mẫu Nhà Phố");
+assert.equal(normalizeDisplayTitle("Thiết Kế  Thi Công Nhà Xưởng"), "Thiết Kế Thi Công Nhà Xưởng");
+assert.equal(normalizeDisplayTitle("Cách Xử Lý Khe Giáp Ranh Giữa  2 Nhà ."), "Cách Xử Lý Khe Giáp Ranh Giữa 2 Nhà");
+for (const clean of [
+  "Kiểm Tra Chất Lượng Bê Tông Trước Khi Đổ.",
+  "Xây nhà trọn gói tại Hà Nội - Báo giá 2026",
+  "100+ Mẫu Thiết Kế Nội Thất Xu Hướng 2026",
+  "Giá 1.000.000 đ/m² - 3,5 tầng",
+  "Nhà phố 5x20m: mẫu đẹp",
+]) assert.equal(normalizeDisplayTitle(clean), clean);
+const cleanItem = { id: 1, title: "Mẫu nhà đẹp", slug: "mau-nha-dep" };
+assert.equal(withDisplayTitles(cleanItem), cleanItem);
+assert.deepEqual(
+  withDisplayTitles({ id: 2, title: " Nhà Trong Ngõ .", slug: "nha-trong-ngo-", metaTitle: "Nhà  Trong Ngõ .", ogTitle: null }),
+  { id: 2, title: "Nhà Trong Ngõ", slug: "nha-trong-ngo-", metaTitle: "Nhà Trong Ngõ", ogTitle: null },
+);
+assert.equal(withDisplayTitles(null), null);
 
 console.log("SEO rich-content regression tests passed");
