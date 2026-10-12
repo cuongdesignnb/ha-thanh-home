@@ -1,6 +1,7 @@
 import { AboutPageConfig } from "./about-page-config";
 import { aboutPageDefaultConfig } from "./about-page-defaults";
 import { resolveCmsList } from "./testimonial-data";
+import { normalizeDisplayTitle, withDisplayTitles } from "./display-title";
 
 export type ProjectGroup = "construction" | "interior" | "xay_nha_tron_goi";
 
@@ -634,8 +635,17 @@ async function fetchJsonNoStore<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
-export function getHome() {
-  return fetchJson<HomeData>("/home", fallbackHome);
+export async function getHome(): Promise<HomeData> {
+  const data = await fetchJson<HomeData>("/home", fallbackHome);
+  return {
+    ...data,
+    constructionProjects: (data.constructionProjects || []).map(withDisplayTitles),
+    interiorProjects: (data.interiorProjects || []).map(withDisplayTitles),
+    services: (data.services || []).map(withDisplayTitles),
+    posts: (data.posts || []).map(withDisplayTitles),
+    architectureDesigns: (data.architectureDesigns || []).map(withDisplayTitles),
+    interiorDesigns: (data.interiorDesigns || []).map(withDisplayTitles),
+  };
 }
 
 export async function getSiteSettings() {
@@ -715,7 +725,7 @@ export function aboutPageWithDefaults(landing?: Partial<AboutPageConfig>): About
 }
 
 function cleanMetadataTitle(title: string) {
-  return title
+  return normalizeDisplayTitle(title)
     .replace(/\s*[|–—-]\s*(Hà Thành Home|Ha Thanh Home)\s*$/gi, "")
     .replace(/\s*[|–—-]\s*(Hà Thành Home|Ha Thanh Home)\s*$/gi, "")
     .trim() || "Hà Thành Home";
@@ -750,19 +760,20 @@ export async function getMenu(location: "header" | "footer") {
 
 export async function getList<T>(path: string): Promise<T[]> {
   const payload = await fetchJson<{ data: T[] }>(path, { data: [] });
-  return payload.data;
+  return (payload.data || []).map(withDisplayTitles);
 }
 
 export async function getListPayload<T>(path: string): Promise<{ data: T[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
-  return fetchJson(path, { data: [], meta: { page: 1, limit: 24, total: 0, totalPages: 1 } });
+  const payload = await fetchJson<{ data: T[]; meta: { page: number; limit: number; total: number; totalPages: number } }>(path, { data: [], meta: { page: 1, limit: 24, total: 0, totalPages: 1 } });
+  return { ...payload, data: (payload.data || []).map(withDisplayTitles) };
 }
 
 export async function getDetail<T>(path: string): Promise<T | null> {
-  return fetchJson<T | null>(path, null);
+  return withDisplayTitles(await fetchJson<T | null>(path, null));
 }
 
-export function getLegacyServiceDetail(slug: string) {
-  return fetchJsonNoStore<Service | null>(`/legacy-services/${encodeURIComponent(slug)}`, null);
+export async function getLegacyServiceDetail(slug: string) {
+  return withDisplayTitles(await fetchJsonNoStore<Service | null>(`/legacy-services/${encodeURIComponent(slug)}`, null));
 }
 
 export async function fetchLandingProjects(
@@ -1200,7 +1211,7 @@ export function contentMetadata(
     description,
     alternates: (item.canonicalUrl || path) ? { canonical: item.canonicalUrl || path } : undefined,
     openGraph: {
-      title: item.ogTitle || title,
+      title: item.ogTitle ? normalizeDisplayTitle(item.ogTitle) : title,
       description: item.ogDescription || description,
       images: image ? [{ url: image }] : undefined,
     },
