@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLegacyRedirectTarget } from "./lib/legacy-redirects";
+import { getGscNotFoundTarget } from "./lib/legacy-redirects-gsc";
 
 const malformedLegacyPaths: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi-tai-ha-nam-ho-tro-tu-van-khao-sat-24/7": "/du-an/xay-nha-tron-goi-tai-ha-nam-ho-tro-tu-van-khao-sat-24-7",
@@ -20,7 +21,7 @@ export function proxy(request: NextRequest) {
     // Keep the encoded path when a malformed URL cannot be decoded safely.
   }
 
-  const targetPath = getLegacyRedirectTarget(pathname) || getMalformedLegacyTarget(pathname);
+  const targetPath = getLegacyRedirectTarget(pathname) || getMalformedLegacyTarget(pathname) || getGscNotFoundTarget(pathname);
   if (!targetPath) return NextResponse.next();
 
   const url = request.nextUrl.clone();
