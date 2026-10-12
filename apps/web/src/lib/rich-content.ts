@@ -113,12 +113,28 @@ function getInternalPathname(href: string): string | undefined {
 export function prepareDetailHtml(html?: string | null) {
   if (!html) return "";
 
-  const normalizedHtml = normalizeLegacyAnchors(html);
+  const normalizedHtml = demoteContentH1(normalizeLegacyAnchors(html));
   return normalizedHtml.replace(/<table\b([^>]*)>([\s\S]*?)<\/table>/gi, (match, attrs: string, inner: string, offset: number, source: string) => {
     if (isAlreadyWrappedByTableScroll(source, offset)) return match;
 
     return `<div class="${TABLE_SCROLL_CLASS}" role="region" aria-label="Bảng nội dung" tabindex="0"><table${attrs}>${inner}</table></div>`;
   });
+}
+
+/**
+ * Detail pages already render the title as the page's only <h1> in their hero, so any <h1>
+ * written inside CMS content becomes an <h2>. Attributes are kept; scripts and styles are untouched.
+ */
+export function demoteContentH1(html: string): string {
+  if (!html) return html;
+  const protectedBlocks: string[] = [];
+  const protectedHtml = html.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, (block) => {
+    const token = `\u0000rich-content-protected-${protectedBlocks.length}\u0000`;
+    protectedBlocks.push(block);
+    return token;
+  });
+  const demoted = protectedHtml.replace(/<(\/?)h1(?=[\s>\/])/gi, "<$1h2");
+  return demoted.replace(/\u0000rich-content-protected-(\d+)\u0000/g, (_token, index: string) => protectedBlocks[Number(index)] || "");
 }
 
 function isAlreadyWrappedByTableScroll(source: string, tableOffset: number) {
