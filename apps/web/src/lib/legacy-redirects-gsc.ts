@@ -5,7 +5,7 @@
  * drives in-content link rewriting and sitemap filtering. Paths in deadInternalHrefPaths are excluded.
  */
 export const gscNotFoundRedirects: Readonly<Record<string, string>> = {
-  "/\"../bao-gia-xay-biet-thu-tron-goi-quy-trinh-va-kinh-nghiem-thi-cong/\"": "/bao-gia-xay-biet-thu-tron-goi-quy-trinh-va-kinh-nghiem-thi-cong",
+  "/\"../bao-gia-xay-biet-thu-tron-goi-quy-trinh-va-kinh-nghiem-thi-cong/\"": "/tin-tuc/gia-xay-biet-thu-tron-goi",
   "/\"../bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi/\"": "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi",
   "/\"../cach-dong-tho-cuoc-dat-tranh-hoa-ruoc-loc/\"": "/tin-tuc/cach-dong-tho-cuoc-dat-tranh-hoa-ruoc-loc",
   "/\"../cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an/\"": "/tin-tuc/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an",
@@ -176,15 +176,15 @@ export const gscNotFoundRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi-tai-soc-son": "/du-an/xay-nha-tron-goi-tai-soc-son-cong-ty-xay-dung-uy-tin",
   "/xay-nha-tron-goi-tai-son-tay": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
   "/xay-nha-tron-goi-tai-thai-binh": "/du-an/xay-nha-tron-goi-tai-thai-binh-bao-gia-nam-2026-quy-trinh-tu-a-z",
-  "/xay-nha-tron-goi-tai-thai-nguyen": "/du-an/xay-nha-tron-goi-thai-nguyen-2026-bao-gia-chi-tiet-thi-cong-uy-tin",
-  "/xay-nha-tron-goi-tai-thai-nguyen-5": "/du-an/xay-nha-tron-goi-thai-nguyen-2026-bao-gia-chi-tiet-thi-cong-uy-tin",
+  "/xay-nha-tron-goi-tai-thai-nguyen": "/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin",
+  "/xay-nha-tron-goi-tai-thai-nguyen-5": "/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin",
   "/xay-nha-tron-goi-tai-thanh-hoa": "/du-an/xay-nha-tron-goi-o-thanh-hoa-cong-ty-xay-dung-uy-tin-hathanhhome",
   "/xay-nha-tron-goi-tai-thanh-tri": "/du-an/xay-nha-tron-goi-tai-thanh-tri-bao-gia-truc-tiep",
   "/xay-nha-tron-goi-tai-vinh-phuc": "/du-an/xay-nha-tron-goi-vinh-phuc-bao-gia-chi-tiet-2026",
   "/xay-nha-tron-goi-tai-vinh-phuc-bao-gia-chi-tiet": "/du-an/xay-nha-tron-goi-vinh-phuc-bao-gia-chi-tiet-2026",
   "/xay-nha-tron-goi-thai-binh": "/du-an/xay-nha-tron-goi-tai-thai-binh-bao-gia-nam-2026-quy-trinh-tu-a-z",
   "/xay-nha-tron-goi-thanh-xuan-tu-van-mien-phi": "/du-an/xay-nha-tron-goi-thanh-xuan-tu-van-khao-sat-mien-phi",
-  "/xay-nha-tron-goi-ti-thai-nguyen": "/du-an/xay-nha-tron-goi-thai-nguyen-2026-bao-gia-chi-tiet-thi-cong-uy-tin",
+  "/xay-nha-tron-goi-ti-thai-nguyen": "/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin",
   "/xay-nha-tron-goi-xuan-phuong-cap-nhap-bao-gia-moi-nhat-2026": "/du-an/xay-nha-tron-goi-xuan-phuong-cap-nhat-bao-gia-nam-2026",
   "/xay-nha-tron-goi-xuan-phuong-cap-nhat-bao-gia-2026": "/du-an/xay-nha-tron-goi-xuan-phuong-cap-nhat-bao-gia-nam-2026",
   "/xay-nha-trong-ngo-co-can-xin-giay-phep-khong-0": "/tin-tuc/xay-nha-trong-ngo-co-can-xin-giay-phep-khong",

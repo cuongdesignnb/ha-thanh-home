@@ -1,3 +1,5 @@
+import { contentConsolidationRedirects } from "./content-consolidation-redirects";
+
 /** Explicit historical SEO redirects. Keep this list exact and intentionally small. */
 export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi": "/dich-vu/xay-nha-tron-goi",
@@ -63,9 +65,9 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that-3": "/tin-tuc/quy-trinh-ve-sinh-tuong-truoc-khi-son-ngoai-that",
 };
 
-/** Return a destination only for an explicitly approved historical pathname. */
+/** Return a destination only for an explicitly approved historical or consolidated pathname. */
 export function getLegacyRedirectTarget(pathname: string): string | undefined {
-  return legacySeoRedirects[pathname];
+  return legacySeoRedirects[pathname] || contentConsolidationRedirects[pathname];
 }
 
 export function isLegacyRedirectSource(pathname: string): boolean {

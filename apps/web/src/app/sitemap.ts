@@ -107,5 +107,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.55,
     }));
 
-  return [...staticRoutes, ...dynamicRoutes, ...legacyCanonicalRoutes];
+  // Content that has been consolidated into another URL redirects away; never advertise the source.
+  const indexableDynamicRoutes = dynamicRoutes.filter((route) => !isLegacyRedirectSource(new URL(route.url).pathname));
+
+  return [...staticRoutes, ...indexableDynamicRoutes, ...legacyCanonicalRoutes];
 }
