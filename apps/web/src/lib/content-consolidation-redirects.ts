@@ -2,8 +2,8 @@
  * Duplicate-content consolidation (SEO content-architecture audit, phase P0, 2026-10-15).
  * Each source duplicates its destination (shingle Jaccard >= 0.95, a "-2" copy of the same post, or the
  * same project published twice). The destination is the URL with more Search Console impressions, or the
- * page chosen as canonical for that topic. Sources are archived in the CMS by migration
- * 20261015090000_archive_duplicate_content.
+ * page chosen as canonical for that topic. The source records stay in the CMS and are archived manually in
+ * the admin (no migration), so these redirects must stay in place even after archiving.
  *
  * Read through getLegacyRedirectTarget(), so these entries also rewrite in-content links and are dropped
  * from the sitemap. Destinations must never be redirect sources themselves.
