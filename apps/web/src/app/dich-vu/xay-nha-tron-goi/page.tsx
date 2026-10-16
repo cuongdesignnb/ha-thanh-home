@@ -43,7 +43,7 @@ import { getConstructionGuidePosts } from "@/lib/related-content";
 import { areaLandingsFor } from "@/lib/project-page-kind";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { resolveServiceDisplayPricing, SERVICE_DISPLAY_REFERENCE_NOTE } from "@/lib/service-display-pricing";
-import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export const metadata: Metadata = {
@@ -64,6 +64,7 @@ export default async function XayNhaTronGoiPage() {
     getConstructionGuidePosts(),
   ]);
   const landing = xayNhaLandingWithDefaults(settings["site.landing.xayNhaTronGoi"]);
+  landing.heroImageUrl = await heroImageFor(landing.heroImageUrl);
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(landing.heroImageUrl);
   // Merged pages redirect away; never link them from the showcase.

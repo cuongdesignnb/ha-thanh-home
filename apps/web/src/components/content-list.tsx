@@ -6,7 +6,7 @@ import { isUsableSlug } from "@/lib/content-validation";
 import { buildPaginationItems, buildProjectCatalogPageHref, parseCatalogPage } from "@/lib/project-catalog-pagination";
 import { buildPostCatalogPageHref, buildPostPaginationItems, parsePostCatalogPage } from "@/lib/post-catalog-pagination";
 import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
-import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
@@ -135,7 +135,7 @@ export async function ProjectDetail({ project }: { project: Project }) {
   const settings = await getSiteSettings();
   const hotline = settings["site.identity"]?.hotline || "0898 502 333";
   const hotlineClean = hotline.replace(/\s/g, "");
-  const image = thumbnailUrl(project, "");
+  const image = await heroImageFor(thumbnailUrl(project, ""));
   const albumImages = buildProjectAlbum(project);
   preloadHeroImage(image);
   const pageInfo = getProjectPageInfo(project.slug);
@@ -262,7 +262,7 @@ export async function ServiceDetail({ service }: { service: Service }) {
   const hotline = settings["site.identity"]?.hotline || "0898 502 333";
   const hotlineClean = hotline.replace(/\s/g, "");
   const fallback = service.group === "interior" ? interiorImages[0] : projectImages[0];
-  const image = thumbnailUrl(service, fallback);
+  const image = await heroImageFor(thumbnailUrl(service, fallback));
   const albumImages = buildServiceAlbum(service);
   preloadHeroImage(image);
   const groupLabel = service.group === "interior" ? "Nội thất" : service.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình";

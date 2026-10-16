@@ -38,7 +38,7 @@ import {
   type LandingTestimonial,
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
-import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export const metadata: Metadata = {
@@ -58,6 +58,7 @@ type LandingType = ReturnType<typeof noiThatLandingWithDefaults>;
 export default async function SanXuatThiCongNoiThatPage() {
   const settings = await getSiteSettings();
   const landing = noiThatLandingWithDefaults(settings["site.servicePages.sanXuatThiCongNoiThat"]);
+  landing.heroImageUrl = await heroImageFor(landing.heroImageUrl);
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(landing.heroImageUrl);
   // Merged pages redirect away; never link them from the showcase.
