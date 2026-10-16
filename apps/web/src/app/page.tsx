@@ -37,18 +37,20 @@ import {
 import type { AboutPageConfig } from "@/lib/about-page-config";
 import { isUsableSlug } from "@/lib/content-validation";
 import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
-import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export default async function HomePage() {
   const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
   const homepage = homepageWithDefaults(settings["site.homepage"]);
 
+  const firstSlide = homepage.heroSlides?.[0] || defaultHomepage.heroSlides[0];
+  const heroSlide = { ...firstSlide, imageUrl: await heroImageFor(firstSlide.imageUrl || defaultHomepage.heroSlides[0].imageUrl) };
   return (
     <>
       <SiteHeader />
       <main>
-        <HeroSection slide={homepage.heroSlides?.[0] || defaultHomepage.heroSlides[0]} />
+        <HeroSection slide={heroSlide} />
         <AboutSection homepage={homepage} />
         <ExpertiseSection homepage={homepage} />
         <ProjectsSection id="projects" title="Dự án công trình tiêu biểu" projects={data.constructionProjects} />

@@ -5,7 +5,7 @@ import { TemplateGalleryModal } from "@/components/template-gallery-modal";
 import { cardImageUrl, interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
-import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -158,7 +158,7 @@ export async function TemplateDetail({ item, kind }: { item: ArchitectureDesign 
   const hotline = settings["site.identity"]?.hotline || "0898 502 333";
   const hotlineClean = hotline.replace(/\s/g, "");
   const isArchitecture = kind === "architecture";
-  const image = thumbnailUrl(item, isArchitecture ? projectImages[0] : interiorImages[0]);
+  const image = await heroImageFor(thumbnailUrl(item, isArchitecture ? projectImages[0] : interiorImages[0]));
   const architecture = item as ArchitectureDesign;
   const interior = item as InteriorDesign;
   const albumImages = buildAlbumImages(item, isArchitecture ? projectImages : interiorImages);
