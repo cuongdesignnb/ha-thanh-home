@@ -9,6 +9,7 @@ import { buildBreadcrumbSchema, buildProjectSchema, buildImageObjectSchema, buil
 import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
 import { absoluteImageUrl } from "@/lib/seo/site";
 import { getRelatedProjects } from "@/lib/related-content";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -20,6 +21,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const project = await getDetail<Project>(`/projects/${slug}`);
   if (!project) notFound();
+  // Before any further await, so the hint is emitted before the document head is flushed.
+  preloadHeroImage(thumbnailUrl(project, ""));
   const related = await getRelatedProjects(project);
 
   const imageUrl = thumbnailUrl(project, "");

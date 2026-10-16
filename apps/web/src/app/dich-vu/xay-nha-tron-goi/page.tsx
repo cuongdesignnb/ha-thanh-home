@@ -44,6 +44,7 @@ import { areaLandingsFor } from "@/lib/project-page-kind";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { resolveServiceDisplayPricing, SERVICE_DISPLAY_REFERENCE_NOTE } from "@/lib/service-display-pricing";
 import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -63,7 +64,10 @@ export default async function XayNhaTronGoiPage() {
     getConstructionGuidePosts(),
   ]);
   const landing = xayNhaLandingWithDefaults(settings["site.landing.xayNhaTronGoi"]);
-  const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "construction" });
+  // Before any further await, so the hint is emitted before the document head is flushed.
+  preloadHeroImage(landing.heroImageUrl);
+  // Merged pages redirect away; never link them from the showcase.
+  const projects = (await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "construction" })).filter((project) => !isLegacyRedirectSource(project.href));
 
   const schemas = [
     buildBreadcrumbSchema([

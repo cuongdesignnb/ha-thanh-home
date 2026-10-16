@@ -39,6 +39,7 @@ import {
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export const metadata: Metadata = {
   title: "Sản xuất thi công nội thất",
@@ -57,7 +58,10 @@ type LandingType = ReturnType<typeof noiThatLandingWithDefaults>;
 export default async function SanXuatThiCongNoiThatPage() {
   const settings = await getSiteSettings();
   const landing = noiThatLandingWithDefaults(settings["site.servicePages.sanXuatThiCongNoiThat"]);
-  const projects = await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "interior" });
+  // Before any further await, so the hint is emitted before the document head is flushed.
+  preloadHeroImage(landing.heroImageUrl);
+  // Merged pages redirect away; never link them from the showcase.
+  const projects = (await fetchLandingProjects(landing.projectsSource, { entity: "project", group: "interior" })).filter((project) => !isLegacyRedirectSource(project.href));
 
   const schemas = [
     buildBreadcrumbSchema([

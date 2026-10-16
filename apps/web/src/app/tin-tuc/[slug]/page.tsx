@@ -20,9 +20,10 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const post = await getDetail<Post>(`/posts/${slug}`);
   if (!post) notFound();
-  const related = await getRelatedPosts(post);
+  // Before any further await, so the hint is emitted before the document head is flushed.
   const imageUrl = thumbnailUrl(post, "");
   preloadHeroImage(imageUrl);
+  const related = await getRelatedPosts(post);
 
   const schemas = [
     buildBreadcrumbSchema([

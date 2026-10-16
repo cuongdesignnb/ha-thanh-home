@@ -6,6 +6,7 @@ import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, thumbnailUrl, type InteriorDesign } from "@/lib/api";
 import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
 import { getRelatedInterior } from "@/lib/related-content";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -17,6 +18,8 @@ export default async function InteriorDesignDetailPage({ params }: { params: Pro
   const { slug } = await params;
   const item = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (!item) notFound();
+  // Before any further await, so the hint is emitted before the document head is flushed.
+  preloadHeroImage(thumbnailUrl(item, ""));
   const related = await getRelatedInterior(item);
 
   const imageUrl = thumbnailUrl(item, "");
