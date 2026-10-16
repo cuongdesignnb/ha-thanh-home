@@ -17,6 +17,7 @@ import { ArchitectureCard, InteriorCard } from "@/components/design-templates";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { HorizontalSliderWrapper } from "@/components/horizontal-slider-wrapper";
 import {
+  cardImageUrl,
   defaultHomepage,
   getAboutPageConfig,
   getHome,
@@ -24,7 +25,6 @@ import {
   homepageWithDefaults,
   interiorImages,
   projectImages,
-  thumbnailUrl,
   type ArchitectureDesign,
   type HomeHeroSlide,
   type InteriorDesign,
@@ -37,6 +37,8 @@ import {
 import type { AboutPageConfig } from "@/lib/about-page-config";
 import { isUsableSlug } from "@/lib/content-validation";
 import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export default async function HomePage() {
   const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
@@ -65,6 +67,7 @@ export default async function HomePage() {
 
 function HeroSection({ slide }: { slide: HomeHeroSlide }) {
   const image = slide.imageUrl || defaultHomepage.heroSlides[0].imageUrl;
+  preloadHeroImage(image);
   return (
     <section className="hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(7, 23, 18, 0.86) 0%, rgba(7, 23, 18, 0.62) 40%, rgba(7, 23, 18, 0.2) 72%, rgba(7, 23, 18, 0.06) 100%), url(${image})` }}>
       <div className="hero-shine" aria-hidden="true" />
@@ -151,9 +154,9 @@ function ProjectsSection({ id, title, projects, cream }: { id?: string; title: s
           <a className="section-link" href={href}>Xem tất cả <ArrowRight size={16} /></a>
         </div>
         <HorizontalSliderWrapper className="project-grid home-slider-grid">
-          {projects.filter((project) => isUsableSlug(project.slug)).slice(0, 6).map((project) => (
+          {projects.filter((project) => isUsableSlug(project.slug) && !isLegacyRedirectSource(`/du-an/${project.slug}`)).slice(0, 6).map((project) => (
             <a className="card" key={project.id} href={`/du-an/${project.slug}`}>
-              <div className="project-image" style={{ backgroundImage: `url(${thumbnailUrl(project, PLACEHOLDER_IMAGE)})` }} />
+              <div className="project-image" style={{ backgroundImage: `url(${cardImageUrl(project, PLACEHOLDER_IMAGE)})` }} />
               <div className="card-body">
                 <h3>{project.title}</h3>
                 <span className="meta"><MapPin size={15} /> {project.location || "Hà Nội"}</span>
@@ -244,7 +247,7 @@ function Testimonials({ homepage, aboutPage }: { homepage: SiteHomepage; aboutPa
       const rating = resolveTestimonialRating(item.rating);
       const initials = item.name.split(/\s+/).filter(Boolean).slice(-2).map((part) => part[0]).join("").toUpperCase();
       return <article className="testimonial" key={`${item.name}-${itemIndex}`}>
-        {item.avatarUrl ? <img className="avatar" alt={item.name} src={item.avatarUrl} /> : <div className="avatar avatar-fallback" aria-hidden="true">{initials || "HT"}</div>}
+        {item.avatarUrl ? <img className="avatar" alt={item.name} src={item.avatarUrl} loading="lazy" decoding="async" /> : <div className="avatar avatar-fallback" aria-hidden="true">{initials || "HT"}</div>}
         <strong>{item.name}</strong>
         {item.location ? <span className="testimonial-location">{item.location}</span> : null}
         {rating ? <div className="stars" aria-label={`${rating} trên 5 sao`}>{Array.from({ length: rating }).map((_, index) => <Star key={index} size={16} fill="currentColor" />)}</div> : null}
@@ -270,9 +273,9 @@ function NewsSection({ posts, homepage }: { posts: Post[]; homepage: SiteHomepag
       <div className="container">
         <div className="section-title"><h2>{homepage.newsTitle || defaultHomepage.newsTitle}</h2></div>
         <div className="news-grid">
-          {posts.filter((post) => isUsableSlug(post.slug)).slice(0, 4).map((post, index) => (
+          {posts.filter((post) => isUsableSlug(post.slug) && !isLegacyRedirectSource(`/tin-tuc/${post.slug}`)).slice(0, 4).map((post, index) => (
             <a className="news-card" key={post.id} href={`/tin-tuc/${post.slug}`}>
-              <div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} />
+              <div className="news-image" style={{ backgroundImage: `url(${cardImageUrl(post, interiorImages[index % interiorImages.length])})` }} />
               {post.publishedAt ? (
                 <span className="date-badge">
                   <CalendarDays size={14} /> {formatPostDate(post.publishedAt)}

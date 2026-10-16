@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import {
   demoteContentH1,
   isUsableSlug,
+  lazyLoadContentImages,
   normalizeLegacyAnchors,
   normalizeLegacyHref,
   prepareDetailHtml,
@@ -592,5 +593,14 @@ assert.deepEqual(
   { id: 2, title: "Nhà Trong Ngõ", slug: "nha-trong-ngo-", metaTitle: "Nhà Trong Ngõ", ogTitle: null },
 );
 assert.equal(withDisplayTitles(null), null);
+
+// Content images are below the hero: lazy-loaded unless the author set loading explicitly.
+assert.equal(lazyLoadContentImages('<p><img src="/a.webp" alt="A"></p>'), '<p><img src="/a.webp" alt="A" loading="lazy" decoding="async"></p>');
+assert.equal(lazyLoadContentImages('<img src="/a.webp" />'), '<img src="/a.webp" loading="lazy" decoding="async" />');
+assert.equal(lazyLoadContentImages('<IMG SRC="/a.webp" decoding="sync">'), '<IMG SRC="/a.webp" decoding="sync" loading="lazy">');
+assert.equal(lazyLoadContentImages('<img src="/a.webp" loading="eager">'), '<img src="/a.webp" loading="eager">');
+assert.equal(lazyLoadContentImages('<script>const s = "<img src=x>";</script>'), '<script>const s = "<img src=x>";</script>');
+assert.equal(lazyLoadContentImages('<imgx>'), '<imgx>');
+assert.ok(prepareDetailHtml('<h1>T</h1><img src="/a.webp">').endsWith('<img src="/a.webp" loading="lazy" decoding="async">'));
 
 console.log("SEO rich-content regression tests passed");

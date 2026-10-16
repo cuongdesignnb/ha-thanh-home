@@ -113,7 +113,7 @@ function getInternalPathname(href: string): string | undefined {
 export function prepareDetailHtml(html?: string | null) {
   if (!html) return "";
 
-  const normalizedHtml = demoteContentH1(normalizeLegacyAnchors(html));
+  const normalizedHtml = lazyLoadContentImages(demoteContentH1(normalizeLegacyAnchors(html)));
   return normalizedHtml.replace(/<table\b([^>]*)>([\s\S]*?)<\/table>/gi, (match, attrs: string, inner: string, offset: number, source: string) => {
     if (isAlreadyWrappedByTableScroll(source, offset)) return match;
 
@@ -127,14 +127,31 @@ export function prepareDetailHtml(html?: string | null) {
  */
 export function demoteContentH1(html: string): string {
   if (!html) return html;
+  return outsideScriptsAndStyles(html, (markup) => markup.replace(/<(\/?)h1(?=[\s>\/])/gi, "<$1h2"));
+}
+
+/**
+ * CMS content always renders below the hero, so its images are never the LCP element: let the browser
+ * defer them. Tags that already set `loading` (e.g. an explicit eager image) are left as written.
+ */
+export function lazyLoadContentImages(html: string): string {
+  if (!html) return html;
+  return outsideScriptsAndStyles(html, (markup) => markup.replace(/<(img)\b([^>]*?)(\s*\/?)>/gi, (tag, name: string, attrs: string, close: string) => {
+    if (/\sloading\s*=/i.test(attrs)) return tag;
+    const decoding = /\sdecoding\s*=/i.test(attrs) ? "" : ' decoding="async"';
+    return `<${name}${attrs} loading="lazy"${decoding}${close}>`;
+  }));
+}
+
+/** Apply a markup rewrite everywhere except inside <script> and <style> blocks. */
+function outsideScriptsAndStyles(html: string, rewrite: (markup: string) => string): string {
   const protectedBlocks: string[] = [];
   const protectedHtml = html.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, (block) => {
     const token = `\u0000rich-content-protected-${protectedBlocks.length}\u0000`;
     protectedBlocks.push(block);
     return token;
   });
-  const demoted = protectedHtml.replace(/<(\/?)h1(?=[\s>\/])/gi, "<$1h2");
-  return demoted.replace(/\u0000rich-content-protected-(\d+)\u0000/g, (_token, index: string) => protectedBlocks[Number(index)] || "");
+  return rewrite(protectedHtml).replace(/\u0000rich-content-protected-(\d+)\u0000/g, (_token, index: string) => protectedBlocks[Number(index)] || "");
 }
 
 function isAlreadyWrappedByTableScroll(source: string, tableOffset: number) {

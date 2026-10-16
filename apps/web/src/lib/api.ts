@@ -808,7 +808,7 @@ export async function fetchLandingProjects(
       title: p.title,
       slug: p.slug,
       href: `/du-an/${p.slug}`,
-      thumbnailUrl: thumbnailUrl(p, PLACEHOLDER_IMAGE),
+      thumbnailUrl: cardImageUrl(p, PLACEHOLDER_IMAGE),
       categoryLabel: p.categoryRef?.name || p.category || (p.group === "interior" ? "Nội thất" : "Công trình"),
       location: p.location || undefined,
       meta: p.area || p.scale || undefined,
@@ -822,7 +822,7 @@ export async function fetchLandingProjects(
       title: t.title,
       slug: t.slug,
       href: `/mau-thiet-ke-kien-truc/${t.slug}`,
-      thumbnailUrl: thumbnailUrl(t, projectImages[index % projectImages.length]),
+      thumbnailUrl: cardImageUrl(t, projectImages[index % projectImages.length]),
       categoryLabel: t.houseType || t.style || "Kiến trúc",
       location: t.location || undefined,
       meta: t.area ? `${t.area}m²` : (t.floors ? `${t.floors} tầng` : undefined),
@@ -835,7 +835,7 @@ export async function fetchLandingProjects(
     title: t.title,
     slug: t.slug,
     href: `/mau-thiet-ke-noi-that/${t.slug}`,
-    thumbnailUrl: thumbnailUrl(t, interiorImages[index % interiorImages.length]),
+    thumbnailUrl: cardImageUrl(t, interiorImages[index % interiorImages.length]),
     categoryLabel: t.interiorStyle || t.roomType || "Nội thất",
     location: t.location || undefined,
     meta: t.area ? `${t.area}m²` : (t.budgetRange || undefined),
@@ -861,6 +861,12 @@ export const PLACEHOLDER_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www
 export function thumbnailUrl(item: { thumbnailMedia?: MediaFile | null } | null | undefined, fallback: string) {
   const media = item?.thumbnailMedia;
   return media?.largeUrl || media?.mediumUrl || media?.webpUrl || media?.thumbUrl || fallback;
+}
+
+/** Card/grid thumbnails (~400px wide): the medium rendition is about half the bytes of the large one. */
+export function cardImageUrl(item: { thumbnailMedia?: MediaFile | null } | null | undefined, fallback: string) {
+  const media = item?.thumbnailMedia;
+  return media?.mediumUrl || media?.largeUrl || media?.webpUrl || media?.thumbUrl || fallback;
 }
 
 export function homepageWithDefaults(homepage?: SiteHomepage): SiteHomepage {

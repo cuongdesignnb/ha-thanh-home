@@ -8,6 +8,7 @@ import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 import { withTurnkeyContextLink } from "@/lib/service-context-links";
 import { getRelatedPosts } from "@/lib/related-content";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -21,6 +22,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
   if (!post) notFound();
   const related = await getRelatedPosts(post);
   const imageUrl = thumbnailUrl(post, "");
+  preloadHeroImage(imageUrl);
 
   const schemas = [
     buildBreadcrumbSchema([

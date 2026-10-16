@@ -7,6 +7,7 @@ import { fetchJson, getListPayload, type Project, type ProjectFilters } from "@/
 import { buildBreadcrumbSchema, buildWebPageSchema, buildItemListSchema } from "@/lib/seo/jsonld";
 import { isUsableSlug } from "@/lib/content-validation";
 import { buildProjectCatalogApiQuery, buildProjectCatalogCanonical, hasCatalogFilters, isCatalogPageOutOfRange, parseCatalogPage } from "@/lib/project-catalog-pagination";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 const description = "Tổng hợp dự án thiết kế, thi công nhà ở, nội thất và công trình đã thực hiện bởi Hà Thành Home.";
 
@@ -43,7 +44,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
       type: "CollectionPage",
     }),
     buildItemListSchema(
-      payload.data.filter((p) => isUsableSlug(p.slug)).map((p) => ({ name: p.title, url: `/du-an/${p.slug}` })),
+      payload.data.filter((p) => isUsableSlug(p.slug) && !isLegacyRedirectSource(`/du-an/${p.slug}`)).map((p) => ({ name: p.title, url: `/du-an/${p.slug}` })),
     ),
   ].filter(Boolean);
 

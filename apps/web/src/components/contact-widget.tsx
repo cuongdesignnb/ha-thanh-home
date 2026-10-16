@@ -40,6 +40,8 @@ export function ContactWidget({ identity }: ContactWidgetProps) {
         <img
           src={zaloIconUrl}
           alt={zaloLabel}
+          loading="lazy"
+          decoding="async"
           style={{ width: `${size}px`, height: `${size}px`, objectFit: "contain" }}
         />
       );
@@ -57,6 +59,8 @@ export function ContactWidget({ identity }: ContactWidgetProps) {
         <img
           src={phoneIconUrl}
           alt={phoneLabel}
+          loading="lazy"
+          decoding="async"
           style={{ width: `${size}px`, height: `${size}px`, objectFit: "contain" }}
         />
       );
@@ -105,7 +109,7 @@ export function ContactWidget({ identity }: ContactWidgetProps) {
         {zaloUrl && (
           <a href={zaloUrl} target="_blank" rel="noreferrer">
             {zaloIconUrl ? (
-              <img src={zaloIconUrl} alt={zaloLabel} style={{ width: "21px", height: "21px", objectFit: "contain" }} />
+              <img src={zaloIconUrl} alt={zaloLabel} loading="lazy" decoding="async" style={{ width: "21px", height: "21px", objectFit: "contain" }} />
             ) : (
               <MessageCircle size={21} />
             )}
@@ -115,7 +119,7 @@ export function ContactWidget({ identity }: ContactWidgetProps) {
         {phoneUrl && (
           <a href={phoneUrl}>
             {phoneIconUrl ? (
-              <img src={phoneIconUrl} alt={phoneLabel} style={{ width: "21px", height: "21px", objectFit: "contain" }} />
+              <img src={phoneIconUrl} alt={phoneLabel} loading="lazy" decoding="async" style={{ width: "21px", height: "21px", objectFit: "contain" }} />
             ) : (
               <Phone size={21} />
             )}

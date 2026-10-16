@@ -121,6 +121,8 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
               <div className={styles.introImageWrapper}>
                 <img
                   src={config.intro?.imageUrl}
+                  loading="lazy"
+                  decoding="async"
                   alt="Hà Thành Home interior"
                   className={styles.introImage}
                 />
@@ -215,6 +217,8 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
             <div className={styles.peopleGrid}>
               <img
                 src={config.people?.imageUrl}
+                loading="lazy"
+                decoding="async"
                 alt="Đội ngũ Hà Thành Home"
                 className={styles.peopleImage}
               />
@@ -302,6 +306,8 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
                   {partner.logoUrl ? (
                     <img
                       src={partner.logoUrl}
+                      loading="lazy"
+                      decoding="async"
                       alt={partner.name}
                       className={styles.partnerLogo}
                     />
@@ -330,6 +336,8 @@ export function AboutPage({ config }: { config: AboutPageConfig }) {
                         {item.avatarUrl && (
                           <img
                             src={item.avatarUrl}
+                            loading="lazy"
+                            decoding="async"
                             alt={item.name}
                             className={styles.clientAvatar}
                           />

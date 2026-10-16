@@ -20,21 +20,27 @@ const body = Inter({
   variable: "--font-body",
 });
 
+// The theme picks one heading and one body font in the admin (default Cormorant + Inter). The alternatives
+// stay available but are not preloaded: preloading all five families put 19 woff2 files (~290 KB) at high
+// priority in front of the hero image on every page.
 const playfair = Playfair_Display({
   subsets: ["latin", "vietnamese"],
   variable: "--font-playfair",
+  preload: false,
 });
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-be-vietnam",
+  preload: false,
 });
 
 const roboto = Roboto({
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "700", "900"],
   variable: "--font-roboto",
+  preload: false,
 });
 
 export const metadata: Metadata = {

@@ -1,17 +1,19 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
+import { cardImageUrl, interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
 import { buildPaginationItems, buildProjectCatalogPageHref, parseCatalogPage } from "@/lib/project-catalog-pagination";
 import { buildPostCatalogPageHref, buildPostPaginationItems, parsePostCatalogPage } from "@/lib/post-catalog-pagination";
 import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
 export function ProjectList({ title, projects }: { title: string; projects: Project[] }) {
   return (
-    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.filter((project) => isUsableSlug(project.slug) && !isLegacyRedirectSource(`/du-an/${project.slug}`)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
   );
 }
 
@@ -42,7 +44,7 @@ export function ProjectCatalog({ filters, group, meta, projects, searchParams }:
           <ProjectFilterBar filters={filters} group={group} searchParams={searchParams} />
           <div className="project-count"><h2>Dự án</h2><p>Hiển thị {meta.total} dự án</p></div>
           <div className="project-catalog-grid">
-            {projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
+            {projects.filter((project) => isUsableSlug(project.slug) && !isLegacyRedirectSource(`/du-an/${project.slug}`)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
           </div>
           <ProjectPagination basePath={basePath} meta={meta} searchParams={searchParams} />
         </div>
@@ -113,11 +115,11 @@ function isReadableOption(value: string) {
 }
 
 function ProjectCard({ index, project }: { index: number; project: Project }) {
-  const image = thumbnailUrl(project, PLACEHOLDER_IMAGE);
+  const image = cardImageUrl(project, PLACEHOLDER_IMAGE);
   const categoryName = project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình");
   return (
     <a className="project-catalog-card" href={`/du-an/${project.slug}`}>
-      <img alt={project.title} src={image} />
+      <img alt={project.title} src={image} loading="lazy" decoding="async" />
       <h3>{project.title}</h3>
       <div className="project-card-meta">
         <span><Home size={16} /><small>Danh mục</small><strong>{categoryName}</strong></span>
@@ -135,6 +137,7 @@ export async function ProjectDetail({ project }: { project: Project }) {
   const hotlineClean = hotline.replace(/\s/g, "");
   const image = thumbnailUrl(project, "");
   const albumImages = buildProjectAlbum(project);
+  preloadHeroImage(image);
   const pageInfo = getProjectPageInfo(project.slug);
   if (pageInfo) return <NonPortfolioProjectDetail project={project} pageInfo={pageInfo} image={image} albumImages={albumImages} hotline={hotline} hotlineClean={hotlineClean} />;
   const specs = [
@@ -261,6 +264,7 @@ export async function ServiceDetail({ service }: { service: Service }) {
   const fallback = service.group === "interior" ? interiorImages[0] : projectImages[0];
   const image = thumbnailUrl(service, fallback);
   const albumImages = buildServiceAlbum(service);
+  preloadHeroImage(image);
   const groupLabel = service.group === "interior" ? "Nội thất" : service.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình";
   const publishedAt = service.publishedAt ? new Date(service.publishedAt).toLocaleDateString("vi-VN", { year: "numeric", month: "long" }) : null;
   const specs = [
@@ -351,7 +355,7 @@ export function PostList({ activeCategory, categories, meta, posts, searchParams
               {categories.map((category) => <a className={activeCategory === category.slug ? "active" : ""} href={`/tin-tuc?category=${category.slug}`} key={category.id}>{category.name}</a>)}
             </nav>
           ) : null}
-          <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
+          <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug) && !isLegacyRedirectSource(`/tin-tuc/${post.slug}`)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${cardImageUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
           <PostPagination meta={meta} searchParams={searchParams} />
         </div>
       </section>

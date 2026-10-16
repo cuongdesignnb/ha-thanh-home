@@ -43,6 +43,7 @@ import { getConstructionGuidePosts } from "@/lib/related-content";
 import { areaLandingsFor } from "@/lib/project-page-kind";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { resolveServiceDisplayPricing, SERVICE_DISPLAY_REFERENCE_NOTE } from "@/lib/service-display-pricing";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -106,6 +107,7 @@ export default async function XayNhaTronGoiPage() {
 }
 
 function XayNhaHero({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
+  preloadHeroImage(landing.heroImageUrl);
   return (
     <section className="xay-nha-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(7, 23, 18, 0.92) 0%, rgba(7, 23, 18, 0.72) 43%, rgba(7, 23, 18, 0.18) 78%), url(${landing.heroImageUrl})` }}>
       <div className="container">
