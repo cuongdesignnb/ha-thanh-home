@@ -10,7 +10,7 @@ import { TURNKEY_SERVICE_PATH, turnkeyContextPosts, withTurnkeyContextLink } fro
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(contentConsolidationRedirects);
-assert.equal(entries.length, 63);
+assert.equal(entries.length, 174);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);
@@ -56,6 +56,11 @@ const samples: Array<[string, string]> = [
   // Older maps that pointed into a merged page now go straight to the kept page (one hop).
   ["/xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-pho-3-tang-tron-goi", "https://hathanhhome.vn/tin-tuc/xay-nha-pho-3-tang-tron-goi-chi-phi-tien-do-va-hang-muc-thi-cong"],
+  // Root and /dich-vu/ aliases redirect even after the merged record is archived in the CMS.
+  ["/xay-nha-tron-goi-mien-bac", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/dich-vu/xay-nha-tron-goi-mien-bac", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/thi-cong-noi-that-van-phong", "https://hathanhhome.vn/dich-vu/thi-cong-noi-that-van-phong"],
+  ["/thi-cong-nha-xuong-ha-nam", "https://hathanhhome.vn/dich-vu/thi-cong-nha-xuong"],
 ];
 for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath), { status: 308, location });
 
@@ -64,6 +69,10 @@ for (const untouched of [
   "/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin",
   "/tin-tuc/gia-xay-biet-thu-tron-goi",
   "/tin-tuc/xay-nha-pho-3-tang-tron-goi-chi-phi-tien-do-va-hang-muc-thi-cong",
+  // The real service pages are never aliased away.
+  "/dich-vu/thi-cong-noi-that-van-phong",
+  "/dich-vu/thi-cong-nha-xuong",
+  "/dich-vu/xay-nha-tron-goi",
   // Pages with their own Search Console visibility are deliberately kept.
   "/du-an/cong-ty-xay-dung-nha-uy-tin-ha-thanh-hathanhhome",
   "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi",
