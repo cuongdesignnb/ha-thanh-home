@@ -21,7 +21,6 @@ const sentences: Readonly<Record<ContextSentence, string>> = {
 
 /** Post slug -> sentence variant. Variants are spread so anchors stay natural and varied. */
 export const turnkeyContextPosts: Readonly<Record<string, ContextSentence>> = {
-  "xay-nha-tron-goi-tu-mong-den-noi-that-quy-trinh-chi-phi-va-cach-han-che-phat-sinh": "process",
   "xay-nha-tron-goi-tu-mong-den-noi-that": "scope",
   "thay-doi-luat-xay-dung-tu-1-7-2026-vi-sao-nen-chon-don-vi-thiet-ke-thi-cong-tron-goi": "process",
   "xay-nha-cho-nguoi-ban-ron-vi-sao-nen-chon-dich-vu-thiet-ke-thi-cong-tron-goi": "process",
@@ -37,7 +36,6 @@ export const turnkeyContextPosts: Readonly<Record<string, ContextSentence>> = {
   "ban-giao-nha-xay-tron-goi-can-kiem-tra-nhung-hang-muc-nao": "scope",
   "cac-khoan-phat-sinh-khi-xay-nha-tron-goi-va-cach-kiem-soat-ngay-tu-hop-dong": "pricing",
   "nghiem-thu-nha-xay-tron-goi-gom-nhung-gi-checklist-truoc-khi-thanh-toan": "scope",
-  "cong-ty-xay-nha-tron-goi-uy-tin": "region",
   "co-nen-thue-xay-nha-tron-goi": "process",
   "nhung-uu-diem-khi-chon-thue-xay-nha-tron-goi": "process",
   "bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi": "pricing",

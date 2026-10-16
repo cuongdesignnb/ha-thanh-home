@@ -1,6 +1,6 @@
 import {
+  cardImageUrl,
   getList,
-  thumbnailUrl,
   type ArchitectureDesign,
   type InteriorDesign,
   type Post,
@@ -34,7 +34,7 @@ export async function getRelatedProjects(item: Project): Promise<RelatedContentI
     getList<Project>(query("/projects", { isPortfolioVerified: "true", limit: 8 })),
   ]);
   return selectVerifiedRelatedProjects(item.id, sameCategory, sameGroup, latest).map((project) => ({
-    id: project.id, title: project.title, href: `/du-an/${project.slug}`, imageUrl: thumbnailUrl(project, ""),
+    id: project.id, title: project.title, href: `/du-an/${project.slug}`, imageUrl: cardImageUrl(project, ""),
     label: project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình"), description: project.description,
   }));
 }
@@ -45,7 +45,7 @@ export async function getRelatedServices(item: Service): Promise<RelatedContentI
     getList<Service>(query("/services", { limit: 8 })),
   ]);
   return uniqueRelated(item.id, sameGroup, latest).filter((service) => isUsableSlug(service.slug)).map((service) => ({
-    id: service.id, title: service.title, href: `/dich-vu/${service.slug}`, imageUrl: thumbnailUrl(service, ""), label: "Dịch vụ", description: service.description,
+    id: service.id, title: service.title, href: `/dich-vu/${service.slug}`, imageUrl: cardImageUrl(service, ""), label: "Dịch vụ", description: service.description,
   }));
 }
 
@@ -56,7 +56,7 @@ export async function getRelatedPosts(item: Post): Promise<RelatedContentItem[]>
     getList<Post>(query("/posts", { limit: 8 })),
   ]);
   return uniqueRelated(item.id, sameCategory, latest).filter((post) => isUsableSlug(post.slug)).map((post) => ({
-    id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: thumbnailUrl(post, ""), label: post.categoryRef?.name || "Tin tức", description: post.excerpt,
+    id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: cardImageUrl(post, ""), label: post.categoryRef?.name || "Tin tức", description: post.excerpt,
   }));
 }
 
@@ -68,7 +68,7 @@ export async function getRelatedArchitecture(item: ArchitectureDesign): Promise<
     getList<ArchitectureDesign>(query("/architecture-designs", { limit: 8 })),
   ]);
   return uniqueRelated(item.id, samePair, sameHouseType, sameStyle, latest).filter((design) => isUsableSlug(design.slug)).map((design) => ({
-    id: design.id, title: design.title, href: `/mau-thiet-ke-kien-truc/${design.slug}`, imageUrl: thumbnailUrl(design, ""), label: design.houseType || design.style || "Mẫu kiến trúc", description: design.description,
+    id: design.id, title: design.title, href: `/mau-thiet-ke-kien-truc/${design.slug}`, imageUrl: cardImageUrl(design, ""), label: design.houseType || design.style || "Mẫu kiến trúc", description: design.description,
   }));
 }
 
@@ -80,7 +80,7 @@ export async function getRelatedInterior(item: InteriorDesign): Promise<RelatedC
     getList<InteriorDesign>(query("/interior-designs", { limit: 8 })),
   ]);
   return uniqueRelated(item.id, samePair, sameStyle, sameRoom, latest).filter((design) => isUsableSlug(design.slug)).map((design) => ({
-    id: design.id, title: design.title, href: `/mau-thiet-ke-noi-that/${design.slug}`, imageUrl: thumbnailUrl(design, ""), label: design.interiorStyle || design.roomType || "Mẫu nội thất", description: design.description,
+    id: design.id, title: design.title, href: `/mau-thiet-ke-noi-that/${design.slug}`, imageUrl: cardImageUrl(design, ""), label: design.interiorStyle || design.roomType || "Mẫu nội thất", description: design.description,
   }));
 }
 
@@ -90,6 +90,6 @@ export async function getConstructionGuidePosts(): Promise<RelatedContentItem[]>
     getList<Post>(query("/posts", { limit: 8 })),
   ]);
   return uniqueRelated(0, guides, latest).filter((post) => isUsableSlug(post.slug)).map((post) => ({
-    id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: thumbnailUrl(post, ""), label: post.categoryRef?.name || "Cẩm nang xây dựng", description: post.excerpt,
+    id: post.id, title: post.title, href: `/tin-tuc/${post.slug}`, imageUrl: cardImageUrl(post, ""), label: post.categoryRef?.name || "Cẩm nang xây dựng", description: post.excerpt,
   }));
 }

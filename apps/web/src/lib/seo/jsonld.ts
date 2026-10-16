@@ -102,6 +102,9 @@ export function buildServiceSchema(input: {
   description?: string;
   url: string;
   serviceType: string;
+  /** A specific place (e.g. "Cầu Giấy, Hà Nội"); defaults to the company's whole service area. */
+  areaServed?: string;
+  image?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -109,8 +112,9 @@ export function buildServiceSchema(input: {
     "@id": `${absoluteUrl(input.url)}#service`,
     name: input.name,
     description: input.description,
+    image: input.image ? absoluteImageUrl(input.image) : undefined,
     provider: { "@id": `${siteConfig.url}/#organization` },
-    areaServed: siteConfig.areaServed,
+    areaServed: input.areaServed ? { "@type": "Place", name: input.areaServed } : siteConfig.areaServed,
     serviceType: input.serviceType,
     url: absoluteUrl(input.url),
   };

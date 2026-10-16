@@ -332,6 +332,59 @@
   gap: 22px;
 }
 
+.xay-nha-areas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.xay-nha-area-group {
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: white;
+}
+
+.xay-nha-area-group h3 {
+  margin: 0 0 14px;
+  color: var(--heading);
+  font-size: 22px;
+}
+
+.xay-nha-area-group ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.xay-nha-area-group a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.xay-nha-area-group a:hover {
+  color: var(--gold);
+}
+
+.xay-nha-area-group svg {
+  flex: none;
+  color: var(--gold);
+}
+
+@media (max-width: 760px) {
+  .xay-nha-areas,
+  .xay-nha-area-group ul {
+    grid-template-columns: 1fr;
+  }
+}
+
 .xay-nha-project-card {
   overflow: hidden;
   border: 1px solid var(--line);

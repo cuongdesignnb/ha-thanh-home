@@ -40,8 +40,10 @@ import {
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
 import { getConstructionGuidePosts } from "@/lib/related-content";
+import { areaLandingsFor } from "@/lib/project-page-kind";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { resolveServiceDisplayPricing, SERVICE_DISPLAY_REFERENCE_NOTE } from "@/lib/service-display-pricing";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export const metadata: Metadata = {
   title: "Xây nhà trọn gói",
@@ -90,6 +92,7 @@ export default async function XayNhaTronGoiPage() {
         <ScopeSection landing={landing} />
         <ProcessTimeline landing={landing} />
         <ProjectShowcase projects={projects} landing={landing} />
+        <ServiceAreasSection />
         <EstimateSection landing={landing} />
         <WhyChooseSection landing={landing} />
         {shouldRenderCmsList(landing.stats) ? <StatsStrip items={landing.stats} /> : null}
@@ -104,6 +107,7 @@ export default async function XayNhaTronGoiPage() {
 }
 
 function XayNhaHero({ landing }: { landing: ReturnType<typeof xayNhaLandingWithDefaults> }) {
+  preloadHeroImage(landing.heroImageUrl);
   return (
     <section className="xay-nha-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(7, 23, 18, 0.92) 0%, rgba(7, 23, 18, 0.72) 43%, rgba(7, 23, 18, 0.18) 78%), url(${landing.heroImageUrl})` }}>
       <div className="container">
@@ -212,6 +216,38 @@ function ProjectShowcase({ projects, landing }: { projects: LandingProjectCard[]
                 <a href={project.href}>Xem chi tiết</a>
               </div>
             </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Links every area landing back from the money page (they previously linked mostly to each other). */
+function ServiceAreasSection() {
+  const areas = areaLandingsFor("xay-nha-tron-goi");
+  const groups = [
+    { title: "Hà Nội", items: areas.filter((area) => area.region.endsWith("Hà Nội")) },
+    { title: "Các tỉnh lân cận", items: areas.filter((area) => !area.region.endsWith("Hà Nội")) },
+  ];
+  return (
+    <section className="section xay-nha-areas-section">
+      <div className="container">
+        <div className="section-title">
+          <span className="eyebrow">Khu vực phục vụ</span>
+          <h2>Xây nhà trọn gói tại Hà Nội và các tỉnh miền Bắc</h2>
+          <p>Hà Thành Home khảo sát, lập dự toán và thi công trực tiếp tại các khu vực dưới đây. Chọn khu vực để xem đơn giá, lưu ý thi công và công trình gần nhất.</p>
+        </div>
+        <div className="xay-nha-areas">
+          {groups.map((group) => (
+            <div className="xay-nha-area-group" key={group.title}>
+              <h3>{group.title}</h3>
+              <ul>
+                {group.items.map((area) => (
+                  <li key={area.slug}><a href={`/du-an/${area.slug}`}><MapPin size={14} /> Xây nhà trọn gói {area.region.split(",")[0]}</a></li>
+                ))}
+              </ul>
+            </div>
           ))}
         </div>
       </div>

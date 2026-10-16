@@ -26,4 +26,71 @@ export const contentConsolidationRedirects: Readonly<Record<string, string>> = {
   "/tin-tuc/gia-xay-biet-thu-tron-goi-2": "/tin-tuc/gia-xay-biet-thu-tron-goi",
   "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin-2": "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin",
   "/tin-tuc/cach-bao-duong-be-tong-sau-khi-do-dung-tieu-chuan-2": "/tin-tuc/cach-bao-duong-be-tong-sau-khi-do-dung-tieu-chuan",
+
+  /*
+   * Phase P1-lite (2026-10-16): cannibalising pages merged into an existing page, URL structure unchanged.
+   * Only sources with no meaningful Search Console visibility over 6 months (old + new URLs combined) are
+   * merged; pages that rank for their own query are kept (e.g. the brand page
+   * /du-an/cong-ty-xay-dung-nha-uy-tin-ha-thanh-hathanhhome at position 3.1, and
+   * /du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi at 11.4).
+   */
+  // Generic "xây nhà trọn gói (Hà Nội)" pages competing with the money page (all average position > 25,
+  // except the HaThanhHome-branded landing whose brand queries the money page also covers).
+  "/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/du-an/dich-vu-xay-nha-tron-goi-tai-ha-noi-bao-gia-minh-bach-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/du-an/xay-nha-tron-goi-uy-tin-tai-ha-noi": "/dich-vu/xay-nha-tron-goi",
+  "/xay-nha-tron-goi-uy-tin-tai-ha-noi-chat-luong-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/du-an/thiet-ke-thi-cong-xay-nha-tron-goi": "/dich-vu/xay-nha-tron-goi",
+  "/thiet-ke-thi-cong-xay-nha-tron-goi-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/du-an/xay-nha-tron-goi-mien-bac": "/dich-vu/xay-nha-tron-goi",
+  "/tin-tuc/cong-ty-xay-nha-tron-goi-uy-tin": "/dich-vu/xay-nha-tron-goi",
+  // Factory construction: generic landings and 9 near-identical "thi công nhà xưởng <tỉnh>" posts (53-94%
+  // shared body text) merged into the service page.
+  "/du-an/cong-ty-xay-dung-nha-xuong": "/dich-vu/thi-cong-nha-xuong",
+  "/du-an/nha-thau-xay-dung-nha-xuong": "/dich-vu/thi-cong-nha-xuong",
+  "/du-an/thi-cong-nha-xuong-tron-goi": "/dich-vu/thi-cong-nha-xuong",
+  "/du-an/thiet-ke-thi-cong-nha-xuong": "/dich-vu/thi-cong-nha-xuong",
+  "/du-an/xay-dung-nha-xuong-cong-nghiep": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/cong-ty-xay-dung-nha-xuong-tron-goi": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-cong-nghiep": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-ha-noi": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-hai-phong": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-thai-binh": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-ninh-binh": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-nam-dinh": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-quang-ninh": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-bac-ninh": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-ha-nam": "/dich-vu/thi-cong-nha-xuong",
+  "/tin-tuc/thi-cong-nha-xuong-hung-yen": "/dich-vu/thi-cong-nha-xuong",
+  // Office fit-out: generic and per-province landings merged into the service page.
+  "/du-an/thi-cong-noi-that-van-phong": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/thi-cong-van-phong-tron-goi": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/cong-ty-noi-that-van-phong": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/cong-ty-noi-that-van-phong-mien-bac": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/thi-cong-noi-that-van-phong-tai-ha-noi": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/thiet-ke-van-phong": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/thi-cong-noi-that-van-phong-bac-giang": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/cong-ty-thiet-ke-van-phong-tai-bac-ninh": "/dich-vu/thi-cong-noi-that-van-phong",
+  "/du-an/thi-cong-van-phong-tai-hai-phong": "/dich-vu/thi-cong-noi-that-van-phong",
+  // Villa and townhouse "trọn gói" blog clusters: one canonical post per topic.
+  "/tin-tuc/thi-cong-biet-thu": "/tin-tuc/xay-biet-thu-tron-goi",
+  "/tin-tuc/thi-cong-biet-thu-tron-goi": "/tin-tuc/xay-biet-thu-tron-goi",
+  "/tin-tuc/thiet-ke-thi-cong-biet-thu-tron-goi": "/tin-tuc/xay-biet-thu-tron-goi",
+  "/tin-tuc/xay-dung-biet-thu": "/tin-tuc/xay-biet-thu-tron-goi",
+  "/du-an/thi-cong-nha-pho": "/tin-tuc/xay-nha-pho-tron-goi",
+  "/du-an/xay-dung-nha-pho": "/tin-tuc/xay-nha-pho-tron-goi",
+  "/tin-tuc/cong-ty-xay-dung-nha-pho": "/tin-tuc/xay-nha-pho-tron-goi",
+  "/tin-tuc/thiet-ke-thi-cong-nha-pho": "/tin-tuc/xay-nha-pho-tron-goi",
+  "/tin-tuc/bao-gia-thi-cong-nha-pho": "/tin-tuc/bao-gia-xay-dung-nha-pho",
+  "/tin-tuc/xay-nha-pho-3-tang-tron-goi-2": "/tin-tuc/xay-nha-pho-3-tang-tron-goi-chi-phi-tien-do-va-hang-muc-thi-cong",
+  // Same-topic posts; the kept post is the one with the better Search Console position.
+  "/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that-quy-trinh-chi-phi-va-cach-han-che-phat-sinh": "/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that",
+  "/tin-tuc/kinh-nghiem-chon-cong-ty-xay-dung-uy-tin-chat-luong-an-toan": "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin",
+  "/tin-tuc/chi-phi-xay-nha-2-tang-100m2": "/tin-tuc/chi-phi-xay-nha-2-tang-100m2-moi-nhat-nam-2026",
+  "/tin-tuc/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay": "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh",
+  "/tin-tuc/huong-dan-len-du-toan-chi-phi-khi-xay-nha": "/tin-tuc/cach-len-du-toan-chi-phi-xay-nha-tiet-kiem",
+  // Misfiled guides: an article page and a warranty process that duplicates the warranty policy.
+  "/du-an/mau-van-phong-dep": "/tin-tuc/cac-mau-van-phong-dep-nam-2026-cam-nang-thiet-ke-sang-trong-cho-doanh-nghiep",
+  "/du-an/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome": "/chinh-sach-bao-hanh",
 };

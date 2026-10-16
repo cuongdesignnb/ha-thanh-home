@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import {
   demoteContentH1,
   isUsableSlug,
+  lazyLoadContentImages,
   normalizeLegacyAnchors,
   normalizeLegacyHref,
   prepareDetailHtml,
@@ -133,7 +134,7 @@ const wave6bInternalMappings: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi", "/tin-tuc/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi"],
   ["/co-nen-cung-dong-tho-xay-nha", "/tin-tuc/co-nen-cung-dong-tho-xay-nha"],
   ["/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an", "/tin-tuc/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an"],
-  ["/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay", "/tin-tuc/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay"],
+  ["/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay", "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh"],
   ["/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man", "/tin-tuc/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man"],
   ["/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man", "/tin-tuc/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man"],
   ["/nen-xay-nha-tron-goi-hay-tu-thue-tho", "/tin-tuc/nen-xay-nha-tron-goi-hay-tu-thue-tho"],
@@ -405,7 +406,7 @@ for (const invalid of [null, undefined, "", "  ", "null", "undefined", "NULL", "
 assert.equal(isUsableSlug("bai-viet-hop-le"), true);
 
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi"), "/dich-vu/xay-nha-tron-goi");
-assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-ha-noi"), "/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep");
+assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-ha-noi"), "/dich-vu/xay-nha-tron-goi");
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-quan-hai-ba-trung"), "/du-an/xay-nha-tron-goi-hai-ba-trung-hathanhhome");
 assert.equal(getLegacyRedirectTarget("/bao-gia-xay-nha-tai-quan-hoan-kiem"), "/du-an/xay-nha-tron-goi-phuong-hoan-kiem-hathanhhome");
 assert.equal(getLegacyRedirectTarget("/bao-gia-xay-dung-nha-tron-goi-gia-re"), "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026");
@@ -415,7 +416,7 @@ const gscRedirects: Array<[string, string]> = [
   ["/mau-thiet-ke-kien-truc/35-mau-biet-thu-tan-co-dien-san-vuon-dep-nha-2026", "/mau-thiet-ke-kien-truc/35-mau-biet-thu-tan-co-dien-san-vuon-dep-2026"],
   ["/du-an/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi", "/du-an/xay-nha-tron-goi-tai-ha-dong"],
   ["/du-an/cong-trinh-nha-o-biet-thu-3-tang-tai-bac-ninh-dep-hien-dai", "/du-an/cong-trinh-nha-o-biet-thu"],
-  ["/cong-ty-noi-that-van-phong-mien-bac-uy-tin-chuyen-nghiep", "/du-an/cong-ty-noi-that-van-phong-mien-bac"],
+  ["/cong-ty-noi-that-van-phong-mien-bac-uy-tin-chuyen-nghiep", "/dich-vu/thi-cong-noi-that-van-phong"],
   ["/xay-nha-tron-goi-ba-vi-ho-tro-24/7-cong-ty-xay-dung-uy-tin", "/du-an/xay-nha-tron-goi-ba-vi-ho-tro-20-7-cong-ty-xay-dung-uy-tin"],
   ["/70%20-mau-biet-thu-tan-co-dien-hien-dai-dep-nha-2026", "/mau-thiet-ke-kien-truc/70-mau-biet-thu-tan-co-dien-hien-dai-dep-2026"],
   ["/du-an/xay-nha-tron-goi-long-bien-ha-noi", "/du-an/xay-nha-tron-goi-long-bien-ha-noi-hathanhhome"],
@@ -488,7 +489,7 @@ assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-nam-dinh-random"), u
 const wave7cRedirects: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong"],
   ["/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do", "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do"],
-  ["/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep", "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep"],
+  ["/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep", "/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home", "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi"],
   ["/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome", "/du-an/xay-nha-tron-goi-tai-phu-xuyen"],
   ["/cap-nhap-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc", "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc"],
@@ -592,5 +593,14 @@ assert.deepEqual(
   { id: 2, title: "Nhà Trong Ngõ", slug: "nha-trong-ngo-", metaTitle: "Nhà Trong Ngõ", ogTitle: null },
 );
 assert.equal(withDisplayTitles(null), null);
+
+// Content images are below the hero: lazy-loaded unless the author set loading explicitly.
+assert.equal(lazyLoadContentImages('<p><img src="/a.webp" alt="A"></p>'), '<p><img src="/a.webp" alt="A" loading="lazy" decoding="async"></p>');
+assert.equal(lazyLoadContentImages('<img src="/a.webp" />'), '<img src="/a.webp" loading="lazy" decoding="async" />');
+assert.equal(lazyLoadContentImages('<IMG SRC="/a.webp" decoding="sync">'), '<IMG SRC="/a.webp" decoding="sync" loading="lazy">');
+assert.equal(lazyLoadContentImages('<img src="/a.webp" loading="eager">'), '<img src="/a.webp" loading="eager">');
+assert.equal(lazyLoadContentImages('<script>const s = "<img src=x>";</script>'), '<script>const s = "<img src=x>";</script>');
+assert.equal(lazyLoadContentImages('<imgx>'), '<imgx>');
+assert.ok(prepareDetailHtml('<h1>T</h1><img src="/a.webp">').endsWith('<img src="/a.webp" loading="lazy" decoding="async">'));
 
 console.log("SEO rich-content regression tests passed");

@@ -10,7 +10,7 @@ import { TURNKEY_SERVICE_PATH, turnkeyContextPosts, withTurnkeyContextLink } fro
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(contentConsolidationRedirects);
-assert.equal(entries.length, 12);
+assert.equal(entries.length, 63);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);
@@ -48,6 +48,14 @@ const samples: Array<[string, string]> = [
   ["/tin-tuc/gia-xay-biet-thu-tron-goi-2", "https://hathanhhome.vn/tin-tuc/gia-xay-biet-thu-tron-goi"],
   // Previously chained through the /du-an Thái Nguyên copy; now one hop to the kept page.
   ["/xay-nha-tron-goi-tai-thai-nguyen", "https://hathanhhome.vn/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin"],
+  // P1-lite merges.
+  ["/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/tin-tuc/thi-cong-nha-xuong-hung-yen", "https://hathanhhome.vn/dich-vu/thi-cong-nha-xuong"],
+  ["/du-an/thi-cong-van-phong-tai-hai-phong", "https://hathanhhome.vn/dich-vu/thi-cong-noi-that-van-phong"],
+  ["/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that-quy-trinh-chi-phi-va-cach-han-che-phat-sinh", "https://hathanhhome.vn/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that"],
+  // Older maps that pointed into a merged page now go straight to the kept page (one hop).
+  ["/xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/xay-nha-pho-3-tang-tron-goi", "https://hathanhhome.vn/tin-tuc/xay-nha-pho-3-tang-tron-goi-chi-phi-tien-do-va-hang-muc-thi-cong"],
 ];
 for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath), { status: 308, location });
 
@@ -55,7 +63,12 @@ for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath),
 for (const untouched of [
   "/xay-nha-tron-goi-thai-nguyen-2026--bao-gia-chi-tiet-thi-cong-uy-tin",
   "/tin-tuc/gia-xay-biet-thu-tron-goi",
-  "/tin-tuc/xay-nha-pho-3-tang-tron-goi-2",
+  "/tin-tuc/xay-nha-pho-3-tang-tron-goi-chi-phi-tien-do-va-hang-muc-thi-cong",
+  // Pages with their own Search Console visibility are deliberately kept.
+  "/du-an/cong-ty-xay-dung-nha-uy-tin-ha-thanh-hathanhhome",
+  "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi",
+  "/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat",
+  "/du-an/vat-lieu-thi-cong-xay-nha-tron-goi",
 ]) {
   assert.deepEqual(redirectOf(untouched), { status: 200, location: null });
 }
@@ -68,7 +81,7 @@ assert.equal(
 
 // Turnkey contextual link.
 const contextSlugs = Object.keys(turnkeyContextPosts);
-assert.equal(contextSlugs.length, 32);
+assert.equal(contextSlugs.length, 30);
 for (const slug of contextSlugs) assert.equal(isLegacyRedirectSource(`/tin-tuc/${slug}`), false, `${slug} redirects away`);
 assert.equal(isLegacyRedirectSource(TURNKEY_SERVICE_PATH), false);
 

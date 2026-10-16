@@ -5,7 +5,8 @@ import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, thumbnailUrl, type Project } from "@/lib/api";
-import { buildBreadcrumbSchema, buildProjectSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
+import { buildBreadcrumbSchema, buildProjectSchema, buildImageObjectSchema, buildServiceSchema, buildWebPageSchema } from "@/lib/seo/jsonld";
+import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
 import { absoluteImageUrl } from "@/lib/seo/site";
 import { getRelatedProjects } from "@/lib/related-content";
 
@@ -22,22 +23,44 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const related = await getRelatedProjects(project);
 
   const imageUrl = thumbnailUrl(project, "");
-  const schemas = [
-    buildBreadcrumbSchema([
-      { name: "Trang chủ", url: "/" },
-      { name: "Dự án", url: "/du-an" },
-      { name: project.title, url: `/du-an/${project.slug}` },
-    ]),
-    buildProjectSchema(project),
-    ...(imageUrl ? [buildImageObjectSchema(imageUrl, project.title)] : []),
-  ];
+  const pageUrl = `/du-an/${project.slug}`;
+  const pageInfo = getProjectPageInfo(project.slug);
+  const parent = pageInfo ? parentServices[pageInfo.parent] : undefined;
+  const schemas = pageInfo && parent
+    ? [
+        buildBreadcrumbSchema([
+          { name: "Trang chủ", url: "/" },
+          { name: "Dịch vụ", url: "/dich-vu" },
+          { name: parent.name, url: parent.path },
+          { name: project.title, url: pageUrl },
+        ]),
+        pageInfo.kind === "guide"
+          ? buildWebPageSchema({ name: project.title, description: project.description || undefined, url: pageUrl })
+          : buildServiceSchema({
+              name: project.title,
+              description: project.description || undefined,
+              url: pageUrl,
+              serviceType: parent.name,
+              areaServed: pageInfo.region,
+              image: imageUrl || undefined,
+            }),
+      ]
+    : [
+        buildBreadcrumbSchema([
+          { name: "Trang chủ", url: "/" },
+          { name: "Dự án", url: "/du-an" },
+          { name: project.title, url: pageUrl },
+        ]),
+        buildProjectSchema(project),
+        ...(imageUrl ? [buildImageObjectSchema(imageUrl, project.title)] : []),
+      ];
 
   return (
     <>
       <SiteHeader />
       <JsonLd data={schemas} />
       <ProjectDetail project={project} />
-      <RelatedContent items={related} title="Dự án liên quan" />
+      <RelatedContent items={related} title={pageInfo ? "Có thể bạn quan tâm" : "Dự án liên quan"} />
       <SiteFooter />
     </>
   );

@@ -38,6 +38,7 @@ import {
   type LandingTestimonial,
 } from "@/lib/api";
 import { buildBreadcrumbSchema, buildServiceSchema, buildFAQSchema } from "@/lib/seo/jsonld";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 export const metadata: Metadata = {
   title: "Thi công nhà xưởng trọn gói",
@@ -109,6 +110,7 @@ function IconText({ icon: Icon, item }: { icon: LucideIcon; item: LandingListIte
 }
 
 function Hero({ landing }: { landing: LandingType }) {
+  preloadHeroImage(landing.heroImageUrl);
   return (
     <section className="xay-nha-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(7, 23, 18, 0.92) 0%, rgba(7, 23, 18, 0.72) 43%, rgba(7, 23, 18, 0.18) 78%), url(${landing.heroImageUrl})` }}>
       <div className="container">

@@ -2,9 +2,10 @@ import { ArrowRight, Banknote, CheckCircle2, Clock, Filter, Home, Images, Layout
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
+import { cardImageUrl, interiorImages, projectImages, thumbnailUrl, type ArchitectureDesign, type CatalogFilters, type InteriorDesign, getSiteSettings } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
@@ -112,10 +113,10 @@ function Select({ alignRight, label, labels, name, options, value }: { alignRigh
 }
 
 export function ArchitectureCard({ design, index }: { design: ArchitectureDesign; index: number }) {
-  const image = thumbnailUrl(design, projectImages[index % projectImages.length]);
+  const image = cardImageUrl(design, projectImages[index % projectImages.length]);
   return (
     <a className="template-card" href={`/mau-thiet-ke-kien-truc/${design.slug}`}>
-      <img alt={design.title} src={image} />
+      <img alt={design.title} src={image} loading="lazy" decoding="async" />
       <h3>{design.title}{design.code ? ` - ${design.code}` : ""}</h3>
       <div className="template-meta">
         <Meta icon={Home} label="Loại nhà" value={design.houseType} />
@@ -130,10 +131,10 @@ export function ArchitectureCard({ design, index }: { design: ArchitectureDesign
 }
 
 export function InteriorCard({ design, index }: { design: InteriorDesign; index: number }) {
-  const image = thumbnailUrl(design, interiorImages[index % interiorImages.length]);
+  const image = cardImageUrl(design, interiorImages[index % interiorImages.length]);
   return (
     <a className="template-card" href={`/mau-thiet-ke-noi-that/${design.slug}`}>
-      <img alt={design.title} src={image} />
+      <img alt={design.title} src={image} loading="lazy" decoding="async" />
       <h3>{design.title}{design.code ? ` - ${design.code}` : ""}</h3>
       <div className="template-meta">
         <Meta icon={Palette} label="Phong cách" value={design.interiorStyle} />
@@ -164,6 +165,8 @@ export async function TemplateDetail({ item, kind }: { item: ArchitectureDesign 
   const specs = isArchitecture
     ? [["Mã mẫu", item.code], ["Loại nhà", architecture.houseType], ["Phong cách", architecture.style], ["Diện tích", architecture.area ? `${architecture.area}m2` : ""], ["Số tầng", architecture.floors], ["Kiểu mái", architecture.roofType], ["Ngân sách", formatMoney(architecture.estimatedBudget)], ["Thời gian", architecture.constructionTime], ["Vị trí", architecture.location]]
     : [["Mã mẫu", item.code], ["Phong cách", interior.interiorStyle], ["Loại nhà", interior.houseType], ["Loại phòng", interior.roomType], ["Diện tích", interior.area ? `${interior.area}m2` : ""], ["Layout", interior.layoutType], ["Tone vật liệu", interior.materialTone], ["Ngân sách", interior.budgetRange || formatMoney(interior.budgetMin)], ["Vị trí", interior.location]];
+
+  preloadHeroImage(image);
 
   return (
     <main>

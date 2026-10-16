@@ -69,7 +69,7 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
       <div className="template-album-grid">
         {images.map((src, index) => (
           <button className="template-album-item" key={`${src}-${index}`} onClick={() => open(index)} type="button">
-            <img src={src} alt={`${title} - hình ${index + 1}`} />
+            <img src={src} alt={`${title} - hình ${index + 1}`} loading="lazy" decoding="async" />
             <span><Maximize2 size={16} /> Xem ảnh</span>
           </button>
         ))}
@@ -97,7 +97,7 @@ export function TemplateGalleryModal({ images, title }: TemplateGalleryModalProp
               <div className="gallery-thumbs">
                 {images.map((src, index) => (
                   <button className={index === activeIndex ? "active" : ""} key={`thumb-${src}-${index}`} onClick={() => open(index)} type="button">
-                    <img src={src} alt={`${title} - thumbnail ${index + 1}`} />
+                    <img src={src} alt={`${title} - thumbnail ${index + 1}`} loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>

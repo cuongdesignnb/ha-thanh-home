@@ -1,16 +1,19 @@
 import { ArrowRight, Banknote, Building2, Filter, Home, MapPin, Ruler, UserRound } from "lucide-react";
 import { TemplateGalleryModal } from "@/components/template-gallery-modal";
-import { interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
+import { cardImageUrl, interiorImages, projectImages, thumbnailUrl, type Post, type PostCategory, type Project, type ProjectFilters, type ProjectGroup, type Service, getSiteSettings, PLACEHOLDER_IMAGE } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { isUsableSlug } from "@/lib/content-validation";
 import { buildPaginationItems, buildProjectCatalogPageHref, parseCatalogPage } from "@/lib/project-catalog-pagination";
 import { buildPostCatalogPageHref, buildPostPaginationItems, parsePostCatalogPage } from "@/lib/post-catalog-pagination";
+import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
+import { preloadHeroImage } from "@/lib/preload-hero-image";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 type Meta = { total: number; page: number; limit: number; totalPages: number };
 
 export function ProjectList({ title, projects }: { title: string; projects: Project[] }) {
   return (
-    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
+    <><PageHero title={title} /><section className="section"><div className="container project-grid">{projects.filter((project) => isUsableSlug(project.slug) && !isLegacyRedirectSource(`/du-an/${project.slug}`)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}</div></section></>
   );
 }
 
@@ -41,7 +44,7 @@ export function ProjectCatalog({ filters, group, meta, projects, searchParams }:
           <ProjectFilterBar filters={filters} group={group} searchParams={searchParams} />
           <div className="project-count"><h2>Dự án</h2><p>Hiển thị {meta.total} dự án</p></div>
           <div className="project-catalog-grid">
-            {projects.filter((project) => isUsableSlug(project.slug)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
+            {projects.filter((project) => isUsableSlug(project.slug) && !isLegacyRedirectSource(`/du-an/${project.slug}`)).map((project, index) => <ProjectCard project={project} index={index} key={project.id} />)}
           </div>
           <ProjectPagination basePath={basePath} meta={meta} searchParams={searchParams} />
         </div>
@@ -112,17 +115,17 @@ function isReadableOption(value: string) {
 }
 
 function ProjectCard({ index, project }: { index: number; project: Project }) {
-  const image = thumbnailUrl(project, PLACEHOLDER_IMAGE);
+  const image = cardImageUrl(project, PLACEHOLDER_IMAGE);
   const categoryName = project.categoryRef?.name || project.category || (project.group === "interior" ? "Nội thất" : "Công trình");
   return (
     <a className="project-catalog-card" href={`/du-an/${project.slug}`}>
-      <img alt={project.title} src={image} />
+      <img alt={project.title} src={image} loading="lazy" decoding="async" />
       <h3>{project.title}</h3>
       <div className="project-card-meta">
         <span><Home size={16} /><small>Danh mục</small><strong>{categoryName}</strong></span>
         <span><Ruler size={16} /><small>Quy mô</small><strong>{project.area || project.scale || "Đang cập nhật"}</strong></span>
         <span><MapPin size={16} /><small>Vị trí</small><strong>{project.location || "Hà Nội"}</strong></span>
-        {project.clientName ? <span><UserRound size={16} /><small>Chủ đầu tư</small><strong>{project.clientName}</strong></span> : null}
+        {project.clientName && !getProjectPageInfo(project.slug) ? <span><UserRound size={16} /><small>Chủ đầu tư</small><strong>{project.clientName}</strong></span> : null}
       </div>
     </a>
   );
@@ -134,6 +137,9 @@ export async function ProjectDetail({ project }: { project: Project }) {
   const hotlineClean = hotline.replace(/\s/g, "");
   const image = thumbnailUrl(project, "");
   const albumImages = buildProjectAlbum(project);
+  preloadHeroImage(image);
+  const pageInfo = getProjectPageInfo(project.slug);
+  if (pageInfo) return <NonPortfolioProjectDetail project={project} pageInfo={pageInfo} image={image} albumImages={albumImages} hotline={hotline} hotlineClean={hotlineClean} />;
   const specs = [
     ["Nhóm", project.group === "interior" ? "Nội thất" : "Công trình"],
     ["Danh mục", project.categoryRef?.name || project.category],
@@ -185,6 +191,72 @@ export async function ProjectDetail({ project }: { project: Project }) {
   );
 }
 
+/** Service/area/pricing/guide pages stored as Projects: same layout, without project-only fields. */
+function NonPortfolioProjectDetail({ project, pageInfo, image, albumImages, hotline, hotlineClean }: {
+  project: Project;
+  pageInfo: NonNullable<ReturnType<typeof getProjectPageInfo>>;
+  image: string;
+  albumImages: string[];
+  hotline: string;
+  hotlineClean: string;
+}) {
+  const parent = parentServices[pageInfo.parent];
+  const isGuide = pageInfo.kind === "guide";
+  const eyebrow = isGuide ? "Cẩm nang xây nhà" : pageInfo.kind === "pricing" ? `Báo giá — ${parent.name}` : `Dịch vụ — ${parent.name}`;
+  const specs: Array<[string, string]> = isGuide
+    ? [["Chuyên mục", "Cẩm nang"], ["Chủ đề", parent.name], ...(pageInfo.region ? [["Khu vực", pageInfo.region] as [string, string]] : [])]
+    : [
+        ["Dịch vụ", parent.name],
+        ...(pageInfo.region ? [["Khu vực phục vụ", pageInfo.region] as [string, string]] : []),
+        ["Thực hiện", "Đội ngũ Hà Thành Home"],
+        ["Hỗ trợ", "Khảo sát · Báo giá · Thi công"],
+      ];
+  const contactHref = `/lien-he?du-an=${project.slug}`;
+  return (
+    <main>
+      <section className="template-detail-hero" style={image ? { backgroundImage: `linear-gradient(90deg, rgba(15,61,46,.84), rgba(15,61,46,.2)), url(${image})` } : undefined}>
+        <div className="container template-detail-hero-content">
+          <span>{eyebrow}</span>
+          <h1>{project.title}</h1>
+          {project.description ? <p>{project.description}</p> : null}
+          <div className="template-detail-actions">
+            <a className="cta" href={contactHref}>{isGuide ? "Nhận tư vấn miễn phí" : "Nhận báo giá chi tiết"}</a>
+            <a className="cta secondary" href={`tel:${hotlineClean}`}>Gọi {hotline}</a>
+          </div>
+        </div>
+      </section>
+      <section className="section template-detail-summary">
+        <div className="container template-detail-grid">
+          <aside className="template-specs-card">
+            <div className="template-specs-heading"><span>{isGuide ? "Thông tin bài viết" : "Thông tin dịch vụ"}</span><strong>{parent.name}</strong></div>
+            <div className="template-specs">{specs.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
+            <a className="template-side-cta" href={parent.path}>Xem dịch vụ {parent.name.toLowerCase()} <ArrowRight size={16} /></a>
+          </aside>
+          <div className="template-detail-main">
+            {albumImages.length > 0 ? (
+              <section className="template-album">
+                <div className="template-section-heading"><span><Building2 size={18} /> Hình ảnh tham khảo</span><h2>Hình ảnh công trình tham khảo</h2></div>
+                <TemplateGalleryModal images={albumImages} title={project.title} />
+              </section>
+            ) : null}
+            <article className="template-article">
+              <div className="detail-content" dangerouslySetInnerHTML={{ __html: prepareDetailHtml(project.contentHtml || `<p>${project.description || "Nội dung đang được cập nhật."}</p>`) }} />
+            </article>
+            <section className="template-lead-box">
+              <div>
+                <span>{parent.name}</span>
+                <h2>{pageInfo.region ? `Cần xây nhà tại ${pageInfo.region.split(",")[0]}?` : "Cần tư vấn và báo giá theo công trình thực tế?"}</h2>
+                <p>Xem đầy đủ phạm vi, quy trình và chính sách bảo hành tại trang <a href={parent.path}>dịch vụ {parent.name.toLowerCase()}</a>, hoặc để Hà Thành Home khảo sát và lập dự toán theo diện tích, vị trí và ngân sách của anh/chị.</p>
+              </div>
+              <div className="template-lead-actions"><a className="cta" href={contactHref}>Đặt lịch khảo sát</a><a className="outline-cta" href={`tel:${hotlineClean}`}>Gọi ngay</a></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export async function ServiceDetail({ service }: { service: Service }) {
   const settings = await getSiteSettings();
   const hotline = settings["site.identity"]?.hotline || "0898 502 333";
@@ -192,6 +264,7 @@ export async function ServiceDetail({ service }: { service: Service }) {
   const fallback = service.group === "interior" ? interiorImages[0] : projectImages[0];
   const image = thumbnailUrl(service, fallback);
   const albumImages = buildServiceAlbum(service);
+  preloadHeroImage(image);
   const groupLabel = service.group === "interior" ? "Nội thất" : service.group === "xay_nha_tron_goi" ? "Xây nhà trọn gói" : "Công trình";
   const publishedAt = service.publishedAt ? new Date(service.publishedAt).toLocaleDateString("vi-VN", { year: "numeric", month: "long" }) : null;
   const specs = [
@@ -282,7 +355,7 @@ export function PostList({ activeCategory, categories, meta, posts, searchParams
               {categories.map((category) => <a className={activeCategory === category.slug ? "active" : ""} href={`/tin-tuc?category=${category.slug}`} key={category.id}>{category.name}</a>)}
             </nav>
           ) : null}
-          <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${thumbnailUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
+          <div className="news-grid">{posts.filter((post) => isUsableSlug(post.slug) && !isLegacyRedirectSource(`/tin-tuc/${post.slug}`)).map((post, index) => <a className="news-card" href={`/tin-tuc/${post.slug}`} key={post.id}><div className="news-image" style={{ backgroundImage: `url(${cardImageUrl(post, interiorImages[index % interiorImages.length])})` }} /><div className="card-body">{post.categoryRef ? <span className="post-category-badge">{post.categoryRef.name}</span> : null}<h3>{post.title}</h3><p>{post.excerpt}</p><span>Đọc thêm <ArrowRight size={14} /></span></div></a>)}</div>
           <PostPagination meta={meta} searchParams={searchParams} />
         </div>
       </section>

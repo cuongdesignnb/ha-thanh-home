@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { PLACEHOLDER_IMAGE } from "@/lib/api";
+import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
 
 export type RelatedContentItem = {
   id: number;
@@ -11,13 +12,15 @@ export type RelatedContentItem = {
 };
 
 export function RelatedContent({ items, title = "Nội dung liên quan" }: { items: RelatedContentItem[]; title?: string }) {
-  if (!items.length) return null;
+  // Merged pages redirect away; linking them would add a hop for users and crawlers.
+  const visible = items.filter((item) => !isLegacyRedirectSource(item.href.split(/[?#]/, 1)[0]));
+  if (!visible.length) return null;
   return (
     <section className="section related-content-section">
       <div className="container">
         <div className="section-title"><span className="eyebrow">Khám phá thêm</span><h2>{title}</h2></div>
         <div className="related-content-grid">
-          {items.slice(0, 4).map((item) => (
+          {visible.slice(0, 4).map((item) => (
             <a className="related-content-card" href={item.href} key={`${item.href}-${item.id}`}>
               <img alt={item.title} loading="lazy" src={item.imageUrl || PLACEHOLDER_IMAGE} />
               <div>
