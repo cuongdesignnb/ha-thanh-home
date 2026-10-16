@@ -2,10 +2,10 @@
  * These entries do not create server redirects or sitemap routes.
  */
 export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
-  "/dich-vu-xay-nha-tron-goi-tai-ha-noi-bao-gia-minh-bach-chuyen-nghiep": "/du-an/dich-vu-xay-nha-tron-goi-tai-ha-noi-bao-gia-minh-bach-chuyen-nghiep",
+  "/dich-vu-xay-nha-tron-goi-tai-ha-noi-bao-gia-minh-bach-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
   "/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh": "/du-an/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh",
   "/xay-nha-tron-goi-la-gi-co-nen-chon-dich-vu-chia-khoa-trao-tay-khong": "/du-an/xay-nha-tron-goi-la-gi-co-nen-chon-dich-vu-chia-khoa-trao-tay-khong",
-  "/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome": "/du-an/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome",
+  "/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome": "/chinh-sach-bao-hanh",
   "/mau-hop-dong-xay-nha-tron-goi-chi-tiet-chuan-phap-ly": "/du-an/mau-hop-dong-xay-nha-tron-goi-chi-tiet-chuan-phap-ly",
   "/kinh-nghiem-xay-nha-pho-o-ha-noi-can-luu-y-nhung-gi": "/du-an/kinh-nghiem-xay-nha-pho-o-ha-noi-can-luu-y-nhung-gi",
   "/xay-nha-tron-goi-phan-tho-uy-tin-chuyen-nghiep": "/du-an/xay-nha-tron-goi-phan-tho-uy-tin-chuyen-nghiep",
@@ -17,7 +17,7 @@ export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/cong-ty-xay-dung-nha-o-uy-tin-ha-noi": "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi",
   "/top-sai-lam-khien-chi-phi-xay-nha-vuot-du-toan": "/du-an/top-sai-lam-khien-chi-phi-xay-nha-vuot-du-toan",
   "/xay-nha-tron-goi-ha-noi-gom-nhung-gi": "/du-an/xay-nha-tron-goi-ha-noi-gom-nhung-gi",
-  "/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep": "/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep",
+  "/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
   "/xay-nha-tron-goi-phuong-hoan-kiem-hathanhhome": "/du-an/xay-nha-tron-goi-phuong-hoan-kiem-hathanhhome",
   "/xay-nha-tron-goi-hoai-duc-cong-ty-xay-dung-uy-tin": "/du-an/xay-nha-tron-goi-hoai-duc-cong-ty-xay-dung-uy-tin",
   "/bao-gia-xay-nha-tron-goi-tai-tuyen-quang-chi-tiet-tung-hang-muc": "/du-an/bao-gia-xay-nha-tron-goi-tai-tuyen-quang-chi-tiet-tung-hang-muc",
@@ -47,7 +47,7 @@ export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi": "/tin-tuc/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi",
   "/co-nen-cung-dong-tho-xay-nha": "/tin-tuc/co-nen-cung-dong-tho-xay-nha",
   "/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an": "/tin-tuc/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an",
-  "/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay": "/tin-tuc/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay",
+  "/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay": "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh",
   "/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man": "/tin-tuc/bi-quyet-chon-tuoi-dong-tho-xay-nha-duoc-may-man",
   "/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man": "/tin-tuc/chon-thang-lam-nha-theo-tuoi-gap-nhieu-may-man",
   "/nen-xay-nha-tron-goi-hay-tu-thue-tho": "/tin-tuc/nen-xay-nha-tron-goi-hay-tu-thue-tho",

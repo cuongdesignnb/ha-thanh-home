@@ -3,7 +3,7 @@ import { contentConsolidationRedirects } from "./content-consolidation-redirects
 /** Explicit historical SEO redirects. Keep this list exact and intentionally small. */
 export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi": "/dich-vu/xay-nha-tron-goi",
-  "/xay-nha-tron-goi-tai-ha-noi": "/du-an/xay-nha-tron-goi-tai-ha-noi-dich-vu-thi-cong-chuyen-nghiep",
+  "/xay-nha-tron-goi-tai-ha-noi": "/dich-vu/xay-nha-tron-goi",
   "/xay-nha-tron-goi-quan-hai-ba-trung": "/du-an/xay-nha-tron-goi-hai-ba-trung-hathanhhome",
   "/bao-gia-xay-nha-tai-quan-hoan-kiem": "/du-an/xay-nha-tron-goi-phuong-hoan-kiem-hathanhhome",
   "/bao-gia-xay-dung-nha-tron-goi-gia-re": "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026",
@@ -12,7 +12,7 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/mau-thiet-ke-kien-truc/35-mau-biet-thu-tan-co-dien-san-vuon-dep-nha-2026": "/mau-thiet-ke-kien-truc/35-mau-biet-thu-tan-co-dien-san-vuon-dep-2026",
   "/du-an/xay-nha-tron-goi-tai-ha-dong-khao-sat-tu-van-mien-phi": "/du-an/xay-nha-tron-goi-tai-ha-dong",
   "/du-an/cong-trinh-nha-o-biet-thu-3-tang-tai-bac-ninh-dep-hien-dai": "/du-an/cong-trinh-nha-o-biet-thu",
-  "/cong-ty-noi-that-van-phong-mien-bac-uy-tin-chuyen-nghiep": "/du-an/cong-ty-noi-that-van-phong-mien-bac",
+  "/cong-ty-noi-that-van-phong-mien-bac-uy-tin-chuyen-nghiep": "/dich-vu/thi-cong-noi-that-van-phong",
   "/xay-nha-tron-goi-ba-vi-ho-tro-24/7-cong-ty-xay-dung-uy-tin": "/du-an/xay-nha-tron-goi-ba-vi-ho-tro-20-7-cong-ty-xay-dung-uy-tin",
   "/70 -mau-biet-thu-tan-co-dien-hien-dai-dep-nha-2026": "/mau-thiet-ke-kien-truc/70-mau-biet-thu-tan-co-dien-hien-dai-dep-2026",
   "/du-an/xay-nha-tron-goi-long-bien-ha-noi": "/du-an/xay-nha-tron-goi-long-bien-ha-noi-hathanhhome",
@@ -44,7 +44,7 @@ export const legacySeoRedirects: Readonly<Record<string, string>> = {
   "/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home": "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026",
   "/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong": "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong",
   "/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
-  "/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep": "/du-an/xay-nha-tron-goi-hathanhhome-cong-ty-xay-dung-uy-tin-chuyen-nghiep",
+  "/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
   "/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home": "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi",
   "/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome": "/du-an/xay-nha-tron-goi-tai-phu-xuyen",
   "/cap-nhap-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc": "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc",
