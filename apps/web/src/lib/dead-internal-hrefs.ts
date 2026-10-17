@@ -8,7 +8,6 @@ export const deadInternalHrefPaths: ReadonlySet<string> = new Set([
   "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
   "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
   "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
-  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
   "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
   "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
   "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",

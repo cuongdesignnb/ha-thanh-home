@@ -3326,6 +3326,46 @@ h3 {
   background: var(--cream);
 }
 
+.featured-posts-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featured-posts-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 100%;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--green);
+  background: #fff;
+  font-weight: 600;
+  line-height: 1.45;
+  transition: border-color .2s ease, color .2s ease;
+}
+
+.featured-posts-list a:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.featured-posts-list svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .featured-posts-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 .related-content-section {
   border-top: 1px solid var(--line);
   background: var(--cream);
