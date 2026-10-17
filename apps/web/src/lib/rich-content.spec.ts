@@ -36,9 +36,9 @@ assert.equal(normalizeLegacyHref("/contact"), "/lien-he");
 assert.equal(normalizeLegacyHref("/100+-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026"), "/mau-thiet-ke-kien-truc/100-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026");
 for (const unresolved of [
   "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
-  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
   "/xay-nha-tron-goi-tai-ha-long",
 ]) assert.equal(normalizeLegacyHref(unresolved), unresolved);
+assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-xuam-truong-nam-dinh"), "/du-an/xay-nha-tron-goi-tai-nam-dinh");
 assert.equal(normalizeLegacyAnchors('<img src="../image.jpg"><p>"../not-a-link/"</p>'), '<img src="../image.jpg"><p>"../not-a-link/"</p>');
 assert.equal(normalizeLegacyAnchors('<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>'), '<script>const html = "<a href=\\"../not-a-link/\\">";</script><style>.x{content:"../not-a-link/"}</style>');
 assert.equal(normalizeLegacyAnchors('<a class="related" href="%27../old-post/%27">Xem</a>'), '<a class="related" href="/old-post/">Xem</a>');
@@ -171,7 +171,7 @@ assert.equal(wave6bInternalMappings.length, 36);
 for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 101);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 102);
 
 const wave6cMappedLinks: Array<[string, string]> = [
   ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
@@ -183,7 +183,7 @@ const wave6cMappedLinks: Array<[string, string]> = [
 assert.equal(wave6cMappedLinks.length, 5);
 for (const [source, target] of wave6cMappedLinks) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia"), "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 101);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 102);
 
 const wave9b1InternalMappings: Array<[string, string]> = [
   ["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
@@ -332,12 +332,11 @@ const wave6cDeadLinks = [
   "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
   "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
   "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
-  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
   "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
   "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
   "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",
 ];
-assert.equal(deadInternalHrefPaths.size, 12);
+assert.equal(deadInternalHrefPaths.size, 11);
 for (const path of wave6cDeadLinks) {
   assert.equal(deadInternalHrefPaths.has(path), true);
   assert.equal(normalizeLegacyHref(path), path);
@@ -394,12 +393,11 @@ const wave6bUnresolved = [
   "/phong-ngu-cho-con-hien-dai-day-du-tien-nghi",
   "/bao-gia-xay-nha-tron-goi-tai-xa-giao-thuy-ninh-binh",
   "/huong-cung-dong-tho-hut-sinh-khi-tai-loc",
-  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh",
   "/hathanhhouse-xay-nha-tron-go-dam-bao-chat-luong-uy-tin-8",
   "/phong-tho-nha-pho-hien-dai-tai-cau-giay-ha-noi",
   "/xay-nha-3-tang-80m2-het-bao-nhieu-tien",
 ];
-assert.equal(wave6bUnresolved.length, 12);
+assert.equal(wave6bUnresolved.length, 11);
 for (const url of wave6bUnresolved) assert.equal(normalizeLegacyHref(url), url);
 
 for (const invalid of [null, undefined, "", "  ", "null", "undefined", "NULL", "Undefined"]) assert.equal(isUsableSlug(invalid), false);

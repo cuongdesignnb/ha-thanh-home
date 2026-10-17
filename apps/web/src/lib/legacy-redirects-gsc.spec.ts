@@ -6,7 +6,7 @@ import { getGscNotFoundTarget, gscNotFoundRedirects } from "./legacy-redirects-g
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(gscNotFoundRedirects);
-assert.equal(entries.length, 186);
+assert.equal(entries.length, 187);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);
@@ -33,6 +33,7 @@ const samples: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
   ["/55+-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026", "https://hathanhhome.vn/mau-thiet-ke-kien-truc/55-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026"],
   ["/%22../co-nen-cung-dong-tho-xay-nha/%22", "https://hathanhhome.vn/tin-tuc/co-nen-cung-dong-tho-xay-nha"],
+  ["/xay-nha-tron-goi-tai-xuam-truong-nam-dinh", "https://hathanhhome.vn/du-an/xay-nha-tron-goi-tai-nam-dinh"],
   ["/xay-nha-tron-goi-tai-hai-d%C6%B0%C6%A1ng", "https://hathanhhome.vn/du-an/xay-nha-tron-goi-tai-hai-duong-cap-nhat-bao-gia-moi-nhat2026"],
 ];
 for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath), { status: 308, location });
@@ -44,7 +45,7 @@ assert.deepEqual(redirectOf("/xay-nha-tron-goi-2?p=1&filter="), {
 });
 
 // Near-miss and dead paths are untouched.
-for (const untouched of ["/xin-cap-phep-xay-dung-o-dau-5", "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh", "/xay-nha-tron-goi-tai-ha-long"]) {
+for (const untouched of ["/xin-cap-phep-xay-dung-o-dau-5", "/xay-nha-tron-goi-tai-ha-long"]) {
   assert.deepEqual(redirectOf(untouched), { status: 200, location: null });
 }
 
