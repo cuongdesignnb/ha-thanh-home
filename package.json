@@ -32,7 +32,7 @@
     "test:settings:unit": "tsx apps/api/src/modules/settings-concurrency.spec.ts && tsx apps/admin/src/lib/versioned-settings.spec.ts && tsx apps/web/src/lib/testimonial-data.spec.ts",
     "test:settings:http": "npm run build -w @hathanh/api && tsx --tsconfig apps/api/tsconfig.json scripts/test-settings-http-integration.ts",
     "test:published-at": "tsx apps/api/src/modules/publication-date.spec.ts && tsx apps/admin/src/lib/published-at-payload.spec.ts",
-    "test:seo": "tsx apps/web/src/lib/rich-content.spec.ts && tsx apps/web/src/lib/legacy-redirects-gsc.spec.ts && tsx apps/web/src/lib/content-consolidation-redirects.spec.ts && tsx apps/web/src/lib/project-page-kind.spec.ts && tsx apps/web/src/lib/preload-hero-image.spec.ts",
+    "test:seo": "tsx apps/web/src/lib/rich-content.spec.ts && tsx apps/web/src/lib/legacy-redirects-gsc.spec.ts && tsx apps/web/src/lib/content-consolidation-redirects.spec.ts && tsx apps/web/src/lib/project-page-kind.spec.ts && tsx apps/web/src/lib/preload-hero-image.spec.ts && tsx apps/web/src/lib/featured-posts.spec.ts",
     "test:portfolio:api": "tsx apps/api/src/modules/project-portfolio-eligibility.spec.ts",
     "test:portfolio:web": "tsx apps/web/src/lib/project-portfolio-selection.spec.ts",
     "test:portfolio:admin": "tsx apps/admin/src/lib/portfolio-verification.spec.ts",

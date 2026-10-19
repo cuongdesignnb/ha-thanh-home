@@ -14,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 import { ArchitectureCard, InteriorCard } from "@/components/design-templates";
+import { FeaturedPosts } from "@/components/featured-posts";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { HorizontalSliderWrapper } from "@/components/horizontal-slider-wrapper";
 import {
@@ -39,9 +40,10 @@ import { isUsableSlug } from "@/lib/content-validation";
 import { resolveTestimonialRating, shouldRenderCmsList } from "@/lib/testimonial-data";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { isLegacyRedirectSource } from "@/lib/legacy-redirects";
+import { getFeaturedPosts } from "@/lib/featured-posts";
 
 export default async function HomePage() {
-  const [data, settings, aboutPage] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig()]);
+  const [data, settings, aboutPage, featuredPosts] = await Promise.all([getHome(), getSiteSettings(), getAboutPageConfig(), getFeaturedPosts({ limit: 12 })]);
   const homepage = homepageWithDefaults(settings["site.homepage"]);
 
   const firstSlide = homepage.heroSlides?.[0] || defaultHomepage.heroSlides[0];
@@ -61,6 +63,7 @@ export default async function HomePage() {
         <ProcessAndStats homepage={homepage} />
         <Testimonials aboutPage={aboutPage} homepage={homepage} />
         <NewsSection homepage={homepage} posts={data.posts} />
+        <FeaturedPosts posts={featuredPosts} />
       </main>
       <SiteFooter />
     </>

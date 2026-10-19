@@ -3,6 +3,7 @@
  */
 export const internalCanonicalHrefTargets: Readonly<Record<string, string>> = {
   "/dich-vu-xay-nha-tron-goi-tai-ha-noi-bao-gia-minh-bach-chuyen-nghiep": "/dich-vu/xay-nha-tron-goi",
+  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
   "/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh": "/du-an/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh",
   "/xay-nha-tron-goi-la-gi-co-nen-chon-dich-vu-chia-khoa-trao-tay-khong": "/du-an/xay-nha-tron-goi-la-gi-co-nen-chon-dich-vu-chia-khoa-trao-tay-khong",
   "/quy-trinh-bao-hanh-xay-nha-tron-goi-cua-hathanhhome": "/chinh-sach-bao-hanh",

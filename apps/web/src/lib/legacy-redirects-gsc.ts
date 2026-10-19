@@ -166,6 +166,8 @@ export const gscNotFoundRedirects: Readonly<Record<string, string>> = {
   "/xay-nha-tron-goi-tai-lang-son": "/du-an/xay-nha-tron-goi-tai-lang-son-uy-tin-chuyen-nghiep",
   "/xay-nha-tron-goi-tai-nam-dinh-1": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
   "/xay-nha-tron-goi-tai-nam-dinh-uy-tin-chat-luong": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
+  // Xuân Trường is a district of Nam Định; the old page had 13 clicks in Apr–Jun 2026.
+  "/xay-nha-tron-goi-tai-xuam-truong-nam-dinh": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
   "/xay-nha-tron-goi-tai-nam-tu-liem": "/du-an/xay-nha-tron-goi-nam-tu-liem-tu-van-khao-sat-mien-phi",
   "/xay-nha-tron-goi-tai-nghe-an": "/du-an/xay-nha-tron-goi-tai-nghe-an-chat-luong-dam-bao-tien-do",
   "/xay-nha-tron-goi-tai-ninh-binh": "/du-an/xay-nha-tron-goi-tai-ninh-binh-cong-ty-xay-dung-uy-tin",

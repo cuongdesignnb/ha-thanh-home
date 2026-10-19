@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { FeaturedPosts } from "@/components/featured-posts";
 import { RelatedContent } from "@/components/related-content";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
@@ -8,6 +9,7 @@ import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 import { withTurnkeyContextLink } from "@/lib/service-context-links";
 import { getRelatedPosts } from "@/lib/related-content";
+import { getFeaturedPosts } from "@/lib/featured-posts";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -23,7 +25,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
   // Before any further await, so the hint is emitted before the document head is flushed.
   const imageUrl = await heroImageFor(thumbnailUrl(post, ""));
   preloadHeroImage(imageUrl);
-  const related = await getRelatedPosts(post);
+  const [related, featuredPosts] = await Promise.all([getRelatedPosts(post), getFeaturedPosts({ exclude: post.slug, limit: 8 })]);
 
   const schemas = [
     buildBreadcrumbSchema([
@@ -58,6 +60,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
         </article>
       </section>
       <RelatedContent items={related} title="Bài viết liên quan" />
+      <FeaturedPosts posts={featuredPosts} />
       <SiteFooter />
     </>
   );
