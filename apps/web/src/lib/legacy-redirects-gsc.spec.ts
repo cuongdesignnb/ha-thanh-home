@@ -28,7 +28,8 @@ function redirectOf(rawPath: string) {
 }
 
 const samples: Array<[string, string]> = [
-  ["/xin-cap-phep-xay-dung-o-dau-4", "https://hathanhhome.vn/tin-tuc/xin-cap-phep-xay-dung-o-dau"],
+  // The post it pointed to was merged on 2026-10-22; the old URL goes straight to the kept post.
+  ["/xin-cap-phep-xay-dung-o-dau-4", "https://hathanhhome.vn/tin-tuc/xin-giay-phep-xay-dung-can-nhung-gi"],
   ["/du-an/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome", "https://hathanhhome.vn/du-an/xay-nha-tron-goi-tai-phu-xuyen"],
   ["/bao-gia-xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
   ["/55+-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026", "https://hathanhhome.vn/mau-thiet-ke-kien-truc/55-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026"],

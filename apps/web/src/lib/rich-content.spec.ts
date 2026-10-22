@@ -144,7 +144,7 @@ const wave6bInternalMappings: Array<[string, string]> = [
   ["/nhung-dieu-can-biet-chuan-bi-le-vat-cung-dong-tho-day-du", "/tin-tuc/nhung-dieu-can-biet-chuan-bi-le-vat-cung-dong-tho-day-du"],
   ["/muon-nguoi-tren-70-tuoi-dong-tho-xay-nha-co-tot-khong", "/tin-tuc/muon-nguoi-tren-70-tuoi-dong-tho-xay-nha-co-tot-khong"],
   ["/van-khan-dong-tho-xay-nha-chuan", "/tin-tuc/van-khan-dong-tho-xay-nha-chuan"],
-  ["/cach-tinh-tuoi-lam-nha-chuan-phong-thuy", "/tin-tuc/cach-tinh-tuoi-lam-nha-chuan-phong-thuy"],
+  ["/cach-tinh-tuoi-lam-nha-chuan-phong-thuy", "/tin-tuc/cach-tinh-trach-tuoi-xay-nha-chuan-nhat"],
   ["/cach-lua-chon-nha-thau-xay-dung-uy-tin", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
   ["/chi-phi-xay-nha-2-tang-100m2-moi-nhat-nam-2026", "/tin-tuc/chi-phi-xay-nha-2-tang-100m2-moi-nhat-nam-2026"],
   ["/don-gia-xay-dung-nha-tron-goi-moi-nhat", "/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat"],
@@ -171,7 +171,7 @@ assert.equal(wave6bInternalMappings.length, 36);
 for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 102);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 96);
 
 const wave6cMappedLinks: Array<[string, string]> = [
   ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
@@ -183,7 +183,7 @@ const wave6cMappedLinks: Array<[string, string]> = [
 assert.equal(wave6cMappedLinks.length, 5);
 for (const [source, target] of wave6cMappedLinks) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia"), "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 102);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 96);
 
 const wave9b1InternalMappings: Array<[string, string]> = [
   ["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
@@ -276,15 +276,24 @@ for (const [source, target] of wave9BatchInternalMappings) {
 const wave10InternalAliasMappings: Array<[string, string]> = [
   ["/cach-tinh-trach-tuoi-xay-nha-chuan-nhat", "/tin-tuc/cach-tinh-trach-tuoi-xay-nha-chuan-nhat"],
   ["/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026", "/tin-tuc/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026"],
-  ["/du-bao-gia-vat-lieu-xay-dung-giua-nam-2026-khu-vuc-mien-bac", "/tin-tuc/du-bao-gia-vat-lieu-xay-dung-giua-nam-2026-khu-vuc-mien-bac"],
-  ["/gia-vat-lieu-xay-dung-nam-2026-khi-nao-giam-nhiet", "/tin-tuc/gia-vat-lieu-xay-dung-nam-2026-khi-nao-giam-nhiet"],
-  ["/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe", "/tin-tuc/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe"],
-  ["/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao", "/tin-tuc/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao"],
   ["/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao", "/tin-tuc/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao"],
-  ["/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung", "/tin-tuc/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung"],
   ["/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu", "/tin-tuc/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu"],
 ];
-assert.equal(wave10InternalAliasMappings.length, 9);
+assert.equal(wave10InternalAliasMappings.length, 4);
+// Merged into the kept post for the same question (blog audit 2026-10-22): the root alias is now an HTTP
+// redirect, and in-content links go straight to the kept post.
+const mergedWave10Aliases: Array<[string, string]> = [
+  ["/du-bao-gia-vat-lieu-xay-dung-giua-nam-2026-khu-vuc-mien-bac", "/tin-tuc/du-doan-ve-gia-vat-lieu-xay-dung-nua-cuoi-nam-2026"],
+  ["/gia-vat-lieu-xay-dung-nam-2026-khi-nao-giam-nhiet", "/tin-tuc/du-doan-ve-gia-vat-lieu-xay-dung-nua-cuoi-nam-2026"],
+  ["/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe", "/tin-tuc/cac-khoan-phat-sinh-khi-xay-nha-tron-goi-va-cach-kiem-soat-ngay-tu-hop-dong"],
+  ["/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao", "/tin-tuc/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao"],
+  ["/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung", "/tin-tuc/chi-phi-xay-dung-cam-nang-du-toan-kiem-soat-ngan-sach"],
+];
+for (const [source, target] of mergedWave10Aliases) {
+  assert.equal(getLegacyRedirectTarget(source), target);
+  assert.equal(normalizeLegacyHref(source), target);
+  assert.equal(internalCanonicalHrefTargets[source], undefined);
+}
 for (const [source, target] of wave10InternalAliasMappings) {
   assert.equal(internalCanonicalHrefTargets[source], target);
   assert.equal(getLegacyRedirectTarget(source), undefined);

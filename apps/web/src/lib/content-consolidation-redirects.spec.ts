@@ -10,7 +10,7 @@ import { TURNKEY_SERVICE_PATH, turnkeyContextPosts, withTurnkeyContextLink } fro
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(contentConsolidationRedirects);
-assert.equal(entries.length, 174);
+assert.equal(entries.length, 333);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);
@@ -61,6 +61,14 @@ const samples: Array<[string, string]> = [
   ["/dich-vu/xay-nha-tron-goi-mien-bac", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
   ["/thi-cong-noi-that-van-phong", "https://hathanhhome.vn/dich-vu/thi-cong-noi-that-van-phong"],
   ["/thi-cong-nha-xuong-ha-nam", "https://hathanhhome.vn/dich-vu/thi-cong-nha-xuong"],
+  // Blog audit 2026-10-22: posts answering the same question go to the kept post, with their aliases.
+  ["/tin-tuc/xay-nha-trong-ngo-co-can-xin-giay-phep-khong", "https://hathanhhome.vn/tin-tuc/cac-truong-hop-mien-giay-phep-xay-dung-nha-o-rieng-le-tu-2026"],
+  ["/xay-nha-trong-ngo-co-can-xin-giay-phep-khong", "https://hathanhhome.vn/tin-tuc/cac-truong-hop-mien-giay-phep-xay-dung-nha-o-rieng-le-tu-2026"],
+  ["/dich-vu/xay-nha-trong-ngo-co-can-xin-giay-phep-khong", "https://hathanhhome.vn/tin-tuc/cac-truong-hop-mien-giay-phep-xay-dung-nha-o-rieng-le-tu-2026"],
+  ["/tin-tuc/gia-xay-dung-nha-xuong-cong-nghiep", "https://hathanhhome.vn/tin-tuc/don-gia-xay-dung-nha-xuong-cong-nghiep"],
+  ["/tin-tuc/cach-noi-thep-cot-dung-tieu-chuan-an-toan", "https://hathanhhome.vn/tin-tuc/khoang-cach-diem-noi-cua-thep-cot-dung-tieu-chuan-an-toan"],
+  // An old URL that used to point at a merged post now goes straight to the kept post.
+  ["/xin-cap-dien-3-pha-o-dau-4", "https://hathanhhome.vn/tin-tuc/thu-tuc-xin-cap-dien-3-pha"],
 ];
 for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath), { status: 308, location });
 
@@ -78,6 +86,12 @@ for (const untouched of [
   "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi",
   "/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat",
   "/du-an/vat-lieu-thi-cong-xay-nha-tron-goi",
+  // Kept posts of the 2026-10-22 merge, and posts deliberately left alone.
+  "/tin-tuc/cac-truong-hop-mien-giay-phep-xay-dung-nha-o-rieng-le-tu-2026",
+  "/tin-tuc/thu-tuc-xin-cap-dien-3-pha",
+  "/tin-tuc/xay-nha-pho-tron-goi",
+  "/tin-tuc/xay-nha-chia-khoa-trao-tay-ha-noi",
+  "/tin-tuc/nam-1994-tuoi-giap-tuat-xay-nha-hop-huong-nao-giup-sinh-tai-loc",
 ]) {
   assert.deepEqual(redirectOf(untouched), { status: 200, location: null });
 }
@@ -90,11 +104,11 @@ assert.equal(
 
 // Turnkey contextual link.
 const contextSlugs = Object.keys(turnkeyContextPosts);
-assert.equal(contextSlugs.length, 30);
+assert.equal(contextSlugs.length, 21);
 for (const slug of contextSlugs) assert.equal(isLegacyRedirectSource(`/tin-tuc/${slug}`), false, `${slug} redirects away`);
 assert.equal(isLegacyRedirectSource(TURNKEY_SERVICE_PATH), false);
 
-const mapped = "co-nen-thue-xay-nha-tron-goi";
+const mapped = "giam-sat-thi-cong-nha-tron-goi-gia-chu-can-theo-doi-nhung-gi";
 const body = "<p>Mở bài.</p><h2>Một</h2><p>A</p><h2>Hai</h2><p>B</p>";
 const linked = withTurnkeyContextLink(mapped, body);
 assert.equal((linked.match(/href="\/dich-vu\/xay-nha-tron-goi"/g) || []).length, 1);
