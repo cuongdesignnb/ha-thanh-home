@@ -7,17 +7,19 @@ import { contentMetadata, getDetail, thumbnailUrl, type ArchitectureDesign } fro
 import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
 import { getRelatedArchitecture } from "@/lib/related-content";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
+import { redirectToCanonicalSlug } from "@/lib/canonical-slug";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
-  return contentMetadata(item, "Mẫu thiết kế kiến trúc | Hà Thành Home", `/mau-thiet-ke-kien-truc/${slug}`);
+  return contentMetadata(item, "Mẫu thiết kế kiến trúc | Hà Thành Home", `/mau-thiet-ke-kien-truc/${item?.slug ?? slug}`);
 }
 
 export default async function ArchitectureDesignDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
   if (!item) notFound();
+  redirectToCanonicalSlug(slug, item, "/mau-thiet-ke-kien-truc");
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(await heroImageFor(thumbnailUrl(item, "")));
   const related = await getRelatedArchitecture(item);

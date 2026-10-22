@@ -6,13 +6,14 @@ import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { contentMetadata, getDetail, getLegacyServiceDetail, hasMeaningfulContentHtml, type CustomPage, type Post, type Project, type ArchitectureDesign, type InteriorDesign } from "@/lib/api";
 import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildBreadcrumbSchema, buildServiceSchema } from "@/lib/seo/jsonld";
+import { redirectToCanonicalSlug } from "@/lib/canonical-slug";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   
   const page = await getDetail<CustomPage>(`/pages/${slug}`);
   if (page) {
-    return contentMetadata(page, "Trang | Hà Thành Home", `/${slug}`);
+    return contentMetadata(page, "Trang | Hà Thành Home", `/${page.slug}`);
   }
 
   const post = await getDetail<Post>(`/posts/${slug}`);
@@ -48,6 +49,7 @@ export default async function CustomPageDetailPage({ params }: { params: Promise
   
   const page = await getDetail<CustomPage>(`/pages/${slug}`);
   if (page) {
+    redirectToCanonicalSlug(slug, page, "");
     const schemas = [
       buildBreadcrumbSchema([
         { name: "Trang chủ", url: "/" },
@@ -73,25 +75,25 @@ export default async function CustomPageDetailPage({ params }: { params: Promise
   // Check if slug belongs to a blog post (tin-tuc)
   const post = await getDetail<Post>(`/posts/${slug}`);
   if (post) {
-    permanentRedirect(`/tin-tuc/${slug}`);
+    permanentRedirect(`/tin-tuc/${encodeURIComponent(post.slug)}`);
   }
 
   // Check if slug belongs to a project (du-an)
   const project = await getDetail<Project>(`/projects/${slug}`);
   if (project) {
-    permanentRedirect(`/du-an/${slug}`);
+    permanentRedirect(`/du-an/${encodeURIComponent(project.slug)}`);
   }
 
   // Check if slug belongs to an architecture design template (mau-thiet-ke-kien-truc)
   const arch = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
   if (arch) {
-    permanentRedirect(`/mau-thiet-ke-kien-truc/${slug}`);
+    permanentRedirect(`/mau-thiet-ke-kien-truc/${encodeURIComponent(arch.slug)}`);
   }
 
   // Check if slug belongs to an interior design template (mau-thiet-ke-noi-that)
   const interior = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (interior) {
-    permanentRedirect(`/mau-thiet-ke-noi-that/${slug}`);
+    permanentRedirect(`/mau-thiet-ke-noi-that/${encodeURIComponent(interior.slug)}`);
   }
 
   const legacyService = await getLegacyServiceDetail(slug);

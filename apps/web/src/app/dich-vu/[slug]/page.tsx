@@ -17,16 +17,16 @@ export default async function LegacyServiceAliasPage({ params }: { params: Promi
   const { slug } = await params;
 
   const project = await getDetail<Project>(`/projects/${slug}`);
-  if (project) permanentRedirect(`/du-an/${slug}`);
+  if (project) permanentRedirect(`/du-an/${encodeURIComponent(project.slug)}`);
 
   const post = await getDetail<Post>(`/posts/${slug}`);
-  if (post) permanentRedirect(`/tin-tuc/${slug}`);
+  if (post) permanentRedirect(`/tin-tuc/${encodeURIComponent(post.slug)}`);
 
   const arch = await getDetail<ArchitectureDesign>(`/architecture-designs/${slug}`);
-  if (arch) permanentRedirect(`/mau-thiet-ke-kien-truc/${slug}`);
+  if (arch) permanentRedirect(`/mau-thiet-ke-kien-truc/${encodeURIComponent(arch.slug)}`);
 
   const interior = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
-  if (interior) permanentRedirect(`/mau-thiet-ke-noi-that/${slug}`);
+  if (interior) permanentRedirect(`/mau-thiet-ke-noi-that/${encodeURIComponent(interior.slug)}`);
 
   const service = await getLegacyServiceDetail(slug);
   if (service && hasMeaningfulContentHtml(service.contentHtml)) {

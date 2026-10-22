@@ -10,17 +10,19 @@ import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
 import { absoluteImageUrl } from "@/lib/seo/site";
 import { getRelatedProjects } from "@/lib/related-content";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
+import { redirectToCanonicalSlug } from "@/lib/canonical-slug";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const project = await getDetail<Project>(`/projects/${slug}`);
-  return contentMetadata(project, "Dự án | Hà Thành Home", `/du-an/${slug}`);
+  return contentMetadata(project, "Dự án | Hà Thành Home", `/du-an/${project?.slug ?? slug}`);
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const project = await getDetail<Project>(`/projects/${slug}`);
   if (!project) notFound();
+  redirectToCanonicalSlug(slug, project, "/du-an");
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(await heroImageFor(thumbnailUrl(project, "")));
   const related = await getRelatedProjects(project);
