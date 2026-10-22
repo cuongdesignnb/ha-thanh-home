@@ -7,17 +7,19 @@ import { contentMetadata, getDetail, thumbnailUrl, type InteriorDesign } from "@
 import { buildBreadcrumbSchema, buildWebPageSchema, buildImageObjectSchema } from "@/lib/seo/jsonld";
 import { getRelatedInterior } from "@/lib/related-content";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
+import { redirectToCanonicalSlug } from "@/lib/canonical-slug";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
-  return contentMetadata(item, "Mẫu thiết kế nội thất | Hà Thành Home", `/mau-thiet-ke-noi-that/${slug}`);
+  return contentMetadata(item, "Mẫu thiết kế nội thất | Hà Thành Home", `/mau-thiet-ke-noi-that/${item?.slug ?? slug}`);
 }
 
 export default async function InteriorDesignDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getDetail<InteriorDesign>(`/interior-designs/${slug}`);
   if (!item) notFound();
+  redirectToCanonicalSlug(slug, item, "/mau-thiet-ke-noi-that");
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(await heroImageFor(thumbnailUrl(item, "")));
   const related = await getRelatedInterior(item);
