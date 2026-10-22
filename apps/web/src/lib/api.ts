@@ -768,8 +768,30 @@ export async function getListPayload<T>(path: string): Promise<{ data: T[]; meta
   return { ...payload, data: (payload.data || []).map(withDisplayTitles) };
 }
 
+export class ApiUnavailableError extends Error {}
+
+/**
+ * Detail fetch that tells "no such record" (API 4xx → null → notFound) apart from "API not answering".
+ * Treating an outage as not-found made every detail page a noindex 404 while the API container restarted
+ * during a deploy; Googlebot crawled two posts in that window on 2026-10-19 and dropped them as noindex.
+ * An outage now throws after one retry, so the page fails with a 5xx that Google retries later.
+ */
+async function fetchDetailJson<T>(path: string): Promise<T | null> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const response = await fetch(`${apiBase()}${path}`, { next: { revalidate: 60 } });
+      if (response.ok) return (await response.json()) as T;
+      if (response.status < 500) return null;
+    } catch {
+      // Connection refused or reset: the API is restarting or unreachable.
+    }
+    if (attempt >= 1) throw new ApiUnavailableError(`API unavailable for ${path}`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
+
 export async function getDetail<T>(path: string): Promise<T | null> {
-  return withDisplayTitles(await fetchJson<T | null>(path, null));
+  return withDisplayTitles(await fetchDetailJson<T>(path));
 }
 
 export async function getLegacyServiceDetail(slug: string) {
