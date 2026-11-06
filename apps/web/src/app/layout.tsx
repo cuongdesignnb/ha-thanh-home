@@ -68,6 +68,8 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   alternates: { canonical: siteConfig.url },
+  // Bing Webmaster Tools site verification.
+  verification: { other: { "msvalidate.01": "09B32C5267B05FAD46B604B5782CE8BF" } },
 };
 
 export const dynamic = "force-dynamic";
