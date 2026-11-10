@@ -9,6 +9,7 @@ import { prepareDetailHtml } from "@/lib/rich-content";
 import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 import { withTurnkeyContextLink } from "@/lib/service-context-links";
 import { withBirthYearHubLink } from "@/lib/birth-year-hub-link";
+import { withBuildingYear2027 } from "@/lib/building-year-2027";
 import { getRelatedPosts } from "@/lib/related-content";
 import { getFeaturedPosts } from "@/lib/featured-posts";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
@@ -59,7 +60,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
       </section>
       <section className="section">
         <article className="detail-content">
-          <div dangerouslySetInnerHTML={{ __html: prepareDetailHtml(withBirthYearHubLink(post.slug, withTurnkeyContextLink(post.slug, post.contentHtml || `<p>${post.excerpt || "Nội dung bài viết đang được cập nhật."}</p>`))) }} />
+          <div dangerouslySetInnerHTML={{ __html: prepareDetailHtml(withBuildingYear2027(post.slug, withBirthYearHubLink(post.slug, withTurnkeyContextLink(post.slug, post.contentHtml || `<p>${post.excerpt || "Nội dung bài viết đang được cập nhật."}</p>`)))) }} />
         </article>
       </section>
       <RelatedContent items={related} title="Bài viết liên quan" />
