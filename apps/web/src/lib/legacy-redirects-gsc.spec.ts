@@ -31,7 +31,8 @@ const samples: Array<[string, string]> = [
   // The post it pointed to was merged on 2026-10-22; the old URL goes straight to the kept post.
   ["/xin-cap-phep-xay-dung-o-dau-4", "https://hathanhhome.vn/tin-tuc/xin-giay-phep-xay-dung-can-nhung-gi"],
   ["/du-an/xay-nha-tron-goi-tai-phu-xuyen-hathanhhome", "https://hathanhhome.vn/du-an/xay-nha-tron-goi-tai-phu-xuyen"],
-  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
+  // Its /du-an target was merged into the service page on 2026-11-16; still one hop.
+  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
   ["/55+-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026", "https://hathanhhome.vn/mau-thiet-ke-kien-truc/55-mau-biet-thu-san-vuon-mai-nhat-duoc-ua-chuong-2026"],
   ["/%22../co-nen-cung-dong-tho-xay-nha/%22", "https://hathanhhome.vn/tin-tuc/co-nen-cung-dong-tho-xay-nha"],
   ["/xay-nha-tron-goi-tai-xuam-truong-nam-dinh", "https://hathanhhome.vn/du-an/xay-nha-tron-goi-tai-nam-dinh"],
