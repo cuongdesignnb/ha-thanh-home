@@ -10,7 +10,7 @@ import { TURNKEY_SERVICE_PATH, turnkeyContextPosts, withTurnkeyContextLink } fro
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(contentConsolidationRedirects);
-assert.equal(entries.length, 333);
+assert.equal(entries.length, 380);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);
@@ -69,6 +69,16 @@ const samples: Array<[string, string]> = [
   ["/tin-tuc/cach-noi-thep-cot-dung-tieu-chuan-an-toan", "https://hathanhhome.vn/tin-tuc/khoang-cach-diem-noi-cua-thep-cot-dung-tieu-chuan-an-toan"],
   // An old URL that used to point at a merged post now goes straight to the kept post.
   ["/xin-cap-dien-3-pha-o-dau-4", "https://hathanhhome.vn/tin-tuc/thu-tuc-xin-cap-dien-3-pha"],
+  // Turnkey pricing cluster (2026-11-16): sources, their aliases, and older URLs that pointed at them.
+  ["/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/dich-vu/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/bao-gia-xay-nha-tron-goi-moi-nhat-2026", "https://hathanhhome.vn/dich-vu/xay-nha-tron-goi"],
+  ["/tin-tuc/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026-cach-tinh-chi-tiet-theo-m2", "https://hathanhhome.vn/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat"],
+  ["/xay-nha-tron-goi-bao-nhieu-tien-1m2", "https://hathanhhome.vn/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat"],
+  ["/du-an/xay-nha-tron-goi-ha-noi-gom-nhung-gi", "https://hathanhhome.vn/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that"],
+  ["/du-an/vat-lieu-thi-cong-xay-nha-tron-goi", "https://hathanhhome.vn/tin-tuc/bang-vat-tu-xay-nha-tron-goi-cach-kiem-tra-truoc-khi-ky-hop-dong"],
+  ["/dich-vu/mau-hop-dong-xay-nha-tron-goi-chi-tiet-chuan-phap-ly", "https://hathanhhome.vn/tin-tuc/hop-dong-xay-nha-tron-goi-khong-phat-sinh-12-dieu-khoan-gia-chu-phai-kiem-tra"],
 ];
 for (const [rawPath, location] of samples) assert.deepEqual(redirectOf(rawPath), { status: 308, location });
 
@@ -85,7 +95,13 @@ for (const untouched of [
   "/du-an/cong-ty-xay-dung-nha-uy-tin-ha-thanh-hathanhhome",
   "/du-an/cong-ty-xay-dung-nha-o-uy-tin-ha-noi",
   "/tin-tuc/don-gia-xay-dung-nha-tron-goi-moi-nhat",
-  "/du-an/vat-lieu-thi-cong-xay-nha-tron-goi",
+  // Kept pages of the 2026-11-16 turnkey pricing merge, and same-cluster pages deliberately left alone.
+  "/tin-tuc/bang-vat-tu-xay-nha-tron-goi-cach-kiem-tra-truoc-khi-ky-hop-dong",
+  "/tin-tuc/xay-nha-phan-tho-va-tron-goi-khac-nhau-the-nao-nen-chon-goi-nao",
+  "/tin-tuc/hop-dong-xay-nha-tron-goi-khong-phat-sinh-12-dieu-khoan-gia-chu-phai-kiem-tra",
+  "/du-an/bao-gia-xay-nha-tron-goi-lien-ke-nam-2026",
+  "/du-an/xay-nha-tron-goi-phan-tho-uy-tin-chuyen-nghiep",
+  "/tin-tuc/bao-gia-xay-dung-nha-pho",
   // Kept posts of the 2026-10-22 merge, and posts deliberately left alone.
   "/tin-tuc/cac-truong-hop-mien-giay-phep-xay-dung-nha-o-rieng-le-tu-2026",
   "/tin-tuc/thu-tuc-xin-cap-dien-3-pha",
@@ -104,7 +120,7 @@ assert.equal(
 
 // Turnkey contextual link.
 const contextSlugs = Object.keys(turnkeyContextPosts);
-assert.equal(contextSlugs.length, 21);
+assert.equal(contextSlugs.length, 17);
 for (const slug of contextSlugs) assert.equal(isLegacyRedirectSource(`/tin-tuc/${slug}`), false, `${slug} redirects away`);
 assert.equal(isLegacyRedirectSource(TURNKEY_SERVICE_PATH), false);
 

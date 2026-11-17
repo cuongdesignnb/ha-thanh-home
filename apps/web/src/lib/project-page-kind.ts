@@ -72,13 +72,7 @@ export const nonPortfolioProjectPages: Readonly<Record<string, ProjectPageInfo>>
   "xay-nha-tron-goi-vinh-phuc-bao-gia-chi-tiet-2026": area("Vĩnh Phúc"),
 
   // Pricing pages.
-  "bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chon-nha-thau-uy-tin": pricing(),
-  "bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong": pricing(),
-  "bao-gia-xay-nha-tron-goi-tai-ha-noi-2026": pricing("xay-nha-tron-goi", "Hà Nội"),
   "bao-gia-xay-nha-tron-goi-lien-ke-nam-2026": pricing(),
-  "xay-nha-tron-goi-bao-nhieu-tien-1m2": pricing(),
-  "cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh": pricing(),
-  "cach-tinh-don-gia-xay-dung-theo-m2-chinh-xac-nhat": pricing(),
   "bao-gia-hoan-thien-nha-xay-tho-2026": pricing(),
   "bao-gia-thiet-ke-nha-2026": pricing(),
   "bao-gia-xay-nha-tron-goi-son-tay-ha-noi": pricing("xay-nha-tron-goi", "Sơn Tây, Hà Nội"),
@@ -108,11 +102,7 @@ export const nonPortfolioProjectPages: Readonly<Record<string, ProjectPageInfo>>
   "nhung-luu-y-khi-xay-nha-tron-goi-tai-quang-ninh-kinh-nghiem-thi-cong": guide("xay-nha-tron-goi", "Quảng Ninh"),
   "nhung-dieu-can-biet-khi-xay-nha-tai-nam-dinh-khi-hau-tho-nhuong-dia-chat-khu-vuc": guide("xay-nha-tron-goi", "Nam Định"),
   "kinh-nghiem-xay-nha-pho-o-ha-noi-can-luu-y-nhung-gi": guide("xay-nha-tron-goi", "Hà Nội"),
-  "mau-hop-dong-xay-nha-tron-goi-chi-tiet-chuan-phap-ly": guide(),
   "top-sai-lam-khien-chi-phi-xay-nha-vuot-du-toan": guide(),
-  "vat-lieu-thi-cong-xay-nha-tron-goi": guide(),
-  "xay-nha-tron-goi-ha-noi-gom-nhung-gi": guide("xay-nha-tron-goi", "Hà Nội"),
-  "xay-nha-tron-goi-la-gi-co-nen-chon-dich-vu-chia-khoa-trao-tay-khong": guide(),
   "mau-nha-xuong-dep": guide("thi-cong-nha-xuong"),
 };
 

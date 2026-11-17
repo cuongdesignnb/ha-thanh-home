@@ -31,7 +31,7 @@ assert.equal(normalizeLegacyHref("https://example.com/a"), "https://example.com/
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/tin-tuc?x=1#top"), "https://hathanhhome.vn/tin-tuc?x=1#top");
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome"), "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet");
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome?utm_source=internal#section"), "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet?utm_source=internal#section");
-assert.equal(normalizeLegacyHref("/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh"), "/du-an/cach-tinh-chi-phi-xay-nha-tron-goi-khong-phat-sinh");
+assert.equal(normalizeLegacyHref("/tin-tuc/cac-khoan-phat-sinh-khi-xay-nha-tron-goi-va-cach-kiem-soat-ngay-tu-hop-dong"), "/tin-tuc/cac-khoan-phat-sinh-khi-xay-nha-tron-goi-va-cach-kiem-soat-ngay-tu-hop-dong");
 assert.equal(normalizeLegacyHref("/contact"), "/lien-he");
 assert.equal(normalizeLegacyHref("/100+-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026"), "/mau-thiet-ke-kien-truc/100-mau-biet-thu-hien-dai-sang-trong-xu-huong-2026");
 for (const unresolved of [
@@ -131,7 +131,7 @@ assert.equal(legacySlugComparisonKey("xay-nha-tron-goi-ba-vi-ho-tro-24/7"), lega
 
 const wave6bInternalMappings: Array<[string, string]> = [
   ["/xin-cap-nuoc-sach-tai-dau", "/tin-tuc/xin-cap-nuoc-sach-tai-dau"],
-  ["/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi", "/tin-tuc/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi"],
+  ["/bao-gia-xay-nha-tron-goi-bao-gom-nhung-gi", "/tin-tuc/xay-nha-tron-goi-tu-mong-den-noi-that"],
   ["/co-nen-cung-dong-tho-xay-nha", "/tin-tuc/co-nen-cung-dong-tho-xay-nha"],
   ["/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an", "/tin-tuc/cach-hoa-giai-han-tam-tai-khi-xay-nha-duoc-binh-an"],
   ["/cach-tinh-chi-phi-xay-nha-chinh-xac-nhat-hien-nay", "/tin-tuc/cach-tinh-chi-phi-xay-nha-tranh-phat-sinh"],
@@ -171,7 +171,7 @@ assert.equal(wave6bInternalMappings.length, 36);
 for (const [source, target] of wave6bInternalMappings) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq"), "/tin-tuc/xin-cap-nuoc-sach-tai-dau?utm_source=internal#faq");
 assert.equal(normalizeLegacyHref("https://www.hathanhhome.vn/xin-cap-nuoc-sach-tai-dau"), "https://hathanhhome.vn/tin-tuc/xin-cap-nuoc-sach-tai-dau");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 96);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 88);
 
 const wave6cMappedLinks: Array<[string, string]> = [
   ["/xay-nha-tron-goi-tai-tay-ho", "/du-an/xay-nha-tron-goi-tay-ho-bao-gia-chi-tiet-minh-bach"],
@@ -183,7 +183,7 @@ const wave6cMappedLinks: Array<[string, string]> = [
 assert.equal(wave6cMappedLinks.length, 5);
 for (const [source, target] of wave6cMappedLinks) assert.equal(normalizeLegacyHref(source), target);
 assert.equal(normalizeLegacyHref("/xay-nha-tron-goi-tai-bac-giang?utm_source=internal#bao-gia"), "/du-an/xay-nha-tron-goi-tai-bac-giang-cong-ty-xay-nha-tron-goi-uy-tin?utm_source=internal#bao-gia");
-assert.equal(Object.keys(internalCanonicalHrefTargets).length, 96);
+assert.equal(Object.keys(internalCanonicalHrefTargets).length, 88);
 
 const wave9b1InternalMappings: Array<[string, string]> = [
   ["/cach-lua-chon-nha-thau-xay-dung-uy-tin-4", "/tin-tuc/cach-lua-chon-nha-thau-xay-dung-uy-tin"],
@@ -233,7 +233,7 @@ for (const [source, target] of wave9b1InternalMappings) {
 const wave9BatchInternalMappings: Array<[string, string]> = [
   ["/xay-nha-tron-goi", "/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet-nhat-hathanhhome", "/du-an/xay-nha-tron-goi-o-hoang-mai-bao-gia-chi-tiet"],
-  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home", "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
+  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home", "/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-tron-goi-dong-da-bao-hanh-dai-han-hathanhhome", "/du-an/xay-nha-tron-goi-dong-da-bao-hanh-dai-han"],
   ["/xay-nha-tron-goi-tai-hoa-lac", "/du-an/xay-nha-tron-goi-o-hoa-lac-khao-sat-mien-phi"],
 ];
@@ -277,9 +277,8 @@ const wave10InternalAliasMappings: Array<[string, string]> = [
   ["/cach-tinh-trach-tuoi-xay-nha-chuan-nhat", "/tin-tuc/cach-tinh-trach-tuoi-xay-nha-chuan-nhat"],
   ["/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026", "/tin-tuc/cap-nhat-kinh-nghiem-lam-mong-nha-dung-ky-thuat-2026"],
   ["/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao", "/tin-tuc/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao"],
-  ["/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu", "/tin-tuc/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu"],
 ];
-assert.equal(wave10InternalAliasMappings.length, 4);
+assert.equal(wave10InternalAliasMappings.length, 3);
 // Merged into the kept post for the same question (blog audit 2026-10-22): the root alias is now an HTTP
 // redirect, and in-content links go straight to the kept post.
 const mergedWave10Aliases: Array<[string, string]> = [
@@ -288,6 +287,8 @@ const mergedWave10Aliases: Array<[string, string]> = [
   ["/kinh-nghiem-xay-nha-tron-goi-khong-phat-sinh-bi-quyet-tu-nguoi-trong-nghe", "/tin-tuc/cac-khoan-phat-sinh-khi-xay-nha-tron-goi-va-cach-kiem-soat-ngay-tu-hop-dong"],
   ["/meo-lam-nha-tiet-kiem-luc-gia-vat-lieu-tang-cao", "/tin-tuc/nhung-dieu-can-biet-khi-xay-nha-luc-vat-lieu-tang-cao"],
   ["/nhung-yeu-to-anh-huong-den-chi-phi-xay-dung", "/tin-tuc/chi-phi-xay-dung-cam-nang-du-toan-kiem-soat-ngan-sach"],
+  // Turnkey pricing cluster merge (2026-11-16).
+  ["/xay-nha-tron-goi-nha-pho-giai-phap-toi-uu-cong-nang-va-chi-phi-cho-gia-chu", "/tin-tuc/xay-nha-pho-tron-goi"],
 ];
 for (const [source, target] of mergedWave10Aliases) {
   assert.equal(getLegacyRedirectTarget(source), target);
@@ -416,7 +417,7 @@ assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi"), "/dich-vu/xay-nha-tro
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-ha-noi"), "/dich-vu/xay-nha-tron-goi");
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-quan-hai-ba-trung"), "/du-an/xay-nha-tron-goi-hai-ba-trung-hathanhhome");
 assert.equal(getLegacyRedirectTarget("/bao-gia-xay-nha-tai-quan-hoan-kiem"), "/du-an/xay-nha-tron-goi-phuong-hoan-kiem-hathanhhome");
-assert.equal(getLegacyRedirectTarget("/bao-gia-xay-dung-nha-tron-goi-gia-re"), "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026");
+assert.equal(getLegacyRedirectTarget("/bao-gia-xay-dung-nha-tron-goi-gia-re"), "/dich-vu/xay-nha-tron-goi");
 assert.equal(getLegacyRedirectTarget("/noi-that-phong-ngu"), "/mau-thiet-ke-noi-that/mau-phong-ngu-dep-am-cung-va-hien-dai");
 const gscRedirects: Array<[string, string]> = [
   ["/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-hathanhhome", "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi"],
@@ -484,7 +485,7 @@ const wave5bRedirects: Array<[string, string]> = [
   ["/xay-nha-tron-goi-tai-dong-anh-don-vi-thi-cong-chuyen-nghiep-ha-thanh-home", "/du-an/xay-nha-tron-goi-dong-anh-don-vi-thi-cong-chuyen-nghiep"],
   ["/xat-nha-tron-goi-tai-phuc-tho-cap-nhap-bao-gia-moi-nhat-hien-nay", "/du-an/xay-nha-tron-goi-phuc-tho-cap-nhat-bao-gia-nam-2026"],
   ["/xay-nha-tron-goi-tai-nam-dinh-cap-nhat-bao-gia-moi-nhat-2026", "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc"],
-  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home", "/du-an/bao-gia-xay-nha-tron-goi-tai-ha-noi-2026"],
+  ["/bao-gia-xay-nha-tron-goi-tai-ha-noi-minh-bach-ha-thanh-home", "/dich-vu/xay-nha-tron-goi"],
 ];
 for (const [source, target] of wave5bRedirects) assert.equal(getLegacyRedirectTarget(source), target);
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-random"), undefined);
@@ -494,7 +495,7 @@ assert.equal(getLegacyRedirectTarget("/bao-gia-xay-nha-tai-tien-du-random"), und
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-dong-da-random"), undefined);
 assert.equal(getLegacyRedirectTarget("/xay-nha-tron-goi-tai-nam-dinh-random"), undefined);
 const wave7cRedirects: Array<[string, string]> = [
-  ["/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong", "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong"],
+  ["/bao-gia-xay-nha-tron-goi-ha-thanh-home-uy-tin-chat-luong", "/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-tron-goi-tai-son-tay-cam-ket-chuan-tien-do", "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do"],
   ["/xay-nha-tron-goi-ha-thanh-home-uy-tin-chuyen-nghiep", "/dich-vu/xay-nha-tron-goi"],
   ["/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi-ha-thanh-home", "/du-an/xay-nha-tron-goi-tai-xa-an-khanh-ha-noi"],
@@ -509,9 +510,9 @@ for (const [source, target] of wave7cRedirects) {
 }
 const wave8aGscProvenRedirects: Array<[string, string]> = [
   ["/bao-gia-xay-nha-tai-phuong-hoanh-bo-quang-ninh", "/du-an/bao-gia-xay-nha-tron-goi-tai-phuong-hoanh-bo-quang-ninh"],
-  ["/bao-gia-xay-nha-tron-goi-hathanhhome", "/du-an/bao-gia-xay-nha-tron-goi-hathanhhome-uy-tin-chat-luong"],
-  ["/bao-gia-xay-nha-tron-goi-nam-2026", "/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu"],
-  ["/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan", "/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan-cho-gia-chu"],
+  ["/bao-gia-xay-nha-tron-goi-hathanhhome", "/dich-vu/xay-nha-tron-goi"],
+  ["/bao-gia-xay-nha-tron-goi-nam-2026", "/dich-vu/xay-nha-tron-goi"],
+  ["/bao-gia-xay-nha-tron-goi-nam-2026-cach-tinh-chi-phi-chuan", "/dich-vu/xay-nha-tron-goi"],
   ["/bao-gia-xay-nha-tron-goi-tai-phuong-ngo-quyen-hai-phong", "/du-an/bao-gia-xay-nha-tron-goi-2026-phuong-ngo-quyen-hai-phong"],
   ["/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi", "/bao-gia-xay-nha-tron-goi-tai-thuong-tin-ha-noi-khong-phat-sinh-chi-phi"],
   ["/contact", "/lien-he"],
