@@ -1,5 +1,6 @@
 import {
   cardImageUrl,
+  getDetail,
   getList,
   type ArchitectureDesign,
   type InteriorDesign,
@@ -10,6 +11,28 @@ import {
 import type { RelatedContentItem } from "@/components/related-content";
 import { isUsableSlug } from "@/lib/content-validation";
 import { selectVerifiedRelatedProjects } from "@/lib/project-portfolio-selection";
+import { areaForProject, projectsForArea } from "@/lib/area-projects";
+
+/** Fetch published projects by slug; a missing or failing one is skipped so the page still renders. */
+async function projectCards(slugs: readonly string[], label: string): Promise<RelatedContentItem[]> {
+  const projects = await Promise.all(slugs.map((slug) => getDetail<Project>(`/projects/${slug}`).catch(() => null)));
+  return projects
+    .filter((project): project is Project => Boolean(project?.slug))
+    .map((project) => ({
+      id: project.id, title: project.title, href: `/du-an/${project.slug}`, imageUrl: cardImageUrl(project, ""), label, description: project.description,
+    }));
+}
+
+/** Real projects built in the area of an area landing page. */
+export function getAreaProjects(areaSlug: string): Promise<RelatedContentItem[]> {
+  return projectCards(projectsForArea(areaSlug), "Công trình thực tế");
+}
+
+/** The area landing for a real project's location, as a single related card. */
+export function getProjectAreaLanding(projectSlug: string): Promise<RelatedContentItem[]> {
+  const area = areaForProject(projectSlug);
+  return area ? projectCards([area], "Dịch vụ tại khu vực") : Promise.resolve([]);
+}
 
 function query(path: string, params: Record<string, string | number | null | undefined>) {
   const search = new URLSearchParams();
