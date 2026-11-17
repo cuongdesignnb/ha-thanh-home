@@ -8,7 +8,7 @@ import { contentMetadata, getDetail, thumbnailUrl, type Project } from "@/lib/ap
 import { buildBreadcrumbSchema, buildProjectSchema, buildImageObjectSchema, buildServiceSchema, buildWebPageSchema } from "@/lib/seo/jsonld";
 import { getProjectPageInfo, parentServices } from "@/lib/project-page-kind";
 import { absoluteImageUrl } from "@/lib/seo/site";
-import { getRelatedProjects } from "@/lib/related-content";
+import { getAreaProjects, getProjectAreaLanding, getRelatedProjects } from "@/lib/related-content";
 import { heroImageFor, preloadHeroImage } from "@/lib/preload-hero-image";
 import { redirectToCanonicalSlug } from "@/lib/canonical-slug";
 
@@ -25,11 +25,16 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   redirectToCanonicalSlug(slug, project, "/du-an");
   // Before any further await, so the hint is emitted before the document head is flushed.
   preloadHeroImage(await heroImageFor(thumbnailUrl(project, "")));
-  const related = await getRelatedProjects(project);
+  const pageInfo = getProjectPageInfo(project.slug);
+  // Area landings show the real projects built there; real projects link back to their area landing.
+  const [relatedAll, localProof] = await Promise.all([
+    getRelatedProjects(project),
+    pageInfo ? getAreaProjects(project.slug) : getProjectAreaLanding(project.slug),
+  ]);
+  const related = relatedAll.filter((item) => !localProof.some((proof) => proof.href === item.href));
 
   const imageUrl = thumbnailUrl(project, "");
   const pageUrl = `/du-an/${project.slug}`;
-  const pageInfo = getProjectPageInfo(project.slug);
   const parent = pageInfo ? parentServices[pageInfo.parent] : undefined;
   const schemas = pageInfo && parent
     ? [
@@ -65,6 +70,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       <SiteHeader />
       <JsonLd data={schemas} />
       <ProjectDetail project={project} />
+      {localProof.length ? (
+        <RelatedContent
+          items={localProof}
+          title={pageInfo ? `Công trình Hà Thành Home đã thi công tại ${pageInfo.region}` : "Dịch vụ xây nhà trọn gói tại khu vực này"}
+        />
+      ) : null}
       <RelatedContent items={related} title={pageInfo ? "Có thể bạn quan tâm" : "Dự án liên quan"} />
       <SiteFooter />
     </>

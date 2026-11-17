@@ -435,4 +435,22 @@ export const contentConsolidationRedirects: Readonly<Record<string, string>> = {
   "/du-an/vat-lieu-thi-cong-xay-nha-tron-goi": "/tin-tuc/bang-vat-tu-xay-nha-tron-goi-cach-kiem-tra-truoc-khi-ky-hop-dong",
   "/vat-lieu-thi-cong-xay-nha-tron-goi": "/tin-tuc/bang-vat-tu-xay-nha-tron-goi-cach-kiem-tra-truoc-khi-ky-hop-dong",
   "/dich-vu/vat-lieu-thi-cong-xay-nha-tron-goi": "/tin-tuc/bang-vat-tu-xay-nha-tron-goi-cach-kiem-tra-truoc-khi-ky-hop-dong",
+
+  /*
+   * Area landings (2026-11-17, owner-approved docs/seo/ra-soat-trang-khu-vuc-11-2026.md). Area pages are kept
+   * (distinct text, 20% of all clicks before 2026-07-15); only pages for the very same area are merged, into
+   * the one with more clicks or the better position, plus a Lương Sơn page that never had an impression.
+   */
+  "/du-an/bao-gia-xay-nha-tron-goi-son-tay-ha-noi": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
+  "/bao-gia-xay-nha-tron-goi-son-tay-ha-noi": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
+  "/dich-vu/bao-gia-xay-nha-tron-goi-son-tay-ha-noi": "/du-an/xay-nha-tron-goi-son-tay-cam-ket-chuan-tien-do",
+  "/du-an/xay-nha-tron-goi-tai-ninh-binh-cong-ty-xay-dung-uy-tin": "/du-an/bao-gia-xay-nha-tron-goi-tai-ninh-binh-nam-2026",
+  "/xay-nha-tron-goi-tai-ninh-binh-cong-ty-xay-dung-uy-tin": "/du-an/bao-gia-xay-nha-tron-goi-tai-ninh-binh-nam-2026",
+  "/dich-vu/xay-nha-tron-goi-tai-ninh-binh-cong-ty-xay-dung-uy-tin": "/du-an/bao-gia-xay-nha-tron-goi-tai-ninh-binh-nam-2026",
+  "/du-an/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
+  "/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
+  "/dich-vu/cap-nhat-bao-gia-xay-nha-tron-goi-tai-nam-dinh-2026-chi-tiet-tung-hang-muc": "/du-an/xay-nha-tron-goi-tai-nam-dinh",
+  "/du-an/xay-nha-tron-goi-tai-luong-son-phu-tho": "/du-an/xay-nha-tron-goi-tai-hoa-binh-bao-gia-canh-tranh",
+  "/xay-nha-tron-goi-tai-luong-son-phu-tho": "/du-an/xay-nha-tron-goi-tai-hoa-binh-bao-gia-canh-tranh",
+  "/dich-vu/xay-nha-tron-goi-tai-luong-son-phu-tho": "/du-an/xay-nha-tron-goi-tai-hoa-binh-bao-gia-canh-tranh",
 };

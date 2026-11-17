@@ -10,7 +10,7 @@ import { TURNKEY_SERVICE_PATH, turnkeyContextPosts, withTurnkeyContextLink } fro
 import { getMalformedLegacyTarget, proxy } from "../proxy";
 
 const entries = Object.entries(contentConsolidationRedirects);
-assert.equal(entries.length, 380);
+assert.equal(entries.length, 392);
 
 for (const [source, target] of entries) {
   assert.ok(source.startsWith("/") && target.startsWith("/"), `${source} -> ${target} must be root-relative`);

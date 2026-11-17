@@ -4,7 +4,7 @@ import { getGscNotFoundTarget } from "./legacy-redirects-gsc";
 import { areaLandingsFor, getProjectPageInfo, nonPortfolioProjectPages, parentServices } from "./project-page-kind";
 
 const entries = Object.entries(nonPortfolioProjectPages);
-assert.equal(entries.length, 72);
+assert.equal(entries.length, 68);
 
 for (const [slug, info] of entries) {
   assert.ok(/^[a-z0-9-]+$/.test(slug), `${slug} must be a bare slug`);
@@ -16,7 +16,7 @@ for (const [slug, info] of entries) {
 }
 
 const kinds = entries.reduce<Record<string, number>>((acc, [, info]) => ({ ...acc, [info.kind]: (acc[info.kind] || 0) + 1 }), {});
-assert.deepEqual(kinds, { area: 44, pricing: 15, service: 7, guide: 6 });
+assert.deepEqual(kinds, { area: 42, pricing: 13, service: 7, guide: 6 });
 
 // Real projects are not in the table and keep the project template.
 for (const project of [
@@ -31,7 +31,7 @@ assert.equal(getProjectPageInfo(undefined), undefined);
 assert.deepEqual(getProjectPageInfo("xay-nha-tron-goi-cau-giay"), { kind: "area", parent: "xay-nha-tron-goi", region: "Cầu Giấy, Hà Nội" });
 
 const areas = areaLandingsFor("xay-nha-tron-goi");
-assert.equal(areas.length, 44);
+assert.equal(areas.length, 42);
 assert.equal(areas.filter((area) => area.region.endsWith("Hà Nội")).length, 27);
 assert.equal(areaLandingsFor("thi-cong-nha-xuong").length, 0);
 
